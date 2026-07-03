@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createApp } from "@/lib/api"
+import { getErrorMessage } from "@/lib/engine/errors"
 import { toast } from "sonner"
 
 function slugify(name: string) {
@@ -37,8 +38,8 @@ export default function NewAppPage() {
       const app = await createApp(name.trim(), slug.trim() || slugify(name))
       toast.success("App created — generate a sandbox key next")
       router.replace(`/apps/${app.id}/keys`)
-    } catch {
-      toast.error("Failed to create app")
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to create app"))
     } finally {
       setIsLoading(false)
     }

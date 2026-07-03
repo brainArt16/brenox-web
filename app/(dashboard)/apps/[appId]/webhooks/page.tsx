@@ -33,6 +33,7 @@ import { DocLinkCard } from "@/components/shared/doc-link-card"
 import { getApp, getWebhooks, createWebhook, deleteWebhook } from "@/lib/api"
 import { WEBHOOK_EVENTS } from "@/lib/mock-data"
 import type { App, Webhook as WebhookType } from "@/lib/types"
+import { getErrorMessage } from "@/lib/engine/errors"
 import { toast } from "sonner"
 
 export default function AppWebhooksPage() {
@@ -84,17 +85,21 @@ export default function AppWebhooksPage() {
       setUrl("")
       load()
       toast.success("Webhook created")
-    } catch {
-      toast.error("Failed to create webhook")
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to create webhook"))
     } finally {
       setCreating(false)
     }
   }
 
   async function handleDelete(id: number) {
-    await deleteWebhook(id)
-    toast.success("Webhook removed")
-    load()
+    try {
+      await deleteWebhook(appId, id)
+      toast.success("Webhook removed")
+      load()
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to remove webhook"))
+    }
   }
 
   if (loading) return <Skeleton className="h-64 w-full rounded-xl" />

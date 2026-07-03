@@ -42,6 +42,7 @@ import { SecretRevealDialog } from "@/components/shared/secret-reveal-dialog"
 import { DocLinkCard } from "@/components/shared/doc-link-card"
 import { getApp, getApiKeys, createApiKey, revokeApiKey } from "@/lib/api"
 import type { ApiKey, ApiKeyCreated, App } from "@/lib/types"
+import { getErrorMessage } from "@/lib/engine/errors"
 import { toast } from "sonner"
 
 export default function AppKeysPage() {
@@ -78,8 +79,8 @@ export default function AppKeysPage() {
       setDialogOpen(false)
       setKeyName("")
       load()
-    } catch {
-      toast.error("Failed to create key")
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to create key"))
     } finally {
       setCreating(false)
     }
@@ -87,7 +88,7 @@ export default function AppKeysPage() {
 
   async function handleRevoke() {
     if (!revokeId) return
-    await revokeApiKey(revokeId)
+    await revokeApiKey(appId, revokeId)
     toast.success("Key revoked")
     setRevokeId(null)
     load()

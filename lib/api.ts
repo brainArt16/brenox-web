@@ -1,7 +1,18 @@
 import type { UserProfile, App, ApiKey, ApiKeyCreated, Webhook, WorkspaceListItem, Channel, MessageListItem, WorkspaceMember, Notification } from './types'
-import { mockUser, mockApps, mockApiKeys, mockWebhooks, mockWorkspaces, mockChannels, mockMessages, mockMembers, mockNotifications } from './mock-data'
+import { mockUser, mockWebhooks, mockWorkspaces, mockChannels, mockMessages, mockMembers, mockNotifications } from './mock-data'
 import { engineFetch } from './engine/client'
 import { fetchCurrentUser } from './engine/auth'
+import {
+  listApps,
+  getAppById,
+  createAppRequest,
+  listApiKeys,
+  createApiKeyRequest,
+  revokeApiKeyRequest,
+  listWebhooks,
+  createWebhookRequest,
+  deleteWebhookRequest,
+} from './engine/apps'
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -10,90 +21,43 @@ export async function getUser(): Promise<UserProfile> {
   return fetchCurrentUser()
 }
 
-// Apps
+// Apps — Brenox engine /api/apps
 export async function getApps(): Promise<App[]> {
-  await delay(400)
-  return mockApps
+  return listApps()
 }
 
 export async function getApp(appId: number): Promise<App | null> {
-  await delay(300)
-  return mockApps.find(app => app.id === appId) || null
+  return getAppById(appId)
 }
 
 export async function createApp(name: string, slug?: string): Promise<App> {
-  await delay(500)
-  const appSlug = slug || name.toLowerCase().replace(/\s+/g, '-')
-  const workspaceId = Math.max(...mockApps.map(a => a.workspace_id), 0) + 1
-  const newApp: App = {
-    id: Math.max(...mockApps.map(a => a.id), 0) + 1,
-    name,
-    slug: appSlug,
-    workspace_id: workspaceId,
-    owner_id: 1,
-    created_at: new Date().toISOString(),
-  }
-  mockApps.push(newApp)
-  return newApp
+  return createAppRequest(name, slug)
 }
 
 // API Keys
 export async function getApiKeys(appId: number): Promise<ApiKey[]> {
-  await delay(400)
-  return mockApiKeys.filter(key => key.app_id === appId)
+  return listApiKeys(appId)
 }
 
 export async function createApiKey(appId: number, name: string, isSandbox: boolean): Promise<ApiKeyCreated> {
-  await delay(500)
-  const secret = `bx_${isSandbox ? 'test' : 'live'}_${Math.random().toString(36).slice(2, 26)}`
-  const keyPrefix = `${secret.slice(0, 16)}...`
-  const newKey: ApiKeyCreated = {
-    id: Math.max(...mockApiKeys.map(k => k.id), 0) + 1,
-    app_id: appId,
-    name,
-    key_prefix: keyPrefix,
-    is_sandbox: isSandbox,
-    created_at: new Date().toISOString(),
-    secret,
-  }
-  mockApiKeys.push(newKey)
-  return newKey
+  return createApiKeyRequest(appId, name, isSandbox)
 }
 
-export async function revokeApiKey(keyId: number): Promise<void> {
-  await delay(300)
-  const key = mockApiKeys.find(k => k.id === keyId)
-  if (key) {
-    key.revoked_at = new Date().toISOString()
-  }
+export async function revokeApiKey(appId: number, keyId: number): Promise<void> {
+  return revokeApiKeyRequest(appId, keyId)
 }
 
 // Webhooks
 export async function getWebhooks(appId: number): Promise<Webhook[]> {
-  await delay(400)
-  return mockWebhooks.filter(wh => wh.app_id === appId)
+  return listWebhooks(appId)
 }
 
 export async function createWebhook(appId: number, url: string, events: string[]): Promise<Webhook> {
-  await delay(500)
-  const newWebhook: Webhook = {
-    id: Math.max(...mockWebhooks.map(w => w.id), 0) + 1,
-    app_id: appId,
-    url,
-    events,
-    created_at: new Date().toISOString(),
-    secret: `whsec_${Math.random().toString(36).substr(2, 24)}`,
-  }
-  mockWebhooks.push(newWebhook)
-  return newWebhook
+  return createWebhookRequest(appId, url, events)
 }
 
-export async function deleteWebhook(webhookId: number): Promise<void> {
-  await delay(300)
-  const idx = mockWebhooks.findIndex(w => w.id === webhookId)
-  if (idx >= 0) {
-    mockWebhooks.splice(idx, 1)
-  }
+export async function deleteWebhook(appId: number, webhookId: number): Promise<void> {
+  return deleteWebhookRequest(appId, webhookId)
 }
 
 // Workspaces
