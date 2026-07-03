@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/shared/empty-state"
 import { getNotifications, markAllNotificationsRead, markNotificationAsRead } from "@/lib/api"
 import type { Notification } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { getErrorMessage } from "@/lib/engine/errors"
 import { toast } from "sonner"
 
 export default function NotificationsPage() {
@@ -15,8 +16,13 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true)
 
   function load() {
+    setLoading(true)
     getNotifications()
       .then(setItems)
+      .catch((error) => {
+        toast.error(getErrorMessage(error, "Failed to load notifications"))
+        setItems([])
+      })
       .finally(() => setLoading(false))
   }
 
@@ -25,14 +31,22 @@ export default function NotificationsPage() {
   }, [])
 
   async function handleMarkAll() {
-    const count = await markAllNotificationsRead()
-    toast.success(`Marked ${count} as read`)
-    load()
+    try {
+      const count = await markAllNotificationsRead()
+      toast.success(count > 0 ? `Marked ${count} as read` : "All caught up")
+      load()
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to mark notifications read"))
+    }
   }
 
   async function handleMarkOne(id: number) {
-    await markNotificationAsRead(id)
-    load()
+    try {
+      await markNotificationAsRead(id)
+      load()
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update notification"))
+    }
   }
 
   const unread = items.filter((n) => !n.read).length
@@ -42,7 +56,7 @@ export default function NotificationsPage() {
       <PageHeader
         eyebrow="Activity"
         title="Notifications"
-        description="API keys, webhooks, and workspace events."
+        description="Mentions, replies, workspace invites, and call events."
         action={
           unread > 0 ? (
             <Button variant="outline" size="sm" onClick={() => void handleMarkAll()}>
@@ -63,7 +77,7 @@ export default function NotificationsPage() {
         <EmptyState
           icon={Bell}
           title="No notifications"
-          description="You'll see API key activity, webhook failures, and workspace events here."
+          description="You'll see mentions, replies, workspace invites, and other activity here."
         />
       ) : (
         <ul className="space-y-2">

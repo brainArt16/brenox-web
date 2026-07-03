@@ -1,5 +1,4 @@
 import type { UserProfile, App, ApiKey, ApiKeyCreated, Webhook, WorkspaceListItem, Channel, MessageListItem, WorkspaceMember, Notification } from './types'
-import { mockNotifications } from './mock-data'
 import { engineFetch } from './engine/client'
 import { fetchCurrentUser } from './engine/auth'
 import {
@@ -25,8 +24,11 @@ import {
   removeMemberRequest,
   updateMemberRoleRequest,
 } from './engine/workspaces'
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+import {
+  listNotifications,
+  markNotificationRead,
+  markAllNotificationsReadRequest,
+} from './engine/notifications'
 
 // User — backed by Brenox engine when authenticated
 export async function getUser(): Promise<UserProfile> {
@@ -138,28 +140,15 @@ export async function updatePresence(status: 'online' | 'away' | 'offline'): Pro
   })
 }
 
-// Notifications
+// Notifications — Brenox engine /api/notifications
 export async function getNotifications(): Promise<Notification[]> {
-  await delay(300)
-  return mockNotifications
+  return listNotifications()
 }
 
 export async function markNotificationAsRead(notificationId: number): Promise<void> {
-  await delay(200)
-  const notif = mockNotifications.find(n => n.id === notificationId)
-  if (notif) {
-    notif.read = true
-  }
+  await markNotificationRead(notificationId)
 }
 
 export async function markAllNotificationsRead(): Promise<number> {
-  await delay(300)
-  let count = 0
-  for (const n of mockNotifications) {
-    if (!n.read) {
-      n.read = true
-      count++
-    }
-  }
-  return count
+  return markAllNotificationsReadRequest()
 }
