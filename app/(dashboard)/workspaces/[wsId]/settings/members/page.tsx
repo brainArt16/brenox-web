@@ -39,6 +39,7 @@ import {
 import { PageHeader } from "@/components/layout/page-header"
 import { getWorkspace, getMembers, inviteMember, removeMember, updateMemberRole } from "@/lib/api"
 import type { WorkspaceListItem, WorkspaceMember } from "@/lib/types"
+import { getErrorMessage } from "@/lib/engine/errors"
 import { toast } from "sonner"
 
 export default function MembersPage() {
@@ -63,23 +64,35 @@ export default function MembersPage() {
 
   async function handleInvite() {
     if (!email.trim()) return
-    await inviteMember(wsId, email.trim(), role)
-    toast.success("Member invited")
-    setDialogOpen(false)
-    setEmail("")
-    load()
+    try {
+      await inviteMember(wsId, email.trim(), role)
+      toast.success("Member invited")
+      setDialogOpen(false)
+      setEmail("")
+      load()
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to invite member"))
+    }
   }
 
   async function handleRemove(userId: number) {
-    await removeMember(wsId, userId)
-    toast.success("Member removed")
-    load()
+    try {
+      await removeMember(wsId, userId)
+      toast.success("Member removed")
+      load()
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to remove member"))
+    }
   }
 
   async function handleRoleChange(userId: number, role: WorkspaceMember["role"]) {
-    await updateMemberRole(wsId, userId, role)
-    toast.success("Role updated")
-    load()
+    try {
+      await updateMemberRole(wsId, userId, role)
+      toast.success("Role updated")
+      load()
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update role"))
+    }
   }
 
   const canManage = workspace?.role === "owner" || workspace?.role === "admin"

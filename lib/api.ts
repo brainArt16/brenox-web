@@ -1,5 +1,5 @@
 import type { UserProfile, App, ApiKey, ApiKeyCreated, Webhook, WorkspaceListItem, Channel, MessageListItem, WorkspaceMember, Notification } from './types'
-import { mockUser, mockWebhooks, mockWorkspaces, mockChannels, mockMessages, mockMembers, mockNotifications } from './mock-data'
+import { mockNotifications } from './mock-data'
 import { engineFetch } from './engine/client'
 import { fetchCurrentUser } from './engine/auth'
 import {
@@ -13,6 +13,18 @@ import {
   createWebhookRequest,
   deleteWebhookRequest,
 } from './engine/apps'
+import {
+  listWorkspaces,
+  getWorkspaceById,
+  listChannels,
+  createChannelRequest,
+  listMessages,
+  sendMessageRequest,
+  listMembers,
+  inviteMemberRequest,
+  removeMemberRequest,
+  updateMemberRoleRequest,
+} from './engine/workspaces'
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -60,82 +72,48 @@ export async function deleteWebhook(appId: number, webhookId: number): Promise<v
   return deleteWebhookRequest(appId, webhookId)
 }
 
-// Workspaces
+// Workspaces — Brenox engine /api/workspaces
 export async function getWorkspaces(): Promise<WorkspaceListItem[]> {
-  await delay(400)
-  return mockWorkspaces
+  return listWorkspaces()
 }
 
 export async function getWorkspace(wsId: number): Promise<WorkspaceListItem | null> {
-  await delay(300)
-  return mockWorkspaces.find(ws => ws.id === wsId) || null
+  return getWorkspaceById(wsId)
 }
 
 // Channels
 export async function getChannels(workspaceId: number): Promise<Channel[]> {
-  await delay(400)
-  return mockChannels.filter(ch => ch.WorkspaceID === workspaceId)
+  return listChannels(workspaceId)
 }
 
 export async function createChannel(workspaceId: number, name: string, isReadOnly = false): Promise<Channel> {
-  await delay(400)
-  const channel: Channel = {
-    ID: Math.max(...mockChannels.map(c => c.ID), 0) + 1,
-    Name: name,
-    OwnerID: 1,
-    WorkspaceID: workspaceId,
-    IsReadOnly: isReadOnly,
-    CreatedAt: new Date().toISOString(),
-  }
-  mockChannels.push(channel)
-  return channel
+  return createChannelRequest(workspaceId, name, isReadOnly)
 }
 
 // Messages
-export async function getMessages(channelId: number): Promise<MessageListItem[]> {
-  await delay(400)
-  return mockMessages.filter(msg => msg.channel_id === channelId)
+export async function getMessages(workspaceId: number, channelId: number): Promise<MessageListItem[]> {
+  return listMessages(workspaceId, channelId)
 }
 
-export async function sendMessage(channelId: number, content: string): Promise<MessageListItem> {
-  await delay(300)
-  const newMessage: MessageListItem = {
-    id: Math.max(...mockMessages.map(m => m.id), 0) + 1,
-    channel_id: channelId,
-    sender_id: 1,
-    content,
-    created_at: new Date().toISOString(),
-    username: 'devuser',
-  }
-  mockMessages.push(newMessage)
-  return newMessage
+export async function sendMessage(workspaceId: number, channelId: number, content: string): Promise<MessageListItem> {
+  return sendMessageRequest(workspaceId, channelId, content)
 }
 
 // Members
 export async function getMembers(workspaceId: number): Promise<WorkspaceMember[]> {
-  await delay(400)
-  return mockMembers
+  return listMembers(workspaceId)
 }
 
-export async function inviteMember(workspaceId: number, email: string, role: 'admin' | 'moderator' | 'member'): Promise<WorkspaceMember> {
-  await delay(500)
-  const newMember: WorkspaceMember = {
-    user_id: Math.max(...mockMembers.map(m => m.user_id), 0) + 1,
-    username: email.split('@')[0],
-    email,
-    role,
-    created_at: new Date().toISOString(),
-  }
-  mockMembers.push(newMember)
-  return newMember
+export async function inviteMember(
+  workspaceId: number,
+  email: string,
+  role: 'admin' | 'moderator' | 'member'
+): Promise<WorkspaceMember> {
+  return inviteMemberRequest(workspaceId, email, role)
 }
 
 export async function removeMember(workspaceId: number, userId: number): Promise<void> {
-  await delay(300)
-  const idx = mockMembers.findIndex(m => m.user_id === userId)
-  if (idx >= 0) {
-    mockMembers.splice(idx, 1)
-  }
+  return removeMemberRequest(workspaceId, userId)
 }
 
 export async function updateMemberRole(
@@ -143,11 +121,7 @@ export async function updateMemberRole(
   userId: number,
   role: WorkspaceMember['role']
 ): Promise<WorkspaceMember> {
-  await delay(300)
-  const member = mockMembers.find(m => m.user_id === userId)
-  if (!member) throw new Error('Member not found')
-  member.role = role
-  return member
+  return updateMemberRoleRequest(workspaceId, userId, role)
 }
 
 export async function updateProfile(username: string): Promise<UserProfile> {

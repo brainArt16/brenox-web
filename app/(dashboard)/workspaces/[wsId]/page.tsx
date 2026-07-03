@@ -60,24 +60,32 @@ function WorkspaceChatContent() {
   }, [wsId, searchParams])
 
   useEffect(() => {
-    if (!selectedChannelId) return
-    getMessages(selectedChannelId).then(setMessages)
-  }, [selectedChannelId])
+    if (!selectedChannelId || !wsId) return
+    getMessages(wsId, selectedChannelId).then(setMessages)
+  }, [selectedChannelId, wsId])
 
   async function handleSend(content: string) {
-    if (!selectedChannelId) return
-    const msg = await sendMessage(selectedChannelId, content)
-    setMessages((prev) => [...prev, msg])
+    if (!selectedChannelId || !wsId) return
+    try {
+      const msg = await sendMessage(wsId, selectedChannelId, content)
+      setMessages((prev) => [...prev, msg])
+    } catch {
+      toast.error("Failed to send message")
+    }
   }
 
   async function handleCreateChannel() {
     if (!newChannelName.trim()) return
-    const ch = await createChannel(wsId, newChannelName.trim())
-    setChannels((prev) => [...prev, ch])
-    setSelectedChannelId(ch.ID)
-    setCreateOpen(false)
-    setNewChannelName("")
-    toast.success(`Channel #${ch.Name} created`)
+    try {
+      const ch = await createChannel(wsId, newChannelName.trim())
+      setChannels((prev) => [...prev, ch])
+      setSelectedChannelId(ch.ID)
+      setCreateOpen(false)
+      setNewChannelName("")
+      toast.success(`Channel #${ch.Name} created`)
+    } catch {
+      toast.error("Failed to create channel")
+    }
   }
 
   const selectedChannel = channels.find((c) => c.ID === selectedChannelId)
