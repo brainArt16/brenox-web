@@ -3,10 +3,10 @@
 import { m } from "framer-motion"
 
 interface TypingIndicatorProps {
-  users: string[]
+  users?: string[]
 }
 
-export function TypingIndicator({ users }: TypingIndicatorProps) {
+export function TypingIndicator({ users = [] }: TypingIndicatorProps) {
   if (users.length === 0) return null
 
   const getText = () => {

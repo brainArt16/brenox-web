@@ -170,7 +170,7 @@ function WorkspaceChatContent() {
                   </div>
                 </div>
               ))}
-              <TypingIndicator userName="sdk_user" />
+              <TypingIndicator />
             </div>
           </ScrollArea>
 
