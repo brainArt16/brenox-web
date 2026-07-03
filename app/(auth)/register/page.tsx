@@ -5,10 +5,13 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { m } from "framer-motion"
 import { Zap, Eye, EyeOff, Loader2, Check, X } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useAuth } from "@/providers/auth-provider"
+import { getErrorMessage } from "@/lib/engine/errors"
 
 function PasswordStrength({ password }: { password: string }) {
   const checks = [
@@ -62,6 +65,7 @@ function PasswordStrength({ password }: { password: string }) {
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { register } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -102,11 +106,22 @@ export default function RegisterPage() {
       return
     }
 
-    // Simulate registration
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    
-    // Redirect to app
-    router.replace("/apps")
+    // Register + auto sign-in via engine API
+    try {
+      await register(
+        {
+          email: formData.email.trim(),
+          username: formData.username.trim(),
+          password: formData.password,
+        },
+        true
+      )
+      router.replace("/apps")
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Registration failed"))
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -220,7 +235,7 @@ export default function RegisterPage() {
             <Label htmlFor="terms" className="text-sm font-normal cursor-pointer leading-relaxed">
               I agree to the{" "}
               <Link href="/terms" className="text-primary hover:underline">
-                Terms of Service
+                Terms
               </Link>{" "}
               and{" "}
               <Link href="/privacy" className="text-primary hover:underline">

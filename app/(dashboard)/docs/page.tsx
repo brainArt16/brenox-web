@@ -8,10 +8,11 @@ import { DocLinkCard } from "@/components/shared/doc-link-card"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { getApps } from "@/lib/api"
 
-const baseUrl = process.env.NEXT_PUBLIC_BRENOX_URL ?? "http://localhost:8080"
+import { getEngineBaseUrl } from "@/lib/engine/config"
 
 export default function DocsPage() {
   const [appSlug, setAppSlug] = useState("my-chat-app")
+  const baseUrl = getEngineBaseUrl()
 
   useEffect(() => {
     void getApps().then((apps) => {

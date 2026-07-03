@@ -26,8 +26,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { getApps, getApp, getWorkspaces, getWorkspace, getChannels, getUser } from "@/lib/api"
-import type { App, Channel, UserProfile, WorkspaceListItem } from "@/lib/types"
+import { getApps, getApp, getWorkspaces, getWorkspace, getChannels } from "@/lib/api"
+import { useAuth } from "@/providers/auth-provider"
+import type { App, Channel, WorkspaceListItem } from "@/lib/types"
 
 function NavLink({
   href,
@@ -59,7 +60,7 @@ function NavLink({
 export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [user, setUser] = useState<UserProfile | null>(null)
+  const { user } = useAuth()
   const [apps, setApps] = useState<App[]>([])
   const [app, setApp] = useState<App | null>(null)
   const [workspaces, setWorkspaces] = useState<WorkspaceListItem[]>([])
@@ -73,10 +74,6 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
   const wsIdMatch = pathname.match(/^\/workspaces\/(\d+)/)
   const wsId = wsIdMatch ? Number(wsIdMatch[1]) : null
   const activeChannelId = searchParams.get("channel")
-
-  useEffect(() => {
-    void getUser().then(setUser)
-  }, [])
 
   useEffect(() => {
     if (pathname.startsWith("/apps")) {

@@ -1,34 +1,38 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense, useState } from "react"
 import { m } from "framer-motion"
 import { Zap, Eye, EyeOff, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useAuth } from "@/providers/auth-provider"
+import { getErrorMessage } from "@/lib/engine/errors"
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    rememberMe: false,
+    rememberMe: true,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsLoading(true)
     setErrors({})
 
-    // Basic validation
     const newErrors: Record<string, string> = {}
-    if (!formData.email) newErrors.email = "Email is required"
+    if (!formData.email.trim()) newErrors.email = "Email is required"
     if (!formData.password) newErrors.password = "Password is required"
 
     if (Object.keys(newErrors).length > 0) {
@@ -37,11 +41,18 @@ export default function LoginPage() {
       return
     }
 
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    
-    // Redirect to developer console
-    router.replace("/apps")
+    try {
+      await login(
+        { email: formData.email.trim(), password: formData.password },
+        formData.rememberMe
+      )
+      const next = searchParams.get("next")
+      router.replace(next && next.startsWith("/") ? next : "/apps")
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Invalid email or password"))
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -51,35 +62,32 @@ export default function LoginPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Logo */}
-      <Link href="/login" className="flex items-center justify-center gap-2 mb-8">
-        <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-          <Zap className="w-6 h-6 text-primary-foreground" />
+      <Link href="/login" className="mb-8 flex items-center justify-center gap-2">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+          <Zap className="h-6 w-6 text-primary-foreground" />
         </div>
-        <span className="font-bold text-2xl">Brenox</span>
+        <span className="text-2xl font-bold">Brenox</span>
       </Link>
 
-      {/* Card */}
-      <div className="bg-card border border-border rounded-xl p-8 shadow-xl">
-        <div className="text-center mb-8">
+      <div className="rounded-xl border border-border bg-card p-8 shadow-xl">
+        <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold">Welcome back</h1>
-          <p className="text-muted-foreground mt-1">Sign in to the Brenox developer console</p>
+          <p className="mt-1 text-muted-foreground">Sign in to the Brenox developer console</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
+              autoComplete="email"
               placeholder="you@example.com"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className={errors.email ? "border-destructive" : ""}
             />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
           </div>
 
           <div className="space-y-2">
@@ -88,6 +96,7 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -98,16 +107,10 @@ export default function LoginPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
           </div>
 
           <div className="flex items-center gap-2">
@@ -115,19 +118,19 @@ export default function LoginPage() {
               id="remember"
               checked={formData.rememberMe}
               onCheckedChange={(checked) =>
-                setFormData({ ...formData, rememberMe: checked as boolean })
+                setFormData({ ...formData, rememberMe: checked === true })
               }
             />
-            <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">
-              Remember me for 30 days
+            <Label htmlFor="remember" className="cursor-pointer text-sm font-normal">
+              Keep me signed in
             </Label>
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Signing in...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in…
               </>
             ) : (
               "Sign in"
@@ -135,7 +138,7 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link href="/register" className="text-primary hover:underline">
             Sign up
@@ -143,5 +146,13 @@ export default function LoginPage() {
         </p>
       </div>
     </m.div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+      <LoginForm />
+    </Suspense>
   )
 }

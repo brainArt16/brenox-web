@@ -1,11 +1,11 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import Link from "next/link"
 import { Suspense, type ReactNode } from "react"
 import { DevRailSidebar } from "@/components/dev/dev-rail-sidebar"
 import { DevNavSidebar } from "@/components/dev/dev-nav-sidebar"
 import { DevMobileNav } from "@/components/dev/dev-mobile-nav"
+import { AuthGuard } from "@/components/auth/auth-guard"
 import { cn } from "@/lib/utils"
 
 function NavSidebarFallback() {
@@ -37,13 +37,15 @@ function DashboardMain({ children }: { children: ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="h-screen flex overflow-hidden bg-background">
-      <DevMobileNav />
-      <DevRailSidebar />
-      <Suspense fallback={<NavSidebarFallback />}>
-        <DevNavSidebar />
-      </Suspense>
-      <DashboardMain>{children}</DashboardMain>
-    </div>
+    <AuthGuard>
+      <div className="h-screen flex overflow-hidden bg-background">
+        <DevMobileNav />
+        <DevRailSidebar />
+        <Suspense fallback={<NavSidebarFallback />}>
+          <DevNavSidebar />
+        </Suspense>
+        <DashboardMain>{children}</DashboardMain>
+      </div>
+    </AuthGuard>
   )
 }

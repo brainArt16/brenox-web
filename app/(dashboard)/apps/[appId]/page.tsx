@@ -12,6 +12,7 @@ import { FlowSteps } from "@/components/shared/flow-steps"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { CopyButton } from "@/components/shared/copy-button"
 import { getApp, getApiKeys, getWebhooks } from "@/lib/api"
+import { getEngineBaseUrl } from "@/lib/engine/config"
 import type { App } from "@/lib/types"
 
 export default function AppOverviewPage() {
@@ -60,7 +61,7 @@ export default function AppOverviewPage() {
     )
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BRENOX_URL ?? "http://localhost:8080"
+  const baseUrl = getEngineBaseUrl()
   const snippet = `import { BrenoxServer } from "@brenox/sdk/server";
 
 const server = new BrenoxServer({

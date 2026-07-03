@@ -13,23 +13,25 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { PageHeader } from "@/components/layout/page-header"
+import { SignOutButton } from "@/components/auth/sign-out-button"
 import { getUser, updateProfile, updatePresence } from "@/lib/api"
-import type { UserProfile } from "@/lib/types"
+import { useAuth } from "@/providers/auth-provider"
+import { getErrorMessage } from "@/lib/engine/errors"
 import { toast } from "sonner"
-import Link from "next/link"
 
 export default function ProfileSettingsPage() {
-  const [user, setUser] = useState<UserProfile | null>(null)
+  const { user: authUser, refreshUser } = useAuth()
   const [username, setUsername] = useState("")
   const [presence, setPresence] = useState<"online" | "away" | "offline">("online")
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    getUser().then((u) => {
-      setUser(u)
-      setUsername(u.username)
-    })
-  }, [])
+    if (authUser) {
+      setUsername(authUser.username)
+    } else {
+      void getUser().then((u) => setUsername(u.username))
+    }
+  }, [authUser])
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -37,7 +39,10 @@ export default function ProfileSettingsPage() {
     try {
       await updateProfile(username.trim())
       await updatePresence(presence)
+      await refreshUser()
       toast.success("Profile updated")
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update profile"))
     } finally {
       setSaving(false)
     }
@@ -57,7 +62,7 @@ export default function ProfileSettingsPage() {
       >
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" value={user?.email ?? ""} readOnly className="bg-surface text-muted-foreground" />
+          <Input id="email" value={authUser?.email ?? ""} readOnly className="bg-surface text-muted-foreground" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="username">Username</Label>
@@ -96,9 +101,7 @@ export default function ProfileSettingsPage() {
       <div className="rounded-xl border border-destructive/30 bg-card p-6">
         <h2 className="font-semibold text-destructive">Sign out</h2>
         <p className="mt-1 text-sm text-muted-foreground">End your session on this device.</p>
-        <Button variant="outline" className="mt-4" asChild>
-          <Link href="/login">Sign out</Link>
-        </Button>
+        <SignOutButton variant="outline" className="mt-4" />
       </div>
     </div>
   )

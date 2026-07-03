@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { m } from "framer-motion"
 import { LayoutGrid, Boxes, BookOpen, Bell, Settings } from "lucide-react"
@@ -15,8 +15,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getNotifications, getUser } from "@/lib/api"
-import type { UserProfile } from "@/lib/types"
+import { getNotifications } from "@/lib/api"
+import { useAuth } from "@/providers/auth-provider"
 
 const railItems = [
   { id: "apps", href: "/apps", icon: LayoutGrid, label: "Apps" },
@@ -26,11 +26,11 @@ const railItems = [
 
 export function DevRailSidebar() {
   const pathname = usePathname()
-  const [user, setUser] = useState<UserProfile | null>(null)
+  const router = useRouter()
+  const { user, logout } = useAuth()
   const [unread, setUnread] = useState(0)
 
   useEffect(() => {
-    void getUser().then(setUser)
     void getNotifications().then((n) => setUnread(n.filter((x) => !x.read).length))
   }, [pathname])
 
@@ -136,8 +136,15 @@ export function DevRailSidebar() {
                 <Link href="/notifications">Notifications</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild className="text-destructive">
-                <Link href="/login">Sign out</Link>
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onSelect={(e) => {
+                  e.preventDefault()
+                  logout()
+                  router.replace("/login")
+                }}
+              >
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

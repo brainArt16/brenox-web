@@ -1,12 +1,13 @@
 import type { UserProfile, App, ApiKey, ApiKeyCreated, Webhook, WorkspaceListItem, Channel, MessageListItem, WorkspaceMember, Notification } from './types'
 import { mockUser, mockApps, mockApiKeys, mockWebhooks, mockWorkspaces, mockChannels, mockMessages, mockMembers, mockNotifications } from './mock-data'
+import { engineFetch } from './engine/client'
+import { fetchCurrentUser } from './engine/auth'
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-// User
+// User — backed by Brenox engine when authenticated
 export async function getUser(): Promise<UserProfile> {
-  await delay(300)
-  return mockUser
+  return fetchCurrentUser()
 }
 
 // Apps
@@ -186,14 +187,17 @@ export async function updateMemberRole(
 }
 
 export async function updateProfile(username: string): Promise<UserProfile> {
-  await delay(400)
-  mockUser.username = username
-  return mockUser
+  return engineFetch<UserProfile>('/api/users/me', {
+    method: 'PATCH',
+    body: JSON.stringify({ username }),
+  })
 }
 
 export async function updatePresence(status: 'online' | 'away' | 'offline'): Promise<void> {
-  await delay(200)
-  void status
+  await engineFetch('/api/users/me/status', {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  })
 }
 
 // Notifications
