@@ -133,6 +133,12 @@ export function DevRailSidebar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
+                <Link href="/docs">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Documentation
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link href="/notifications">Notifications</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

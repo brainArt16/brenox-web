@@ -27,8 +27,20 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { getApps, getApp, getWorkspaces, getWorkspace, getChannels } from "@/lib/api"
+import { DOC_SECTIONS } from "@/lib/docs/content"
 import { useAuth } from "@/providers/auth-provider"
 import type { App, Channel, WorkspaceListItem } from "@/lib/types"
+
+function DocSubLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-2 py-1 pl-8 pr-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+    >
+      <span className="truncate">{children}</span>
+    </Link>
+  )
+}
 
 function NavLink({
   href,
@@ -121,7 +133,7 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
         <span className="font-semibold truncate">{headerTitle}</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 py-3">
+      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 py-3 flex flex-col">
         {/* Apps section */}
         {(pathname.startsWith("/apps")) && (
           <>
@@ -266,20 +278,6 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
           </div>
         )}
 
-        {pathname.startsWith("/docs") && (
-          <div className="space-y-0.5">
-            <NavLink href="/docs" active={pathname === "/docs"} icon={BookOpen}>
-              SDK & API
-            </NavLink>
-            <NavLink href="/docs#websocket" active={false} icon={BookOpen}>
-              WebSocket events
-            </NavLink>
-            <NavLink href="/docs#quickstart" active={false} icon={BookOpen}>
-              Quick start
-            </NavLink>
-          </div>
-        )}
-
         {pathname.startsWith("/notifications") && (
           <div className="space-y-0.5">
             <NavLink href="/notifications" active={pathname === "/notifications"} icon={Bell}>
@@ -287,6 +285,21 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
             </NavLink>
           </div>
         )}
+
+        <div className="mt-auto space-y-0.5 pt-4">
+          <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Resources
+          </div>
+          <NavLink href="/docs" active={pathname.startsWith("/docs")} icon={BookOpen}>
+            Documentation
+          </NavLink>
+          {pathname.startsWith("/docs") &&
+            DOC_SECTIONS.map((section) => (
+              <DocSubLink key={section.id} href={`/docs#${section.id}`}>
+                {section.label}
+              </DocSubLink>
+            ))}
+        </div>
       </div>
 
       <div className="p-2 border-t border-border bg-surface-elevated">

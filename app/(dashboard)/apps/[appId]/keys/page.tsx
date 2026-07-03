@@ -111,7 +111,7 @@ export default function AppKeysPage() {
       <PageHeader
         eyebrow={app.name}
         title="API Keys"
-        description="Server-side keys for the /v1 Developer API. Never expose these in client apps."
+        description="Server-side keys for BrenoxServer. Never expose these in client apps."
         action={
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -155,9 +155,9 @@ export default function AppKeysPage() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <DocLinkCard
-          title="Authentication"
-          description="Pass your key as Authorization: Bearer bx_test_..."
-          href="/docs#auth"
+          title="BrenoxServer"
+          description="Use your key with the server SDK on your backend."
+          href="/docs#sdk-server"
           icon={BookOpen}
         />
         <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
@@ -175,7 +175,7 @@ export default function AppKeysPage() {
         <EmptyState
           icon={Key}
           title="No API keys yet"
-          description="Create a sandbox key to test the /v1 Developer API in the Sandbox tab."
+          description="Create a sandbox key to test BrenoxServer in the Sandbox tab."
           action={
             <Button onClick={() => setDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />

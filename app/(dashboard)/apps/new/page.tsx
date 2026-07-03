@@ -65,7 +65,7 @@ export default function NewAppPage() {
       <div className="flex gap-3 rounded-xl border border-border bg-surface-elevated p-4">
         <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
         <p className="text-sm leading-relaxed text-muted-foreground">
-          After creation you&apos;ll be prompted to create a sandbox key — the fastest path to your first /v1 API call.
+          After creation you&apos;ll be prompted to create a sandbox key — the fastest path to your first SDK integration.
         </p>
       </div>
 

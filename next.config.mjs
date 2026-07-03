@@ -11,7 +11,6 @@ const nextConfig = {
       { source: "/app", destination: "/workspaces", permanent: false },
       { source: "/app/:path*", destination: "/workspaces", permanent: false },
       { source: "/developers", destination: "/apps", permanent: false },
-      { source: "/docs", destination: "/apps", permanent: false },
       { source: "/pricing", destination: "/login", permanent: false },
       { source: "/about", destination: "/login", permanent: false },
       { source: "/blog", destination: "/login", permanent: false },

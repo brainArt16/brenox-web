@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { Loader2, Play, FlaskConical, Terminal } from "lucide-react"
+import { Loader2, Play, FlaskConical, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,43 +15,45 @@ import { DocLinkCard } from "@/components/shared/doc-link-card"
 import { getApp } from "@/lib/api"
 import type { App } from "@/lib/types"
 
-interface ApiResult {
-  request: object
-  response: object
+interface SdkResult {
+  call: string
+  input: object
+  output: object
   durationMs: number
-  status: number
+  ok: boolean
 }
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-async function mockV1Call(endpoint: string, body: object): Promise<ApiResult> {
+async function mockSdkCall(call: string, input: object): Promise<SdkResult> {
   const start = Date.now()
   await delay(400 + Math.random() * 200)
+  const output =
+    call === "server.users.provision"
+      ? { id: 42, external_id: (input as { external_id: string }).external_id, username: (input as { username?: string }).username }
+      : call === "server.channels.create"
+        ? { id: 1, name: (input as { name: string }).name, workspace_id: 10 }
+        : call === "server.messages.send"
+          ? { id: 99, channel_id: (input as { channel_id: number }).channel_id, content: (input as { content: string }).content }
+          : call === "server.messages.list"
+            ? { messages: [{ id: 1, content: "Hello from sandbox", channel_id: (input as { channel_id: number }).channel_id }] }
+            : { messages: [] }
   return {
-    request: { method: "POST", path: endpoint, body },
-    response: {
-      ok: true,
-      data:
-        endpoint === "/v1/users"
-          ? { id: 42, external_id: (body as { external_id: string }).external_id, username: (body as { username?: string }).username }
-          : endpoint === "/v1/channels"
-            ? { id: 1, name: (body as { name: string }).name, workspace_id: 10 }
-            : endpoint === "/v1/messages"
-              ? { id: 99, channel_id: (body as { channel_id: number }).channel_id, content: (body as { content: string }).content }
-              : { messages: [] },
-    },
+    call,
+    input,
+    output,
     durationMs: Date.now() - start,
-    status: 200,
+    ok: true,
   }
 }
 
-function JsonPanel({ result }: { result: ApiResult | null }) {
+function JsonPanel({ result }: { result: SdkResult | null }) {
   if (!result) {
     return (
       <div className="flex h-full min-h-[360px] flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface p-8 text-center">
         <FlaskConical className="mb-3 h-8 w-8 text-muted-foreground" />
         <p className="text-sm font-medium">No request yet</p>
-        <p className="mt-1 text-xs text-muted-foreground">Run a sandbox call to inspect request and response</p>
+        <p className="mt-1 text-xs text-muted-foreground">Run a sandbox operation to preview SDK input and output</p>
       </div>
     )
   }
@@ -59,18 +61,22 @@ function JsonPanel({ result }: { result: ApiResult | null }) {
   return (
     <div className="space-y-4 rounded-xl border border-border bg-card p-4">
       <div className="flex items-center gap-3">
-        <span className={`rounded-md px-2 py-0.5 font-mono text-sm ${result.status === 200 ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive"}`}>
-          {result.status}
+        <span className={`rounded-md px-2 py-0.5 font-mono text-sm ${result.ok ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive"}`}>
+          {result.ok ? "ok" : "error"}
         </span>
         <span className="text-sm text-muted-foreground">{result.durationMs}ms</span>
       </div>
       <div className="overflow-hidden rounded-lg border border-border bg-surface">
-        <p className="border-b border-border px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Request</p>
-        <pre className="max-h-40 overflow-auto p-3 font-mono text-xs leading-relaxed">{JSON.stringify(result.request, null, 2)}</pre>
+        <p className="border-b border-border px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">SDK call</p>
+        <pre className="max-h-24 overflow-auto p-3 font-mono text-xs leading-relaxed">{result.call}</pre>
       </div>
       <div className="overflow-hidden rounded-lg border border-border bg-surface">
-        <p className="border-b border-border px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Response</p>
-        <pre className="max-h-52 overflow-auto p-3 font-mono text-xs leading-relaxed">{JSON.stringify(result.response, null, 2)}</pre>
+        <p className="border-b border-border px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Input</p>
+        <pre className="max-h-40 overflow-auto p-3 font-mono text-xs leading-relaxed">{JSON.stringify(result.input, null, 2)}</pre>
+      </div>
+      <div className="overflow-hidden rounded-lg border border-border bg-surface">
+        <p className="border-b border-border px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Output</p>
+        <pre className="max-h-52 overflow-auto p-3 font-mono text-xs leading-relaxed">{JSON.stringify(result.output, null, 2)}</pre>
       </div>
     </div>
   )
@@ -82,7 +88,7 @@ export default function SandboxPage() {
   const [app, setApp] = useState<App | null>(null)
   const [loading, setLoading] = useState(true)
   const [apiKey, setApiKey] = useState("")
-  const [result, setResult] = useState<ApiResult | null>(null)
+  const [result, setResult] = useState<SdkResult | null>(null)
   const [running, setRunning] = useState(false)
 
   const [provision, setProvision] = useState({ external_id: "user-1", username: "sdk_user" })
@@ -96,19 +102,20 @@ export default function SandboxPage() {
       .finally(() => setLoading(false))
   }, [appId])
 
-  async function run(endpoint: string, body: object) {
+  async function run(call: string, input: object) {
     if (!apiKey.trim()) {
       setResult({
-        request: { method: "POST", path: endpoint, body },
-        response: { error: "Paste a sandbox API key first (bx_test_...)" },
+        call,
+        input,
+        output: { error: "Paste a sandbox API key first (bx_test_...)" },
         durationMs: 0,
-        status: 401,
+        ok: false,
       })
       return
     }
     setRunning(true)
     try {
-      setResult(await mockV1Call(endpoint, body))
+      setResult(await mockSdkCall(call, input))
     } finally {
       setRunning(false)
     }
@@ -122,7 +129,7 @@ export default function SandboxPage() {
       <PageHeader
         eyebrow={app.name}
         title="Sandbox"
-        description="Exercise /v1 endpoints with mock responses before going live."
+        description="Try BrenoxServer operations with mock responses before wiring your backend."
       />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
@@ -141,10 +148,10 @@ export default function SandboxPage() {
           </p>
         </div>
         <DocLinkCard
-          title="API reference"
-          description="Full /v1 endpoint docs and error codes."
-          href="/docs#api"
-          icon={Terminal}
+          title="BrenoxServer docs"
+          description="Server SDK — provision users, channels, and messages."
+          href="/docs#sdk-server"
+          icon={BookOpen}
           className="lg:w-72"
         />
       </div>
@@ -168,7 +175,7 @@ export default function SandboxPage() {
                 <Label>username</Label>
                 <Input value={provision.username} onChange={(e) => setProvision({ ...provision, username: e.target.value })} className="bg-surface" />
               </div>
-              <Button disabled={running} onClick={() => void run("/v1/users", provision)}>
+              <Button disabled={running} onClick={() => void run("server.users.provision", provision)}>
                 {running ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
                 Provision user
               </Button>
@@ -179,7 +186,7 @@ export default function SandboxPage() {
                 <Label>name</Label>
                 <Input value={channel.name} onChange={(e) => setChannel({ name: e.target.value })} className="bg-surface font-mono" />
               </div>
-              <Button disabled={running} onClick={() => void run("/v1/channels", channel)}>
+              <Button disabled={running} onClick={() => void run("server.channels.create", channel)}>
                 {running ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
                 Create channel
               </Button>
@@ -201,7 +208,7 @@ export default function SandboxPage() {
               <Button
                 disabled={running}
                 onClick={() =>
-                  void run("/v1/messages", {
+                  void run("server.messages.send", {
                     channel_id: Number(message.channel_id),
                     external_id: message.external_id,
                     content: message.content,
@@ -225,7 +232,7 @@ export default function SandboxPage() {
               <Button
                 disabled={running}
                 onClick={() =>
-                  void run("/v1/messages", {
+                  void run("server.messages.list", {
                     channel_id: Number(listParams.channel_id),
                     limit: Number(listParams.limit),
                   })

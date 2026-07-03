@@ -12,7 +12,7 @@ import { FlowSteps } from "@/components/shared/flow-steps"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { CopyButton } from "@/components/shared/copy-button"
 import { getApp, getApiKeys, getWebhooks } from "@/lib/api"
-import { getEngineBaseUrl } from "@/lib/engine/config"
+import { getDocSnippets } from "@/lib/docs/content"
 import type { App } from "@/lib/types"
 
 export default function AppOverviewPage() {
@@ -61,21 +61,7 @@ export default function AppOverviewPage() {
     )
   }
 
-  const baseUrl = getEngineBaseUrl()
-  const snippet = `import { BrenoxServer } from "@brenox/sdk/server";
-
-const server = new BrenoxServer({
-  baseUrl: "${baseUrl}",
-  apiKey: process.env.BRENOX_API_KEY!,
-});
-
-const user = await server.users.provision({ external_id: "user-1" });
-const channel = await server.channels.create({ name: "general" });
-await server.messages.send({
-  channel_id: channel.id,
-  external_id: "user-1",
-  content: "Hello from Brenox",
-});`
+  const snippet = getDocSnippets().serverIntegration
 
   return (
     <div className="space-y-8">
@@ -97,7 +83,7 @@ await server.messages.send({
         <FlowSteps
           steps={[
             { number: 1, title: "Create key", description: "Generate a sandbox bx_test_ key", href: `/apps/${app.id}/keys`, active: keyCount === 0 },
-            { number: 2, title: "Test API", description: "Provision users & send messages", href: `/apps/${app.id}/sandbox`, active: keyCount > 0 },
+            { number: 2, title: "Test SDK", description: "Try BrenoxServer in sandbox", href: `/apps/${app.id}/sandbox`, active: keyCount > 0 },
             { number: 3, title: "Add webhook", description: "Receive realtime events", href: `/apps/${app.id}/webhooks`, active: false },
             { number: 4, title: "Open workspace", description: "See messages live", href: `/workspaces/${app.workspace_id}`, active: false },
           ]}
