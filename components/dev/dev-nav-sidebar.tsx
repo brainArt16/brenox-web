@@ -258,7 +258,7 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
               Settings
             </div>
             <NavLink href="/settings/profile" active={pathname === "/settings/profile"} icon={Settings}>
-              Profile
+              Account
             </NavLink>
             <NavLink href="/notifications" active={pathname === "/notifications"} icon={Bell}>
               Notifications

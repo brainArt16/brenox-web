@@ -29,6 +29,7 @@ import {
   markNotificationRead,
   markAllNotificationsReadRequest,
 } from './engine/notifications'
+import { getMyPresence, changePassword, type PresenceStatus } from './engine/users'
 
 // User — backed by Brenox engine when authenticated
 export async function getUser(): Promise<UserProfile> {
@@ -133,11 +134,20 @@ export async function updateProfile(username: string): Promise<UserProfile> {
   })
 }
 
-export async function updatePresence(status: 'online' | 'away' | 'offline'): Promise<void> {
+export async function updatePresence(status: PresenceStatus): Promise<void> {
   await engineFetch('/api/users/me/status', {
     method: 'PATCH',
     body: JSON.stringify({ status }),
   })
+}
+
+export async function fetchPresence(): Promise<PresenceStatus> {
+  const p = await getMyPresence()
+  return p.status
+}
+
+export async function updatePassword(currentPassword: string, newPassword: string): Promise<void> {
+  return changePassword(currentPassword, newPassword)
 }
 
 // Notifications — Brenox engine /api/notifications
