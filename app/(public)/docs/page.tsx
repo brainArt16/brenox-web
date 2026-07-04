@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
   ExternalLink,
@@ -8,7 +8,6 @@ import {
   Layers,
   Lightbulb,
   Loader2,
-  Package,
 } from "lucide-react"
 import { DocSection } from "@/components/docs/doc-section"
 import { DocsCallout } from "@/components/docs/docs-callout"
@@ -19,9 +18,11 @@ import { DocsHero } from "@/components/docs/docs-hero"
 import { DocsQuickNav } from "@/components/docs/docs-quick-nav"
 import { DocsToc } from "@/components/docs/docs-toc"
 import { DocsVersionPicker } from "@/components/docs/docs-version-picker"
+import { SdkIcon } from "@/components/docs/sdk-icon"
 import { useDocsSdk } from "@/components/docs/use-docs-sdk"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { FlowSteps } from "@/components/shared/flow-steps"
+import { useAuth } from "@/providers/auth-provider"
 import {
   BEST_PRACTICES,
   CONSOLE_STEPS,
@@ -32,26 +33,53 @@ import {
 } from "@/lib/docs/content"
 import { getApps } from "@/lib/api"
 
+function gatePath(path: string, isAuthenticated: boolean) {
+  return isAuthenticated ? path : `/login?next=${encodeURIComponent(path)}`
+}
+
 function DocsPageContent() {
   const { sdk, isAvailable, snippets, versions, version, setSdk, setVersion } = useDocsSdk()
+  const { isAuthenticated } = useAuth()
   const [firstAppId, setFirstAppId] = useState<string | null>(null)
 
   const has = (id: string) => sdk.sections.includes(id as (typeof sdk.sections)[number])
 
   useEffect(() => {
+    if (!isAuthenticated) return
     void getApps().then((apps) => {
       if (apps[0]) setFirstAppId(String(apps[0].id))
     })
-  }, [])
+  }, [isAuthenticated])
 
-  const sandboxHref = firstAppId ? `/apps/${firstAppId}/sandbox` : "/apps"
-  const keysHref = firstAppId ? `/apps/${firstAppId}/keys` : "/apps"
-  const webhooksHref = firstAppId ? `/apps/${firstAppId}/webhooks` : "/apps"
+  const { sandboxHref, keysHref, webhooksHref, newAppHref } = useMemo(() => {
+    const appsBase = gatePath("/apps", isAuthenticated)
+    return {
+      sandboxHref:
+        isAuthenticated && firstAppId
+          ? `/apps/${firstAppId}/sandbox`
+          : gatePath("/apps", isAuthenticated),
+      keysHref:
+        isAuthenticated && firstAppId
+          ? `/apps/${firstAppId}/keys`
+          : appsBase,
+      webhooksHref:
+        isAuthenticated && firstAppId
+          ? `/apps/${firstAppId}/webhooks`
+          : appsBase,
+      newAppHref: gatePath("/apps/new", isAuthenticated),
+    }
+  }, [firstAppId, isAuthenticated])
 
   const consoleSteps = CONSOLE_STEPS.map((step) => ({
     ...step,
     href:
-      step.number === 2 ? keysHref : step.number === 3 ? sandboxHref : step.href,
+      step.number === 1
+        ? newAppHref
+        : step.number === 2
+          ? keysHref
+          : step.number === 3
+            ? sandboxHref
+            : step.href,
     active: step.number === 1,
   }))
 
@@ -79,7 +107,7 @@ function DocsPageContent() {
               >
                 <DocsCapabilityGrid />
                 <DocsCallout icon={Layers} title="SDK-first integration" variant="tip">
-                  Integrate through official SDKs only. Use this console for apps, keys, and
+                  Integrate through official SDKs only. Use the developer console for apps, keys, and
                   webhooks — never call the platform HTTP API directly from your product.
                 </DocsCallout>
               </DocSection>
@@ -130,7 +158,7 @@ function DocsPageContent() {
                 {isAvailable && (
                   <DocsCallout icon={Lightbulb} title="Credentials" variant="info">
                     Create an app under{" "}
-                    <Link href="/apps/new" className="font-medium text-primary hover:underline">
+                    <Link href={newAppHref} className="font-medium text-primary hover:underline">
                       Apps → New app
                     </Link>
                     , then a sandbox key at{" "}
@@ -296,7 +324,9 @@ function DocsPageContent() {
                     >
                       <div>
                         <div className="flex items-center gap-2">
-                          <Package className="h-4 w-4 text-primary" />
+                          {pkg.icon ? (
+                            <SdkIcon src={pkg.icon} alt={pkg.name} size={18} />
+                          ) : null}
                           <p className="font-mono text-sm font-medium">{pkg.packageName}</p>
                           <span className="text-xs text-muted-foreground">· {pkg.language}</span>
                         </div>
@@ -315,7 +345,7 @@ function DocsPageContent() {
           </div>
 
           <aside className="hidden w-56 shrink-0 lg:block">
-            <div className="sticky top-8 space-y-6">
+            <div className="sticky top-20 space-y-6">
               <DocsSdkPicker selectedId={sdk.id} onSelect={setSdk} variant="sidebar" />
               <DocsToc sdkId={sdk.id} />
             </div>

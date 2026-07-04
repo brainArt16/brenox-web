@@ -33,6 +33,8 @@ export interface SdkDefinition {
   installCommand?: string
   githubUrl?: string
   npmUrl?: string
+  /** Path under /public/icons for SDK branding */
+  icon?: string
   /** Human-readable: what this SDK is best for */
   bestFor: string[]
   /** Feature keys for the comparison matrix */
@@ -132,6 +134,7 @@ export const SDK_REGISTRY: SdkDefinition[] = [
     role: "fullstack",
     status: "available",
     packageName: "@brenox/sdk",
+    icon: "/icons/JavaScript.svg",
     description: "Core SDK for browsers, Node.js, and server-side automation.",
     installCommand: "npm install @brenox/sdk",
     githubUrl: "https://github.com/brainArt16/brenox-sdk",
@@ -158,6 +161,7 @@ export const SDK_REGISTRY: SdkDefinition[] = [
     role: "framework",
     status: "available",
     packageName: "@brenox/react",
+    icon: "/icons/React.svg",
     description: "Hooks and provider for React — live messages, notifications, and call signaling.",
     installCommand: "npm install @brenox/react @brenox/sdk",
     githubUrl: "https://github.com/brainArt16/brenox-sdk/tree/main/react",
@@ -184,6 +188,7 @@ export const SDK_REGISTRY: SdkDefinition[] = [
     role: "fullstack",
     status: "coming_soon",
     packageName: "brenox-sdk",
+    icon: "/icons/Python.svg",
     description: "Python client and server library for Django, FastAPI, Flask, and scripts.",
     installCommand: "pip install brenox-sdk",
     bestFor: ["FastAPI", "Django", "Backend services", "Data pipelines"],
@@ -214,6 +219,7 @@ export const SDK_REGISTRY: SdkDefinition[] = [
     role: "client",
     status: "coming_soon",
     packageName: "brenox_sdk",
+    icon: "/icons/Flutter.svg",
     description: "Cross-platform mobile SDK for iOS and Android chat apps.",
     installCommand: "flutter pub add brenox_sdk",
     bestFor: ["iOS", "Android", "Cross-platform mobile"],
@@ -229,6 +235,7 @@ export const SDK_REGISTRY: SdkDefinition[] = [
     role: "framework",
     status: "coming_soon",
     packageName: "@brenox/vue",
+    icon: "/icons/Vue.js.svg",
     description: "Composables and plugin for Vue 3 and Nuxt.",
     installCommand: "npm install @brenox/vue @brenox/sdk",
     bestFor: ["Vue 3", "Nuxt", "Vite"],
@@ -245,6 +252,7 @@ export const SDK_REGISTRY: SdkDefinition[] = [
     role: "framework",
     status: "coming_soon",
     packageName: "@brenox/react-native",
+    icon: "/icons/React.svg",
     description: "Native mobile hooks with secure token storage and background reconnect.",
     installCommand: "npm install @brenox/react-native @brenox/sdk",
     bestFor: ["iOS", "Android", "Expo"],

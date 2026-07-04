@@ -11,6 +11,8 @@ import {
 } from "@/lib/docs/sdk-registry"
 import type { SdkVersionDoc } from "@/lib/docs/sdk-versions"
 import { Badge } from "@/components/ui/badge"
+import { SdkIcon } from "@/components/docs/sdk-icon"
+import { getFrameworkIcon } from "@/lib/docs/framework-icons"
 import { Check, Clock, FlaskConical } from "lucide-react"
 
 const STATUS_LABEL: Record<SdkStatus, string> = {
@@ -39,13 +41,16 @@ export function DocsSdkPicker({ selectedId, onSelect, variant = "full" }: DocsSd
             type="button"
             onClick={() => onSelect(sdk.id)}
             className={cn(
-              "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm transition-colors",
+              "flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors",
               selectedId === sdk.id
                 ? "bg-primary/10 font-medium text-primary"
                 : "text-muted-foreground hover:bg-surface hover:text-foreground",
             )}
           >
-            <span className="truncate">{sdk.language}</span>
+            <span className="flex min-w-0 items-center gap-2 truncate">
+              {sdk.icon ? <SdkIcon src={sdk.icon} alt={sdk.name} size={16} /> : null}
+              <span className="truncate">{sdk.language}</span>
+            </span>
             <SdkStatusBadge status={sdk.status} />
           </button>
         ))}
@@ -122,9 +127,16 @@ function SdkCard({
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-sm font-medium text-foreground">{sdk.name}</p>
-          <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">{sdk.packageName}</p>
+        <div className="flex items-start gap-3 min-w-0">
+          {sdk.icon ? (
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface">
+              <SdkIcon src={sdk.icon} alt={sdk.name} size={22} />
+            </div>
+          ) : null}
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-foreground">{sdk.name}</p>
+            <p className="mt-0.5 font-mono text-[11px] text-muted-foreground truncate">{sdk.packageName}</p>
+          </div>
         </div>
         <SdkStatusBadge status={sdk.status} />
       </div>
@@ -134,14 +146,18 @@ function SdkCard({
       </p>
 
       <div className="mt-3 flex flex-wrap gap-1">
-        {sdk.bestFor.slice(0, 3).map((tag) => (
-          <span
-            key={tag}
-            className="rounded-md bg-surface px-1.5 py-0.5 text-[10px] text-muted-foreground"
-          >
-            {tag}
-          </span>
-        ))}
+        {sdk.bestFor.slice(0, 3).map((tag) => {
+          const tagIcon = getFrameworkIcon(tag)
+          return (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 rounded-md bg-surface px-1.5 py-0.5 text-[10px] text-muted-foreground"
+            >
+              {tagIcon ? <SdkIcon src={tagIcon} alt="" size={12} className="opacity-80" /> : null}
+              {tag}
+            </span>
+          )
+        })}
       </div>
 
       {sdk.note && (
@@ -202,7 +218,10 @@ export function DocsSdkMatrix({ selectedId }: { selectedId: string }) {
                     sdk.id === selectedId ? "bg-primary/10 text-primary" : "text-muted-foreground",
                   )}
                 >
-                  {sdk.language}
+                  <span className="inline-flex flex-col items-center gap-1">
+                    {sdk.icon ? <SdkIcon src={sdk.icon} alt={sdk.name} size={16} /> : null}
+                    {sdk.language}
+                  </span>
                 </th>
               ))}
             </tr>
@@ -250,6 +269,11 @@ export function DocsSdkBanner({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface-elevated px-4 py-3">
+      {sdk.icon ? (
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-card border border-border">
+          <SdkIcon src={sdk.icon} alt={sdk.name} size={24} />
+        </div>
+      ) : null}
       <div className="min-w-0 flex-1">
         <p className="text-sm text-muted-foreground">
           Viewing docs for{" "}
@@ -284,7 +308,11 @@ export function DocsSdkBanner({
 export function DocsComingSoonPanel({ sdk }: { sdk: SdkDefinition }) {
   return (
     <div className="rounded-xl border border-dashed border-border bg-surface p-8 text-center">
-      <Clock className="mx-auto h-10 w-10 text-muted-foreground" />
+      {sdk.icon ? (
+        <SdkIcon src={sdk.icon} alt={sdk.name} size={40} className="mx-auto opacity-60" />
+      ) : (
+        <Clock className="mx-auto h-10 w-10 text-muted-foreground" />
+      )}
       <p className="mt-4 text-lg font-medium text-foreground">{sdk.name} SDK — coming soon</p>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{sdk.description}</p>
       {sdk.installCommand && (
