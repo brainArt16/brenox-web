@@ -1,25 +1,28 @@
 "use client"
 
-import { useEffect, useMemo, useState, type ComponentType } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
-  BookOpen,
-  Code2,
   ExternalLink,
-  Key,
+  Info,
   Layers,
+  Lightbulb,
   Package,
-  Shield,
-  Webhook,
-  Zap,
 } from "lucide-react"
-import { PageHeader } from "@/components/layout/page-header"
-import { DocLinkCard } from "@/components/shared/doc-link-card"
-import { CodeSnippet } from "@/components/shared/code-snippet"
 import { DocSection } from "@/components/docs/doc-section"
+import { DocsCallout } from "@/components/docs/docs-callout"
+import { DocsCapabilityGrid } from "@/components/docs/docs-capability-grid"
+import { DocsCodeTabs } from "@/components/docs/docs-code-tabs"
+import { DocsHero } from "@/components/docs/docs-hero"
+import { DocsQuickNav } from "@/components/docs/docs-quick-nav"
 import { DocsToc } from "@/components/docs/docs-toc"
+import { CodeSnippet } from "@/components/shared/code-snippet"
+import { FlowSteps } from "@/components/shared/flow-steps"
 import {
+  BEST_PRACTICES,
+  CONSOLE_STEPS,
   getDocSnippets,
+  REACT_HOOKS,
   SDK_PACKAGES,
   WEBHOOK_EVENTS,
   WEBSOCKET_EVENTS,
@@ -37,336 +40,288 @@ export default function DocsPage() {
   }, [])
 
   const sandboxHref = firstAppId ? `/apps/${firstAppId}/sandbox` : "/apps"
+  const keysHref = firstAppId ? `/apps/${firstAppId}/keys` : "/apps"
+  const webhooksHref = firstAppId ? `/apps/${firstAppId}/webhooks` : "/apps"
+
+  const consoleSteps = CONSOLE_STEPS.map((step) => ({
+    ...step,
+    href:
+      step.number === 2
+        ? keysHref
+        : step.number === 3
+          ? sandboxHref
+          : step.href,
+    active: step.number === 1,
+  }))
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        eyebrow="Resources"
-        title="SDK documentation"
-        description="Build chat and realtime features into your product using @brenox/sdk — no direct platform API integration required."
-      />
+    <div className="min-h-full">
+      <div className="mx-auto max-w-6xl space-y-10 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <DocsHero sandboxHref={sandboxHref} />
+        <DocsQuickNav />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <DocLinkCard
-          title="Quick start"
-          description="Install the SDK and send your first message."
-          href="#setup"
-          icon={Zap}
-        />
-        <DocLinkCard
-          title="Developer guide"
-          description="Full SDK guide (Markdown)."
-          href="https://github.com/brainArt16/brenox-sdk/blob/main/docs/DEVELOPER_GUIDE.md"
-          icon={BookOpen}
-          external
-        />
-        <DocLinkCard
-          title="JavaScript SDK"
-          description="@brenox/sdk on GitHub."
-          href="https://github.com/brainArt16/brenox-sdk"
-          icon={Code2}
-          external
-        />
-        <DocLinkCard
-          title="React hooks"
-          description="@brenox/react — useMessages, useNotifications, and more."
-          href="#sdk-react"
-          icon={Code2}
-        />
-        <DocLinkCard
-          title="Webhooks"
-          description="Receive events in your backend."
-          href="#webhooks"
-          icon={Webhook}
-        />
-        <DocLinkCard
-          title="Sandbox"
-          description="Try BrenoxServer operations before going live."
-          href={sandboxHref}
-          icon={ExternalLink}
-        />
-      </div>
-
-      <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
-        <div className="min-w-0 flex-1 space-y-12">
-          <DocSection
-            id="overview"
-            title="How Brenox works for developers"
-            description="You register an app in this console, install our SDKs in your product, and Brenox handles chat infrastructure behind the scenes."
-          >
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-surface text-left">
-                    <th className="px-4 py-3 font-medium text-foreground">You build</th>
-                    <th className="px-4 py-3 font-medium text-foreground">With</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Purpose</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  <tr>
-                    <td className="px-4 py-3 font-medium">Your frontend</td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">BrenoxClient</td>
-                    <td className="px-4 py-3 text-muted-foreground">User login, chat UI, realtime messages</td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3 font-medium">Your backend</td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">BrenoxServer</td>
-                    <td className="px-4 py-3 text-muted-foreground">Provision users, send messages, server workflows</td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3 font-medium">This console</td>
-                    <td className="px-4 py-3 text-muted-foreground">Dashboard</td>
-                    <td className="px-4 py-3 text-muted-foreground">Create apps, API keys, webhooks, test sandbox</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <TipCard
-              icon={Layers}
-              title="Use the SDKs, not raw HTTP"
-              body="Integrate exclusively through @brenox/sdk and @brenox/react. Create API keys here and pass them to BrenoxServer on your server — never in client code."
-            />
-          </DocSection>
-
-          <DocSection
-            id="setup"
-            title="Setup"
-            description="Install packages in your app and configure credentials from this console."
-          >
-            <CodeSnippet code={snippets.sdkInstall} title="Install" />
-            <CodeSnippet code={snippets.envExample} title="Environment variables (your app)" />
-          </DocSection>
-
-          <DocSection
-            id="console"
-            title="Console workflow"
-            description="From app creation to your first SDK call."
-          >
-            <ol className="space-y-3 text-sm leading-relaxed text-muted-foreground">
-              <li className="flex gap-3">
-                <Step n={1} />
-                <span><strong className="text-foreground">Register / login</strong> — access this developer console.</span>
-              </li>
-              <li className="flex gap-3">
-                <Step n={2} />
-                <span><strong className="text-foreground">Apps → New app</strong> — provisions an isolated workspace for your integration.</span>
-              </li>
-              <li className="flex gap-3">
-                <Step n={3} />
-                <span><strong className="text-foreground">API Keys</strong> — create a sandbox key for BrenoxServer; copy the secret once.</span>
-              </li>
-              <li className="flex gap-3">
-                <Step n={4} />
-                <span><strong className="text-foreground">Sandbox</strong> — dry-run server SDK operations before wiring your backend.</span>
-              </li>
-              <li className="flex gap-3">
-                <Step n={5} />
-                <span><strong className="text-foreground">Webhooks</strong> — register your HTTPS endpoint for platform events.</span>
-              </li>
-              <li className="flex gap-3">
-                <Step n={6} />
-                <span><strong className="text-foreground">Integrate</strong> — add <code className="font-mono text-xs">@brenox/sdk</code> to your frontend and backend.</span>
-              </li>
-            </ol>
-            <Link
-              href="/apps"
-              className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-10">
+          <div className="min-w-0 flex-1 space-y-16">
+            {/* Overview */}
+            <DocSection
+              id="overview"
+              title="What you can build"
+              description="Brenox SDKs cover messaging through voice and video. Integrate through @brenox/sdk — the platform handles infrastructure behind the scenes."
             >
-              Open apps
-              <ExternalLink className="h-3.5 w-3.5" />
-            </Link>
-          </DocSection>
+              <DocsCapabilityGrid />
+              <DocsCallout icon={Layers} title="SDK-first integration" variant="tip">
+                Use <code className="font-mono text-xs">BrenoxClient</code> in your frontend,{" "}
+                <code className="font-mono text-xs">BrenoxServer</code> on your backend, and this
+                console to manage apps, keys, and webhooks. No raw HTTP integration required.
+              </DocsCallout>
+            </DocSection>
 
-          <DocSection
-            id="auth"
-            title="Authentication"
-            description="Two credential types — one for your users, one for your server."
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <AuthCard
-                icon={Shield}
-                title="User sessions (BrenoxClient)"
-                detail="Your end users sign in through the SDK. Tokens are stored and refreshed automatically — use localStorageTokenStore() in browsers."
+            {/* Quick start */}
+            <DocSection
+              id="quickstart"
+              title="Quick start"
+              badge="~5 min"
+              description="Install the SDK, configure credentials from this console, and send your first message."
+            >
+              <DocsCodeTabs
+                tabs={[
+                  { id: "install", label: "Install", code: snippets.install },
+                  { id: "env", label: "Environment", code: snippets.env },
+                  { id: "code", label: "First message", code: snippets.quickStart },
+                ]}
               />
-              <AuthCard
-                icon={Key}
-                title="Server keys (BrenoxServer)"
-                detail="API keys from App → API Keys. Pass to BrenoxServer via BRENOX_API_KEY. Sandbox keys start with bx_test_. Never expose keys in frontend code."
-              />
-            </div>
-            <CodeSnippet code={snippets.clientQuickStart} title="User login + first message" />
-          </DocSection>
+              <DocsCallout icon={Lightbulb} title="Where to get credentials" variant="info">
+                Create an app under{" "}
+                <Link href="/apps/new" className="font-medium text-primary hover:underline">
+                  Apps → New app
+                </Link>
+                , then generate a sandbox key at{" "}
+                <Link href={keysHref} className="font-medium text-primary hover:underline">
+                  API Keys
+                </Link>
+                . Copy the secret once — it powers BrenoxServer on your backend.
+              </DocsCallout>
+            </DocSection>
 
-          <DocSection
-            id="sdk-client"
-            title="BrenoxClient"
-            description="User-facing chat — workspaces, channels, messages, presence, and realtime."
-          >
-            <CodeSnippet code={snippets.clientQuickStart} title="Workspaces, channels, messages" />
-            <CodeSnippet code={snippets.clientRealtime} title="Realtime channel (WebSocket)" />
-          </DocSection>
+            {/* Console */}
+            <DocSection
+              id="console"
+              title="Console setup"
+              description="Four steps from zero to a working integration."
+            >
+              <FlowSteps steps={consoleSteps} />
+            </DocSection>
 
-          <DocSection
-            id="sdk-server"
-            title="BrenoxServer"
-            description="Server-side integration — map your users, send messages, and manage channels from your backend."
-          >
-            <CodeSnippet code={snippets.serverIntegration} title="Provision users and send messages" />
-          </DocSection>
-
-          <DocSection
-            id="sdk-react"
-            title="React hooks (@brenox/react)"
-            description="Wrap BrenoxClient with hooks for live messages, notifications, and call signaling."
-          >
-            <CodeSnippet code={snippets.reactSetup} title="BrenoxProvider + useMessages" />
-            <p className="text-sm text-muted-foreground">
-              See{" "}
-              <a
-                href="https://github.com/brainArt16/brenox-sdk/blob/main/react/README.md"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-primary hover:underline"
-              >
-                react/README.md
-              </a>{" "}
-              for <code className="font-mono text-xs">useChannel</code>,{" "}
-              <code className="font-mono text-xs">useNotifications</code>, and{" "}
-              <code className="font-mono text-xs">useCallSignaling</code>.
-            </p>
-          </DocSection>
-
-          <DocSection
-            id="webhooks"
-            title="Webhooks"
-            description="Your backend receives HTTPS callbacks when key events occur in your app."
-          >
-            <ul className="grid gap-2 sm:grid-cols-3">
-              {WEBHOOK_EVENTS.map((event) => (
-                <li
-                  key={event}
-                  className="rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs text-foreground"
-                >
-                  {event}
-                </li>
-              ))}
-            </ul>
-            <p className="text-sm text-muted-foreground">
-              Register endpoints under{" "}
-              <Link href="/apps" className="font-medium text-primary hover:underline">
-                App → Webhooks
-              </Link>
-              . Each endpoint receives a signing secret once at creation.
-            </p>
-            <CodeSnippet code={snippets.webhookVerify} title="Verify signatures" />
-          </DocSection>
-
-          <DocSection
-            id="realtime"
-            title="Realtime events"
-            description="Subscribe via client.channel() or useMessages. Every event includes a sequence number for gap detection and automatic backfill on reconnect."
-          >
-            <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {WEBSOCKET_EVENTS.map((event) => (
-                <li
-                  key={event}
-                  className="rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs text-foreground"
-                >
-                  {event}
-                </li>
-              ))}
-            </ul>
-            <p className="text-sm text-muted-foreground">
-              Listen with <code className="font-mono text-xs">conn.on(&quot;message.new&quot;, handler)</code> or the{" "}
-              <code className="font-mono text-xs">useMessages</code> hook.
-            </p>
-          </DocSection>
-
-          <DocSection
-            id="packages"
-            title="SDK packages"
-            description="Everything you need is published on npm — pick the package that matches your stack."
-          >
-            <div className="space-y-4">
-              {SDK_PACKAGES.map((pkg) => (
-                <div key={pkg.name} className="rounded-xl border border-border bg-card p-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Package className="h-4 w-4 text-primary" />
-                    <p className="font-mono text-sm font-medium text-foreground">{pkg.name}</p>
-                    <span className="text-xs text-muted-foreground">→ {pkg.export}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{pkg.use}</p>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {pkg.features.map((f) => (
-                      <span
-                        key={f}
-                        className="rounded-md bg-surface px-2 py-0.5 font-mono text-[11px] text-muted-foreground"
-                      >
-                        {f}
-                      </span>
-                    ))}
-                  </div>
+            {/* Auth */}
+            <DocSection
+              id="auth"
+              title="Authentication"
+              description="Two credential types — pick the right one for each layer of your app."
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="font-mono text-xs text-primary">BrenoxClient</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">User sessions</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    End users sign in via the SDK. Tokens persist with{" "}
+                    <code className="font-mono text-xs">localStorageTokenStore()</code> and refresh
+                    automatically.
+                  </p>
                 </div>
-              ))}
-            </div>
-          </DocSection>
-        </div>
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="font-mono text-xs text-primary">BrenoxServer</p>
+                  <p className="mt-2 text-sm font-medium text-foreground">Server API keys</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    Keys from App → API Keys. Pass via{" "}
+                    <code className="font-mono text-xs">BRENOX_API_KEY</code>. Sandbox keys start
+                    with <code className="font-mono text-xs">bx_test_</code>.
+                  </p>
+                </div>
+              </div>
+            </DocSection>
 
-        <aside className="hidden shrink-0 lg:block lg:w-52">
-          <div className="sticky top-6">
-            <DocsToc />
+            {/* Messaging */}
+            <DocSection
+              id="messaging"
+              title="Messaging"
+              badge="BrenoxClient"
+              description="REST for history, WebSocket for live delivery. Includes typing, presence, notifications, and file attachments."
+            >
+              <DocsCodeTabs
+                tabs={[
+                  { id: "messages", label: "Send & list", code: snippets.messaging },
+                  { id: "files", label: "Attachments", code: snippets.attachments },
+                ]}
+              />
+            </DocSection>
+
+            {/* Realtime */}
+            <DocSection
+              id="realtime"
+              title="Realtime events"
+              badge="WebSocket"
+              description="Subscribe via client.channel() or useMessages. Events include sequence numbers for gap detection and automatic backfill on reconnect."
+            >
+              <CodeSnippet code={snippets.realtime} title="Channel connection" />
+              <div className="grid gap-4 sm:grid-cols-2">
+                {Object.entries(WEBSOCKET_EVENTS).map(([group, events]) => (
+                  <div key={group} className="rounded-xl border border-border bg-card p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {group}
+                    </p>
+                    <ul className="mt-3 space-y-1.5">
+                      {events.map((event) => (
+                        <li
+                          key={event}
+                          className="rounded-md bg-surface px-2.5 py-1 font-mono text-[11px] text-foreground"
+                        >
+                          {event}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </DocSection>
+
+            {/* Calls */}
+            <DocSection
+              id="calls"
+              title="Voice & video calls"
+              badge="CallSignaling"
+              description="Full call lifecycle and WebRTC signaling. You wire RTCPeerConnection, media tracks, and STUN/TURN."
+            >
+              <CodeSnippet code={snippets.calls} title="Initiate a video call" />
+              <CodeSnippet code={snippets.callsNote} title="SDK vs your code" language="guide" />
+              <DocsCallout icon={Info} title="Signaling, not media" variant="warning">
+                The SDK exchanges SDP offers/answers and ICE candidates. Audio and video flow
+                peer-to-peer via WebRTC — configure your own STUN/TURN servers for production.
+              </DocsCallout>
+            </DocSection>
+
+            {/* Server */}
+            <DocSection
+              id="server"
+              title="BrenoxServer"
+              badge="@brenox/sdk/server"
+              description="Backend automation — map your auth users, provision accounts, and send messages from trusted servers."
+            >
+              <CodeSnippet code={snippets.server} title="Provision & send" />
+              <Link
+                href={sandboxHref}
+                className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+              >
+                Try in sandbox
+                <ExternalLink className="h-3.5 w-3.5" />
+              </Link>
+            </DocSection>
+
+            {/* React */}
+            <DocSection
+              id="react"
+              title="React hooks"
+              badge="@brenox/react"
+              description="Drop-in hooks for messages, notifications, and call signaling — wraps BrenoxClient with auto-connect and cleanup."
+            >
+              <CodeSnippet code={snippets.react} title="BrenoxProvider + useMessages" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                {REACT_HOOKS.map((hook) => (
+                  <div
+                    key={hook.name}
+                    className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/20"
+                  >
+                    <p className="font-mono text-sm font-medium text-primary">{hook.name}</p>
+                    <p className="mt-1.5 text-sm text-muted-foreground">{hook.description}</p>
+                    <code className="mt-3 block overflow-x-auto rounded-md bg-surface px-2 py-1.5 font-mono text-[10px] text-muted-foreground">
+                      {hook.snippet}
+                    </code>
+                  </div>
+                ))}
+              </div>
+            </DocSection>
+
+            {/* Webhooks */}
+            <DocSection
+              id="webhooks"
+              title="Webhooks"
+              description="Receive HTTPS callbacks on your server when key events occur."
+            >
+              <div className="grid gap-3 sm:grid-cols-3">
+                {WEBHOOK_EVENTS.map((event) => (
+                  <div key={event.name} className="rounded-xl border border-border bg-card p-4">
+                    <p className="font-mono text-xs text-foreground">{event.name}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">{event.description}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Register under{" "}
+                <Link href={webhooksHref} className="font-medium text-primary hover:underline">
+                  App → Webhooks
+                </Link>
+                . Each endpoint gets a signing secret once at creation.
+              </p>
+              <CodeSnippet code={snippets.webhookVerify} title="Verify signatures (Node.js)" />
+            </DocSection>
+
+            {/* Best practices */}
+            <DocSection
+              id="best-practices"
+              title="Best practices"
+              description="Follow these patterns for a secure, smooth integration."
+            >
+              <div className="grid gap-4 sm:grid-cols-3">
+                {BEST_PRACTICES.map((item) => (
+                  <div key={item.title} className="rounded-xl border border-border bg-card p-4">
+                    <item.icon className="h-5 w-5 text-primary" />
+                    <p className="mt-3 text-sm font-medium text-foreground">{item.title}</p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                      {item.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-foreground">SDK packages</p>
+                {SDK_PACKAGES.map((pkg) => (
+                  <div
+                    key={pkg.name}
+                    className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Package className="h-4 w-4 shrink-0 text-primary" />
+                        <p className="font-mono text-sm font-medium text-foreground">{pkg.name}</p>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">{pkg.use}</p>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {pkg.features.map((f) => (
+                          <span
+                            key={f}
+                            className="rounded bg-surface px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground"
+                          >
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <code className="shrink-0 rounded-lg bg-surface px-3 py-2 font-mono text-[11px] text-muted-foreground">
+                      {pkg.install}
+                    </code>
+                  </div>
+                ))}
+              </div>
+            </DocSection>
           </div>
-        </aside>
-      </div>
-    </div>
-  )
-}
 
-function Step({ n }: { n: number }) {
-  return (
-    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-      {n}
-    </span>
-  )
-}
-
-function TipCard({
-  icon: Icon,
-  title,
-  body,
-}: {
-  icon: ComponentType<{ className?: string }>
-  title: string
-  body: string
-}) {
-  return (
-    <div className="flex gap-3 rounded-xl border border-border bg-surface p-4">
-      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-      <div>
-        <p className="text-sm font-medium text-foreground">{title}</p>
-        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{body}</p>
+          <aside className="hidden w-56 shrink-0 lg:block">
+            <div className="sticky top-8">
+              <DocsToc />
+            </div>
+          </aside>
+        </div>
       </div>
-    </div>
-  )
-}
-
-function AuthCard({
-  icon: Icon,
-  title,
-  detail,
-}: {
-  icon: ComponentType<{ className?: string }>
-  title: string
-  detail: string
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4 text-primary" />
-        <p className="text-sm font-medium text-foreground">{title}</p>
-      </div>
-      <p className="mt-2 text-sm text-muted-foreground">{detail}</p>
     </div>
   )
 }

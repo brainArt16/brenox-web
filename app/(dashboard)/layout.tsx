@@ -15,6 +15,7 @@ function NavSidebarFallback() {
 function DashboardMain({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const isWorkspaceChat = /^\/workspaces\/\d+$/.test(pathname)
+  const isDocs = pathname.startsWith("/docs")
 
   return (
     <main
@@ -26,7 +27,11 @@ function DashboardMain({ children }: { children: ReactNode }) {
       <div
         className={cn(
           "flex-1",
-          isWorkspaceChat ? "p-0" : "p-4 sm:p-6 md:max-w-5xl md:mx-auto md:w-full"
+          isWorkspaceChat
+            ? "p-0"
+            : isDocs
+              ? "p-0 md:max-w-none md:mx-0 md:w-full"
+              : "p-4 sm:p-6 md:max-w-5xl md:mx-auto md:w-full"
         )}
       >
         {children}
