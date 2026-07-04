@@ -13,7 +13,7 @@ import {
   Zap,
 } from "lucide-react"
 import { ALL_DOC_SECTIONS, getSdkOrDefault } from "./sdk-registry"
-import { getSnippetsForSdkSafe } from "./sdk-snippets"
+import { getSnippetsForSdkSafe, BRENOX_API_URL_PRODUCTION } from "./sdk-snippets"
 
 export {
   ALL_DOC_SECTIONS,
@@ -38,10 +38,7 @@ export {
   getVersionOrDefault,
   getVersionsForSdk,
 } from "./sdk-versions"
-export {
-  BRENOX_API_URL_PRODUCTION,
-  BRENOX_API_URL_PLACEHOLDER,
-} from "./api-config"
+
 export type { SdkVersionDoc, SdkVersionStatus } from "./sdk-versions"
 export {
   ENGINE_VERSION_CATALOG,
@@ -414,7 +411,7 @@ export const BEST_PRACTICES = [
 ] as const
 
 /** @deprecated use getSnippetsForSdkSafe(sdk) — kept for app overview snippet */
-export function getDocSnippets(apiUrl = BRENOX_API_URL_PLACEHOLDER) {
+export function getDocSnippets(apiUrl = BRENOX_API_URL_PRODUCTION) {
   const s = getSnippetsForSdkSafe(getSdkOrDefault("typescript"), apiUrl)
   return {
     ...s,

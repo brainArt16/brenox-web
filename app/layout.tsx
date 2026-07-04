@@ -11,6 +11,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.breno-x.com"),
   title: 'Brenox | Realtime Communication Platform',
   description: 'Build realtime communication into any app. Chat, video calls, presence, and more.',
   generator: 'v0.app',
