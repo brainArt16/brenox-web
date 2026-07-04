@@ -4,8 +4,17 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useMemo } from "react"
 import { DEFAULT_SDK_ID, getSdkOrDefault } from "@/lib/docs/sdk-registry"
 import { getSnippetsForSdkSafe } from "@/lib/docs/sdk-snippets"
+import {
+  getVersionOrDefault,
+  getVersionsForSdk,
+  type SdkVersionDoc,
+} from "@/lib/docs/sdk-versions"
 import type { SdkDefinition } from "@/lib/docs/sdk-registry"
 import type { SdkSnippets } from "@/lib/docs/sdk-snippets"
+
+function buildDocsUrl(params: URLSearchParams): string {
+  return `/docs?${params.toString()}`
+}
 
 export function useDocsSdk() {
   const router = useRouter()
@@ -14,25 +23,62 @@ export function useDocsSdk() {
   const sdk = useMemo(() => getSdkOrDefault(sdkId), [sdkId])
   const isAvailable = sdk.status === "available" || sdk.status === "beta"
 
-  const snippets = useMemo(
-    () => getSnippetsForSdkSafe(sdk) as SdkSnippets,
-    [sdk],
+  const versions = useMemo(() => getVersionsForSdk(sdk.id), [sdk.id])
+  const version = useMemo(
+    () => getVersionOrDefault(sdk.id, searchParams.get("v")),
+    [sdk.id, searchParams],
   )
 
-  const setSdk = useCallback(
-    (id: string) => {
+  const snippets = useMemo(
+    () => getSnippetsForSdkSafe(sdk, undefined, version) as SdkSnippets,
+    [sdk, version],
+  )
+
+  const updateParams = useCallback(
+    (mutate: (params: URLSearchParams) => void) => {
       const params = new URLSearchParams(searchParams.toString())
-      params.set("sdk", id)
-      router.replace(`/docs?${params.toString()}`, { scroll: false })
+      mutate(params)
+      router.replace(buildDocsUrl(params), { scroll: false })
     },
     [router, searchParams],
   )
 
-  return { sdk, sdkId, isAvailable, snippets, setSdk } satisfies {
+  const setSdk = useCallback(
+    (id: string) => {
+      updateParams((params) => {
+        params.set("sdk", id)
+        params.delete("v")
+      })
+    },
+    [updateParams],
+  )
+
+  const setVersion = useCallback(
+    (v: string) => {
+      updateParams((params) => {
+        params.set("v", v)
+      })
+    },
+    [updateParams],
+  )
+
+  return {
+    sdk,
+    sdkId,
+    isAvailable,
+    snippets,
+    versions,
+    version,
+    setSdk,
+    setVersion,
+  } satisfies {
     sdk: SdkDefinition
     sdkId: string
     isAvailable: boolean
     snippets: SdkSnippets
+    versions: SdkVersionDoc[]
+    version: SdkVersionDoc | undefined
     setSdk: (id: string) => void
+    setVersion: (v: string) => void
   }
 }

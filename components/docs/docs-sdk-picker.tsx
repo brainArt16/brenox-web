@@ -9,6 +9,7 @@ import {
   type SdkFeatureKey,
   type SdkStatus,
 } from "@/lib/docs/sdk-registry"
+import type { SdkVersionDoc } from "@/lib/docs/sdk-versions"
 import { Badge } from "@/components/ui/badge"
 import { Check, Clock, FlaskConical } from "lucide-react"
 
@@ -240,22 +241,42 @@ export function DocsSdkMatrix({ selectedId }: { selectedId: string }) {
   )
 }
 
-export function DocsSdkBanner({ sdk }: { sdk: SdkDefinition }) {
+export function DocsSdkBanner({
+  sdk,
+  version,
+}: {
+  sdk: SdkDefinition
+  version?: SdkVersionDoc
+}) {
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface-elevated px-4 py-3">
       <div className="min-w-0 flex-1">
         <p className="text-sm text-muted-foreground">
           Viewing docs for{" "}
           <span className="font-medium text-foreground">{sdk.name}</span>
-          <span className="ml-2 font-mono text-xs text-primary">{sdk.packageName}</span>
+          <span className="ml-2 font-mono text-xs text-primary">
+            {version ? `${sdk.packageName}@${version.version}` : sdk.packageName}
+          </span>
         </p>
-        {sdk.installCommand && sdk.status === "available" && (
+        {version?.installPackages && sdk.status === "available" && (
           <code className="mt-1 block font-mono text-[11px] text-muted-foreground">
-            {sdk.installCommand}
+            npm install {version.installPackages}
           </code>
         )}
       </div>
-      <SdkStatusBadge status={sdk.status} />
+      {version && (
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-[10px] font-medium uppercase",
+            version.status === "current" && "bg-primary/15 text-primary",
+            version.status === "deprecated" && "bg-warning/15 text-warning",
+            version.status === "supported" && "bg-surface text-muted-foreground",
+          )}
+        >
+          {version.status}
+        </span>
+      )}
+      {!version && <SdkStatusBadge status={sdk.status} />}
     </div>
   )
 }

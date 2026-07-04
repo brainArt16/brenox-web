@@ -87,6 +87,7 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
   const wsId = wsIdMatch ? Number(wsIdMatch[1]) : null
   const activeChannelId = searchParams.get("channel")
   const docsSdkId = searchParams.get("sdk") ?? DEFAULT_SDK_ID
+  const docsVersion = searchParams.get("v")
 
   useEffect(() => {
     if (pathname.startsWith("/apps")) {
@@ -295,14 +296,18 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
             Documentation
           </NavLink>
           {pathname.startsWith("/docs") &&
-            getDocSectionsForSdk(docsSdkId).map((section) => (
-              <DocSubLink
-                key={section.id}
-                href={`/docs?sdk=${docsSdkId}#${section.id}`}
-              >
-                {section.label}
-              </DocSubLink>
-            ))}
+            getDocSectionsForSdk(docsSdkId).map((section) => {
+              const q = new URLSearchParams({ sdk: docsSdkId })
+              if (docsVersion) q.set("v", docsVersion)
+              return (
+                <DocSubLink
+                  key={section.id}
+                  href={`/docs?${q.toString()}#${section.id}`}
+                >
+                  {section.label}
+                </DocSubLink>
+              )
+            })}
         </div>
       </div>
 

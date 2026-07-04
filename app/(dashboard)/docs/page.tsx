@@ -18,6 +18,7 @@ import { DocsComingSoonPanel, DocsSdkBanner, DocsSdkMatrix, DocsSdkPicker } from
 import { DocsHero } from "@/components/docs/docs-hero"
 import { DocsQuickNav } from "@/components/docs/docs-quick-nav"
 import { DocsToc } from "@/components/docs/docs-toc"
+import { DocsVersionPicker } from "@/components/docs/docs-version-picker"
 import { useDocsSdk } from "@/components/docs/use-docs-sdk"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { FlowSteps } from "@/components/shared/flow-steps"
@@ -32,7 +33,7 @@ import {
 import { getApps } from "@/lib/api"
 
 function DocsPageContent() {
-  const { sdk, isAvailable, snippets, setSdk } = useDocsSdk()
+  const { sdk, isAvailable, snippets, versions, version, setSdk, setVersion } = useDocsSdk()
   const [firstAppId, setFirstAppId] = useState<string | null>(null)
 
   const has = (id: string) => sdk.sections.includes(id as (typeof sdk.sections)[number])
@@ -57,9 +58,16 @@ function DocsPageContent() {
   return (
     <div className="min-h-full">
       <div className="mx-auto max-w-6xl space-y-10 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <DocsHero sdk={sdk} sandboxHref={sandboxHref} />
+        <DocsHero sdk={sdk} version={version} sandboxHref={sandboxHref} />
         <DocsQuickNav />
-        <DocsSdkBanner sdk={sdk} />
+        <DocsSdkBanner sdk={sdk} version={version} />
+        {versions.length > 0 && (
+          <DocsVersionPicker
+            versions={versions}
+            selected={version}
+            onSelect={setVersion}
+          />
+        )}
 
         <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-10">
           <div className="min-w-0 flex-1 space-y-16">

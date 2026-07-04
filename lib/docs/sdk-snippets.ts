@@ -1,18 +1,19 @@
 import type { SdkDefinition } from "./sdk-registry"
 import { getSdkById } from "./sdk-registry"
+import type { SdkVersionDoc } from "./sdk-versions"
 
 export const BRENOX_API_URL_PLACEHOLDER = "https://api.brenox.io"
 
-/** Install lines for any Node package manager — @brenox/* packages are standard npm packages. */
-export function formatInstallCommand(packages: string): string {
+/** Install lines for any Node package manager — pass pinned packages e.g. @brenox/sdk@0.4.0 */
+export function formatInstallCommand(installPackages: string): string {
   return `# npm
-npm install ${packages}
+npm install ${installPackages}
 
 # pnpm
-pnpm add ${packages}
+pnpm add ${installPackages}
 
 # yarn
-yarn add ${packages}`
+yarn add ${installPackages}`
 }
 
 export interface SdkSnippets {
@@ -29,8 +30,16 @@ export interface SdkSnippets {
   webhookVerify: string
 }
 
-function typescriptSnippets(apiUrl: string): SdkSnippets {
-  return {
+function applyVersionInstall(
+  snippets: SdkSnippets,
+  version?: SdkVersionDoc,
+): SdkSnippets {
+  if (!version?.installPackages) return snippets
+  return { ...snippets, install: formatInstallCommand(version.installPackages) }
+}
+
+function typescriptSnippets(apiUrl: string, version?: SdkVersionDoc): SdkSnippets {
+  const base: SdkSnippets = {
     install: formatInstallCommand("@brenox/sdk"),
     env: `# Server-side (BrenoxServer)
 BRENOX_API_KEY=bx_test_your_sandbox_key
@@ -109,11 +118,12 @@ export function verifyBrenoxWebhook(rawBody: string, signature: string, secret: 
   return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }`,
   }
+  return applyVersionInstall(base, version)
 }
 
-function reactSnippets(apiUrl: string): SdkSnippets {
-  const base = typescriptSnippets(apiUrl)
-  return {
+function reactSnippets(apiUrl: string, version?: SdkVersionDoc): SdkSnippets {
+  const base = typescriptSnippets(apiUrl, version)
+  const merged: SdkSnippets = {
     ...base,
     install: formatInstallCommand("@brenox/react @brenox/sdk"),
     quickStart: `import { BrenoxClient } from "@brenox/sdk";
@@ -167,6 +177,7 @@ signaling?.on("call.offer", (e) => { /* WebRTC */ });`,
     framework: base.quickStart,
     server: "",
   }
+  return applyVersionInstall(merged, version)
 }
 
 function comingSoonSnippets(sdk: SdkDefinition): Partial<SdkSnippets> {
@@ -193,8 +204,9 @@ export function getSnippetsForSdk(
 export function getSnippetsForSdkSafe(
   sdk: SdkDefinition,
   apiUrl = BRENOX_API_URL_PLACEHOLDER,
+  version?: SdkVersionDoc,
 ): SdkSnippets | Partial<SdkSnippets> {
   if (sdk.status === "coming_soon") return comingSoonSnippets(sdk)
-  if (sdk.id === "react") return reactSnippets(apiUrl)
-  return typescriptSnippets(apiUrl)
+  if (sdk.id === "react") return reactSnippets(apiUrl, version)
+  return typescriptSnippets(apiUrl, version)
 }

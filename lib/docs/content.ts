@@ -30,6 +30,15 @@ export {
 export type { DocSectionId, SdkDefinition, SdkFeatureKey, SdkStatus } from "./sdk-registry"
 export { getSnippetsForSdk, getSnippetsForSdkSafe } from "./sdk-snippets"
 export type { SdkSnippets } from "./sdk-snippets"
+export {
+  SDK_VERSION_CATALOG,
+  buildDocsQuery,
+  getDefaultVersion,
+  getVersionDoc,
+  getVersionOrDefault,
+  getVersionsForSdk,
+} from "./sdk-versions"
+export type { SdkVersionDoc, SdkVersionStatus } from "./sdk-versions"
 
 export const DOC_SECTIONS = ALL_DOC_SECTIONS
 

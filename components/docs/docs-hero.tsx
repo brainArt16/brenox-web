@@ -3,13 +3,15 @@ import { ArrowRight, BookOpen, Github } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { SdkDefinition } from "@/lib/docs/sdk-registry"
+import type { SdkVersionDoc } from "@/lib/docs/sdk-versions"
 
 interface DocsHeroProps {
   sdk: SdkDefinition
+  version?: SdkVersionDoc
   sandboxHref: string
 }
 
-export function DocsHero({ sdk, sandboxHref }: DocsHeroProps) {
+export function DocsHero({ sdk, version, sandboxHref }: DocsHeroProps) {
   const isAvailable = sdk.status === "available" || sdk.status === "beta"
 
   return (
@@ -18,7 +20,7 @@ export function DocsHero({ sdk, sandboxHref }: DocsHeroProps) {
       <div className="relative px-6 py-10 sm:px-10 sm:py-12">
         <div className="flex flex-wrap gap-2">
           <Badge variant="secondary" className="font-mono text-[11px]">
-            {sdk.packageName}
+            {version ? `${sdk.packageName}@${version.version}` : sdk.packageName}
           </Badge>
           <Badge
             variant={isAvailable ? "default" : "outline"}
