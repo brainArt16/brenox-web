@@ -114,7 +114,7 @@ export const CONSOLE_STEPS = [
   {
     number: 1,
     title: "Create app",
-    description: "Register an integration — each app gets an isolated workspace.",
+    description: "Register an app to get its own workspace.",
     href: "/apps/new",
   },
   {
