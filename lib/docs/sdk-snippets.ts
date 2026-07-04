@@ -4,7 +4,7 @@ import type { SdkVersionDoc } from "./sdk-versions"
 
 export const BRENOX_API_URL_PLACEHOLDER = "https://api.brenox.io"
 
-/** Install lines for any Node package manager — pass pinned packages e.g. @brenox/sdk@0.4.0 */
+/** Install lines for any Node package manager — pass pinned packages e.g. @brenox/sdk@0.1.0 */
 export function formatInstallCommand(installPackages: string): string {
   return `# npm
 npm install ${installPackages}
