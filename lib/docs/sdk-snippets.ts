@@ -1,8 +1,9 @@
 import type { SdkDefinition } from "./sdk-registry"
 import { getSdkById } from "./sdk-registry"
 import type { SdkVersionDoc } from "./sdk-versions"
+import { BRENOX_API_URL_PRODUCTION } from "./api-config"
 
-export const BRENOX_API_URL_PLACEHOLDER = "https://api.brenox.io"
+export { BRENOX_API_URL_PRODUCTION, BRENOX_API_URL_PLACEHOLDER } from "./api-config"
 
 /** Install lines for any Node package manager — pass pinned packages e.g. @brenox/sdk@0.1.0 */
 export function formatInstallCommand(installPackages: string): string {
@@ -194,7 +195,7 @@ function comingSoonSnippets(sdk: SdkDefinition): Partial<SdkSnippets> {
 
 export function getSnippetsForSdk(
   sdkId: string,
-  apiUrl = BRENOX_API_URL_PLACEHOLDER,
+  apiUrl = BRENOX_API_URL_PRODUCTION,
 ): SdkSnippets | Partial<SdkSnippets> {
   const sdk = getSdkById(sdkId)
   if (!sdk) return typescriptSnippets(apiUrl)
@@ -203,7 +204,7 @@ export function getSnippetsForSdk(
 
 export function getSnippetsForSdkSafe(
   sdk: SdkDefinition,
-  apiUrl = BRENOX_API_URL_PLACEHOLDER,
+  apiUrl = BRENOX_API_URL_PRODUCTION,
   version?: SdkVersionDoc,
 ): SdkSnippets | Partial<SdkSnippets> {
   if (sdk.status === "coming_soon") return comingSoonSnippets(sdk)

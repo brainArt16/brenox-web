@@ -32,8 +32,18 @@ export interface SdkVersionDoc {
 export const SDK_VERSION_CATALOG: Record<string, SdkVersionDoc[]> = {
   typescript: [
     {
-      version: "0.1.0",
+      version: "0.1.1",
       status: "current",
+      released: "2026-07-04",
+      highlights: [
+        "npm README and package metadata with live documentation links",
+        "Published to npm with homepage and repository fields",
+      ],
+      installPackages: "@brenox/sdk@0.1.1",
+    },
+    {
+      version: "0.1.0",
+      status: "supported",
       released: "2026-07-04",
       highlights: [
         "Initial public release — BrenoxClient for browsers and Node",
@@ -47,8 +57,18 @@ export const SDK_VERSION_CATALOG: Record<string, SdkVersionDoc[]> = {
   ],
   react: [
     {
-      version: "0.1.0",
+      version: "0.1.1",
       status: "current",
+      released: "2026-07-04",
+      highlights: [
+        "npm README with links to live React SDK documentation",
+        "Published alongside @brenox/sdk@0.1.1",
+      ],
+      installPackages: "@brenox/react@0.1.1 @brenox/sdk@0.1.1",
+    },
+    {
+      version: "0.1.0",
+      status: "supported",
       released: "2026-07-04",
       highlights: [
         "Initial public release — BrenoxProvider + React hooks",

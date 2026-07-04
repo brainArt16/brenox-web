@@ -38,11 +38,21 @@ export {
   getVersionOrDefault,
   getVersionsForSdk,
 } from "./sdk-versions"
+export {
+  BRENOX_API_URL_PRODUCTION,
+  BRENOX_API_URL_PLACEHOLDER,
+} from "./api-config"
 export type { SdkVersionDoc, SdkVersionStatus } from "./sdk-versions"
+export {
+  ENGINE_VERSION_CATALOG,
+  getDefaultEngineVersion,
+  getEngineVersion,
+  getEngineVersionOrDefault,
+  getEngineVersions,
+} from "./engine-versions"
+export type { EngineVersionDoc, EngineVersionStatus } from "./engine-versions"
 
 export const DOC_SECTIONS = ALL_DOC_SECTIONS
-
-export const BRENOX_API_URL_PLACEHOLDER = "https://api.brenox.io"
 
 export const DOC_QUICK_LINKS = [
   { id: "quickstart", label: "Quick start", href: "#quickstart" },

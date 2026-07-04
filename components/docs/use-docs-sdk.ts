@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useMemo } from "react"
+import { getDefaultEngineVersion, getEngineVersionOrDefault, getEngineVersions } from "@/lib/docs/engine-versions"
 import { DEFAULT_SDK_ID, getSdkOrDefault } from "@/lib/docs/sdk-registry"
 import { getSnippetsForSdkSafe } from "@/lib/docs/sdk-snippets"
 import {
@@ -11,6 +12,7 @@ import {
 } from "@/lib/docs/sdk-versions"
 import type { SdkDefinition } from "@/lib/docs/sdk-registry"
 import type { SdkSnippets } from "@/lib/docs/sdk-snippets"
+import type { EngineVersionDoc } from "@/lib/docs/engine-versions"
 
 function buildDocsUrl(params: URLSearchParams): string {
   return `/docs?${params.toString()}`
@@ -29,9 +31,14 @@ export function useDocsSdk() {
     [sdk.id, searchParams],
   )
 
+  const engine = useMemo(
+    () => getEngineVersionOrDefault(searchParams.get("engine")),
+    [searchParams],
+  )
+
   const snippets = useMemo(
-    () => getSnippetsForSdkSafe(sdk, undefined, version) as SdkSnippets,
-    [sdk, version],
+    () => getSnippetsForSdkSafe(sdk, engine.baseUrl, version) as SdkSnippets,
+    [sdk, engine.baseUrl, version],
   )
 
   const updateParams = useCallback(
@@ -62,6 +69,8 @@ export function useDocsSdk() {
     [updateParams],
   )
 
+  const engineVersions = useMemo(() => getEngineVersions(), [])
+
   return {
     sdk,
     sdkId,
@@ -69,6 +78,8 @@ export function useDocsSdk() {
     snippets,
     versions,
     version,
+    engine,
+    engineVersions,
     setSdk,
     setVersion,
   } satisfies {
@@ -78,6 +89,8 @@ export function useDocsSdk() {
     snippets: SdkSnippets
     versions: SdkVersionDoc[]
     version: SdkVersionDoc | undefined
+    engine: EngineVersionDoc
+    engineVersions: EngineVersionDoc[]
     setSdk: (id: string) => void
     setVersion: (v: string) => void
   }

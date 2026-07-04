@@ -19,6 +19,7 @@ import { DocsQuickNav } from "@/components/docs/docs-quick-nav"
 import { DocsRealtimeSection } from "@/components/docs/docs-realtime-section"
 import { DocsToc } from "@/components/docs/docs-toc"
 import { DocsVersionPicker } from "@/components/docs/docs-version-picker"
+import { DocsEngineBadge } from "@/components/docs/docs-engine-badge"
 import { SdkIcon } from "@/components/docs/sdk-icon"
 import { useDocsSdk } from "@/components/docs/use-docs-sdk"
 import { CodeSnippet } from "@/components/shared/code-snippet"
@@ -38,7 +39,7 @@ function gatePath(path: string, isAuthenticated: boolean) {
 }
 
 function DocsPageContent() {
-  const { sdk, isAvailable, snippets, versions, version, setSdk, setVersion } = useDocsSdk()
+  const { sdk, isAvailable, snippets, versions, version, engine, setSdk, setVersion } = useDocsSdk()
   const { isAuthenticated } = useAuth()
   const [firstAppId, setFirstAppId] = useState<string | null>(null)
 
@@ -87,6 +88,7 @@ function DocsPageContent() {
     <div className="min-h-full">
       <div className="mx-auto max-w-7xl space-y-10 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <DocsHero sdk={sdk} version={version} sandboxHref={sandboxHref} />
+        <DocsEngineBadge engine={engine} />
         <DocsQuickNav />
         <DocsSdkBanner sdk={sdk} version={version} />
         {versions.length > 0 && (
