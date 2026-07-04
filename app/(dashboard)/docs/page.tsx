@@ -111,6 +111,15 @@ function DocsPageContent() {
                   <DocsComingSoonPanel sdk={sdk} />
                 )}
                 {isAvailable && (
+                  <DocsCallout icon={Lightbulb} title="Package managers" variant="info">
+                    <code className="font-mono text-xs">@brenox/*</code> packages are published to npm.
+                    Use <strong className="font-medium text-foreground">npm</strong>,{" "}
+                    <strong className="font-medium text-foreground">pnpm</strong>, or{" "}
+                    <strong className="font-medium text-foreground">yarn</strong> — imports and
+                    usage are identical after install.
+                  </DocsCallout>
+                )}
+                {isAvailable && (
                   <DocsCallout icon={Lightbulb} title="Credentials" variant="info">
                     Create an app under{" "}
                     <Link href="/apps/new" className="font-medium text-primary hover:underline">

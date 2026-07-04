@@ -3,6 +3,18 @@ import { getSdkById } from "./sdk-registry"
 
 export const BRENOX_API_URL_PLACEHOLDER = "https://api.brenox.io"
 
+/** Install lines for any Node package manager — @brenox/* packages are standard npm packages. */
+export function formatInstallCommand(packages: string): string {
+  return `# npm
+npm install ${packages}
+
+# pnpm
+pnpm add ${packages}
+
+# yarn
+yarn add ${packages}`
+}
+
 export interface SdkSnippets {
   install: string
   env: string
@@ -19,7 +31,7 @@ export interface SdkSnippets {
 
 function typescriptSnippets(apiUrl: string): SdkSnippets {
   return {
-    install: `npm install @brenox/sdk`,
+    install: formatInstallCommand("@brenox/sdk"),
     env: `# Server-side (BrenoxServer)
 BRENOX_API_KEY=bx_test_your_sandbox_key
 
@@ -103,7 +115,7 @@ function reactSnippets(apiUrl: string): SdkSnippets {
   const base = typescriptSnippets(apiUrl)
   return {
     ...base,
-    install: `npm install @brenox/react @brenox/sdk`,
+    install: formatInstallCommand("@brenox/react @brenox/sdk"),
     quickStart: `import { BrenoxClient } from "@brenox/sdk";
 import { BrenoxProvider, useMessages } from "@brenox/react";
 
