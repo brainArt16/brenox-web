@@ -16,6 +16,7 @@ import { DocsCodeTabs } from "@/components/docs/docs-code-tabs"
 import { DocsComingSoonPanel, DocsSdkBanner, DocsSdkMatrix, DocsSdkPicker } from "@/components/docs/docs-sdk-picker"
 import { DocsHero } from "@/components/docs/docs-hero"
 import { DocsQuickNav } from "@/components/docs/docs-quick-nav"
+import { DocsRealtimeSection } from "@/components/docs/docs-realtime-section"
 import { DocsToc } from "@/components/docs/docs-toc"
 import { DocsVersionPicker } from "@/components/docs/docs-version-picker"
 import { SdkIcon } from "@/components/docs/sdk-icon"
@@ -29,7 +30,6 @@ import {
   REACT_HOOKS,
   SDK_REGISTRY,
   WEBHOOK_EVENTS,
-  WEBSOCKET_EVENTS,
 } from "@/lib/docs/content"
 import { getApps } from "@/lib/api"
 
@@ -220,25 +220,10 @@ function DocsPageContent() {
             )}
 
             {has("realtime") && isAvailable && snippets.realtime && (
-              <DocSection id="realtime" title="Realtime events" badge="WebSocket">
-                <CodeSnippet code={snippets.realtime} title="Subscribe to events" language={sdk.codeLanguage} />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {Object.entries(WEBSOCKET_EVENTS).map(([group, events]) => (
-                    <div key={group} className="rounded-xl border border-border bg-card p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        {group}
-                      </p>
-                      <ul className="mt-3 space-y-1.5">
-                        {events.map((event) => (
-                          <li key={event} className="rounded-md bg-surface px-2.5 py-1 font-mono text-[11px]">
-                            {event}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </DocSection>
+              <DocsRealtimeSection
+                connectCode={snippets.realtime}
+                usesHooks={sdk.role === "framework"}
+              />
             )}
 
             {has("calls") && isAvailable && snippets.calls && (

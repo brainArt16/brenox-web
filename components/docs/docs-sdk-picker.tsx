@@ -334,7 +334,7 @@ export function DocsComingSoonPanel({ sdk }: { sdk: SdkDefinition }) {
             el?.scrollIntoView({ behavior: "smooth" })
           }}
         >
-          JavaScript / TypeScript
+          TypeScript
         </button>{" "}
         today, or follow progress on GitHub.
       </p>

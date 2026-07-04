@@ -187,6 +187,155 @@ export const WEBSOCKET_EVENTS = {
   other: ["notification.new"] as const,
 }
 
+export interface RealtimeEventDef {
+  name: string
+  description: string
+  payload?: string
+}
+
+export interface RealtimeEventGroup {
+  id: keyof typeof WEBSOCKET_EVENTS
+  label: string
+  description: string
+  icon: LucideIcon
+  events: RealtimeEventDef[]
+}
+
+export const REALTIME_FLOW_STEPS = [
+  {
+    step: 1,
+    title: "Authenticate",
+    description: "User JWT from SDK login — attached when the socket opens.",
+  },
+  {
+    step: 2,
+    title: "Connect",
+    description: "Open a channel-scoped WebSocket with origin for CORS.",
+  },
+  {
+    step: 3,
+    title: "Subscribe",
+    description: "Register handlers before or after connect — events buffer until ready.",
+  },
+  {
+    step: 4,
+    title: "React",
+    description: "Update UI from payloads; SDK hooks wrap this for React apps.",
+  },
+] as const
+
+export const REALTIME_CONNECTION_STATES = [
+  { id: "idle", label: "Idle", description: "Not connected yet" },
+  { id: "connecting", label: "Connecting", description: "Handshake in progress" },
+  { id: "connected", label: "Connected", description: "Receiving live events" },
+  { id: "reconnecting", label: "Reconnecting", description: "Auto-retry with backoff" },
+] as const
+
+export const REALTIME_EVENT_GROUPS: RealtimeEventGroup[] = [
+  {
+    id: "messaging",
+    label: "Messaging",
+    description: "Live delivery, edits, and typing indicators in a channel.",
+    icon: MessageSquare,
+    events: [
+      {
+        name: "message.new",
+        description: "A message was posted to the channel.",
+        payload: "{ id, content, user_id, created_at }",
+      },
+      {
+        name: "message.updated",
+        description: "An existing message was edited.",
+        payload: "{ id, content, updated_at }",
+      },
+      {
+        name: "typing.start",
+        description: "A member started typing.",
+        payload: "{ user_id, channel_id }",
+      },
+      {
+        name: "typing.stop",
+        description: "Typing indicator cleared for a member.",
+        payload: "{ user_id, channel_id }",
+      },
+    ],
+  },
+  {
+    id: "presence",
+    label: "Presence",
+    description: "Who is online and their status across the workspace.",
+    icon: Radio,
+    events: [
+      {
+        name: "presence.online",
+        description: "User came online.",
+        payload: "{ user_id, last_seen_at }",
+      },
+      {
+        name: "presence.offline",
+        description: "User went offline.",
+        payload: "{ user_id, last_seen_at }",
+      },
+      {
+        name: "presence.status",
+        description: "Custom status changed (away, busy, etc.).",
+        payload: "{ user_id, status, message? }",
+      },
+    ],
+  },
+  {
+    id: "calls",
+    label: "Calls",
+    description: "WebRTC signaling — SDP, ICE, and call lifecycle (not media streams).",
+    icon: Video,
+    events: [
+      { name: "call.join", description: "Participant joined the call room." },
+      { name: "call.leave", description: "Participant left the call." },
+      { name: "call.end", description: "Call ended for everyone." },
+      { name: "call.offer", description: "SDP offer from a peer.", payload: "{ call_id, sdp, to_user_id }" },
+      { name: "call.answer", description: "SDP answer from a peer.", payload: "{ call_id, sdp }" },
+      { name: "call.ice", description: "ICE candidate exchange.", payload: "{ call_id, candidate }" },
+      { name: "call.video.on", description: "Remote peer enabled camera." },
+      { name: "call.video.off", description: "Remote peer disabled camera." },
+      { name: "call.screen.start", description: "Screen share started." },
+      { name: "call.screen.stop", description: "Screen share stopped." },
+    ],
+  },
+  {
+    id: "other",
+    label: "Notifications",
+    description: "In-app alerts pushed over the same connection.",
+    icon: Bell,
+    events: [
+      {
+        name: "notification.new",
+        description: "New notification for the signed-in user.",
+        payload: "{ id, type, title, body, read }",
+      },
+    ],
+  },
+]
+
+export const REALTIME_HANDLER_EXAMPLE = `// Register handlers before connect — none are missed
+conn.on("message.new", (event) => {
+  appendMessage(event.payload);
+});
+
+conn.on("typing.start", (event) => {
+  showTypingIndicator(event.payload.user_id);
+});
+
+conn.on("typing.stop", (event) => {
+  hideTypingIndicator(event.payload.user_id);
+});
+
+conn.on("presence.online", (event) => {
+  setMemberStatus(event.payload.user_id, "online");
+});
+
+await conn.connect();`
+
+
 export const WEBHOOK_EVENTS = [
   {
     name: "message.created",

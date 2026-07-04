@@ -23,7 +23,7 @@ export type SdkRole = "client" | "server" | "fullstack" | "framework"
 export interface SdkDefinition {
   id: string
   name: string
-  /** e.g. TypeScript / JavaScript */
+  /** e.g. TypeScript */
   language: string
   category: SdkCategory
   role: SdkRole
@@ -128,13 +128,13 @@ const COMING_SOON_SECTIONS: DocSectionId[] = [
 export const SDK_REGISTRY: SdkDefinition[] = [
   {
     id: "typescript",
-    name: "JavaScript / TypeScript",
+    name: "TypeScript",
     language: "TypeScript",
     category: "language",
     role: "fullstack",
     status: "available",
     packageName: "@brenox/sdk",
-    icon: "/icons/JavaScript.svg",
+    icon: "/icons/TypeScript.svg",
     description: "Core SDK for browsers, Node.js, and server-side automation.",
     installCommand: "npm install @brenox/sdk",
     githubUrl: "https://github.com/brainArt16/brenox-sdk",
@@ -204,6 +204,7 @@ export const SDK_REGISTRY: SdkDefinition[] = [
     role: "server",
     status: "coming_soon",
     packageName: "github.com/brenox/brenox-go",
+    icon: "/icons/Go.svg",
     description: "Idiomatic Go SDK for high-throughput backend integrations.",
     installCommand: "go get github.com/brenox/brenox-go",
     bestFor: ["Microservices", "CLI tools", "Cloud functions"],
@@ -219,7 +220,7 @@ export const SDK_REGISTRY: SdkDefinition[] = [
     role: "client",
     status: "coming_soon",
     packageName: "brenox_sdk",
-    icon: "/icons/Flutter.svg",
+    icon: "/icons/Dart.svg",
     description: "Cross-platform mobile SDK for iOS and Android chat apps.",
     installCommand: "flutter pub add brenox_sdk",
     bestFor: ["iOS", "Android", "Cross-platform mobile"],
@@ -275,7 +276,7 @@ export function getSdkOrDefault(id: string | null): SdkDefinition {
 
 export function getDocSectionsForSdk(sdkId: string): typeof ALL_DOC_SECTIONS {
   const sdk = getSdkOrDefault(sdkId)
-  return ALL_DOC_SECTIONS.filter((s) => sdk.sections.includes(s.id))
+  return ALL_DOC_SECTIONS.filter((s) => sdk.sections.includes(s.id)) as unknown as typeof ALL_DOC_SECTIONS
 }
 
 export function getAvailableSdks(): SdkDefinition[] {
