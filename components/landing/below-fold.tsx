@@ -11,6 +11,7 @@ import {
   Globe,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { DeveloperCodePreview } from "@/components/landing/developer-code-preview"
 
 export function LandingBelowFold() {
   return (
@@ -81,7 +82,7 @@ function FeaturesSection() {
               className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors"
             >
               <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <feature.icon className="w-6 h-6 text-primary" />
+                <feature.icon className="w-6 h-6 text-muted-foreground" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
@@ -94,19 +95,6 @@ function FeaturesSection() {
 }
 
 function DeveloperSection() {
-  const codeLines = [
-    "import { BrenoxProvider, ChatWindow } from '@brenox/react'",
-    "",
-    "// Full chat in your app with one component",
-    "export function App() {",
-    "  return (",
-    "    <BrenoxProvider apiKey={process.env.BRENOX_API_KEY}>",
-    "      <ChatWindow channelId=\"support\" />",
-    "    </BrenoxProvider>",
-    "  )",
-    "}",
-  ]
-
   return (
     <section className="py-24">
       <div className="container mx-auto px-4">
@@ -147,24 +135,7 @@ function DeveloperSection() {
             </Button>
           </div>
 
-          <div className="rounded-xl border border-border bg-card overflow-hidden shadow-2xl">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-surface">
-              <div className="w-3 h-3 rounded-full bg-destructive/60" />
-              <div className="w-3 h-3 rounded-full bg-warning/60" />
-              <div className="w-3 h-3 rounded-full bg-success/60" />
-              <span className="ml-4 text-xs text-muted-foreground font-mono">App.tsx</span>
-            </div>
-            <pre className="p-4 text-sm overflow-x-auto">
-              <code className="text-muted-foreground font-mono">
-                {codeLines.map((line, i) => (
-                  <div key={i} className="leading-relaxed">
-                    <span className="text-muted-foreground/50 select-none w-8 inline-block">{i + 1}</span>
-                    {line}
-                  </div>
-                ))}
-              </code>
-            </pre>
-          </div>
+          <DeveloperCodePreview />
         </div>
       </div>
     </section>

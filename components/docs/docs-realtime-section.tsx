@@ -30,7 +30,7 @@ function FlowStrip() {
           <div key={step.step} className="flex items-center">
             <div className="flex w-[140px] flex-col gap-2 sm:w-auto sm:min-w-[148px] sm:max-w-[180px]">
               <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted-foreground text-xs font-bold text-background">
                   {step.step}
                 </span>
                 <p className="text-sm font-medium text-foreground">{step.title}</p>
@@ -188,7 +188,7 @@ function ArchitectureDiagram() {
     <div className="grid gap-3 sm:grid-cols-3">
       <div className="rounded-xl border border-border bg-card p-4">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-          <Wifi className="h-4 w-4 text-primary" />
+          <Wifi className="h-4 w-4 text-muted-foreground" />
         </div>
         <p className="mt-3 text-sm font-medium">One socket per channel</p>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -197,7 +197,7 @@ function ArchitectureDiagram() {
       </div>
       <div className="rounded-xl border border-border bg-card p-4">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10">
-          <Radio className="h-4 w-4 text-accent" />
+          <Radio className="h-4 w-4 text-muted-foreground" />
         </div>
         <p className="mt-3 text-sm font-medium">Event-driven handlers</p>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -206,7 +206,7 @@ function ArchitectureDiagram() {
       </div>
       <div className="rounded-xl border border-border bg-card p-4">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success/10">
-          <RefreshCw className="h-4 w-4 text-success" />
+          <RefreshCw className="h-4 w-4 text-muted-foreground" />
         </div>
         <p className="mt-3 text-sm font-medium">Resilient by default</p>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">

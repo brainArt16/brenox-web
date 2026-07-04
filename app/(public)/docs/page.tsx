@@ -179,10 +179,10 @@ function DocsPageContent() {
             )}
 
             {has("auth") && isAvailable && (
-              <DocSection id="auth" title="Authentication" description="Two credential types — one for users, one for your server.">
+              <DocSection id="auth" title="Authentication" description="Two credential types - one for users, one for your server.">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="rounded-xl border border-border bg-card p-5">
-                    <p className="font-mono text-xs text-primary">
+                    <p className="font-mono text-xs text-muted-foreground">
                       {sdk.role === "framework" ? "Via @brenox/sdk" : sdk.packageName}
                     </p>
                     <p className="mt-2 text-sm font-medium text-foreground">User sessions</p>
@@ -191,7 +191,7 @@ function DocsPageContent() {
                     </p>
                   </div>
                   <div className="rounded-xl border border-border bg-card p-5">
-                    <p className="font-mono text-xs text-primary">BrenoxServer</p>
+                    <p className="font-mono text-xs text-muted-foreground">BrenoxServer</p>
                     <p className="mt-2 text-sm font-medium text-foreground">Server API keys</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       Keys from App → API Keys. Never expose{" "}
@@ -297,7 +297,7 @@ function DocsPageContent() {
                 <div className="grid gap-4 sm:grid-cols-3">
                   {BEST_PRACTICES.map((item) => (
                     <div key={item.title} className="rounded-xl border border-border bg-card p-4">
-                      <item.icon className="h-5 w-5 text-primary" />
+                      <item.icon className="h-5 w-5 text-muted-foreground" />
                       <p className="mt-3 text-sm font-medium">{item.title}</p>
                       <p className="mt-1.5 text-sm text-muted-foreground">{item.body}</p>
                     </div>

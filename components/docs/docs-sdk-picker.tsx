@@ -278,7 +278,7 @@ export function DocsSdkBanner({
         <p className="text-sm text-muted-foreground">
           Viewing docs for{" "}
           <span className="font-medium text-foreground">{sdk.name}</span>
-          <span className="ml-2 font-mono text-xs text-primary">
+          <span className="ml-2 font-mono text-xs text-muted-foreground">
             {version ? `${sdk.packageName}@${version.version}` : sdk.packageName}
           </span>
         </p>
@@ -292,7 +292,7 @@ export function DocsSdkBanner({
         <span
           className={cn(
             "rounded-full px-2 py-0.5 text-[10px] font-medium uppercase",
-            version.status === "current" && "bg-primary/15 text-primary",
+            version.status === "current" && "bg-primary/15 text-foreground",
             version.status === "deprecated" && "bg-warning/15 text-warning",
             version.status === "supported" && "bg-surface text-muted-foreground",
           )}

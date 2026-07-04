@@ -12,7 +12,15 @@ interface CodeSnippetProps {
   className?: string
 }
 
-function HighlightedCode({ code, language }: { code: string; language: string }) {
+export function HighlightedCode({
+  code,
+  language,
+  className,
+}: {
+  code: string
+  language: string
+  className?: string
+}) {
   const [html, setHtml] = useState<string | null>(null)
 
   useEffect(() => {
@@ -30,7 +38,12 @@ function HighlightedCode({ code, language }: { code: string; language: string })
 
   if (!html) {
     return (
-      <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-muted-foreground">
+      <pre
+        className={cn(
+          "overflow-x-auto p-4 font-mono text-xs leading-relaxed text-muted-foreground",
+          className,
+        )}
+      >
         <code>{code}</code>
       </pre>
     )
@@ -42,10 +55,15 @@ function HighlightedCode({ code, language }: { code: string; language: string })
         "shiki-code overflow-x-auto p-4 text-xs leading-relaxed",
         "[&_.shiki]:!bg-transparent [&_.shiki]:m-0 [&_.shiki]:overflow-x-auto [&_.shiki]:p-0",
         "[&_.shiki_code]:font-mono [&_.shiki_code]:text-[0.8125rem] [&_.shiki_code]:leading-relaxed",
+        className,
       )}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   )
+}
+
+function HighlightedCodeInner({ code, language }: { code: string; language: string }) {
+  return <HighlightedCode code={code} language={language} />
 }
 
 export function CodeSnippet({ code, title, language = "typescript", className }: CodeSnippetProps) {

@@ -157,22 +157,6 @@ export function HeroSection() {
               </div>
             </div>
           </div>
-
-          <div className="absolute -left-4 top-1/3 bg-card border border-border rounded-lg p-3 shadow-xl hidden lg:block">
-            <div className="text-xs text-muted-foreground">Active Users</div>
-            <div className="text-2xl font-bold text-primary">2.4K</div>
-            <div className="text-xs text-success">+12% today</div>
-          </div>
-
-          <div className="absolute -right-4 top-1/2 bg-card border border-border rounded-lg p-3 shadow-xl hidden lg:block">
-            <div className="text-xs text-muted-foreground">Messages/sec</div>
-            <div className="text-2xl font-bold text-accent">847</div>
-            <div className="flex gap-1 mt-1">
-              {[4, 7, 3, 8, 5, 9, 6].map((h, i) => (
-                <div key={i} className="w-1 bg-accent/60 rounded-full" style={{ height: h * 3 }} />
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </section>
