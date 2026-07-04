@@ -18,6 +18,7 @@ import {
 
 interface DocsRealtimeSectionProps {
   connectCode: string
+  codeLanguage?: string
   usesHooks?: boolean
 }
 
@@ -218,6 +219,7 @@ function ArchitectureDiagram() {
 
 export function DocsRealtimeSection({
   connectCode,
+  codeLanguage = "typescript",
   usesHooks = false,
 }: DocsRealtimeSectionProps) {
   const codeTabs = [
@@ -238,7 +240,7 @@ export function DocsRealtimeSection({
         <div className="space-y-4">
           <div>
             <p className="mb-2 text-sm font-medium text-foreground">Implementation</p>
-            <DocsCodeTabs tabs={codeTabs} />
+            <DocsCodeTabs tabs={codeTabs} language={codeLanguage} />
           </div>
           <ConnectionStates />
         </div>

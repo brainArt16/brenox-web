@@ -137,9 +137,10 @@ function DocsPageContent() {
               >
                 {isAvailable ? (
                   <DocsCodeTabs
+                    language={sdk.codeLanguage}
                     tabs={[
-                      { id: "install", label: "Install", code: snippets.install },
-                      { id: "env", label: "Environment", code: snippets.env },
+                      { id: "install", label: "Install", code: snippets.install, language: "bash" },
+                      { id: "env", label: "Environment", code: snippets.env, language: "bash" },
                       { id: "code", label: "First message", code: snippets.quickStart },
                     ]}
                   />
@@ -209,6 +210,7 @@ function DocsPageContent() {
                 description="REST for history, WebSocket for live delivery, plus attachments and presence."
               >
                 <DocsCodeTabs
+                  language={sdk.codeLanguage}
                   tabs={[
                     { id: "messages", label: "Send & list", code: snippets.messaging },
                     ...(snippets.attachments
@@ -222,6 +224,7 @@ function DocsPageContent() {
             {has("realtime") && isAvailable && snippets.realtime && (
               <DocsRealtimeSection
                 connectCode={snippets.realtime}
+                codeLanguage={sdk.codeLanguage}
                 usesHooks={sdk.role === "framework"}
               />
             )}

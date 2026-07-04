@@ -1,6 +1,8 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { CopyButton } from "@/components/shared/copy-button"
+import { highlightCode } from "@/lib/shiki/highlighter"
 import { cn } from "@/lib/utils"
 
 interface CodeSnippetProps {
@@ -8,6 +10,42 @@ interface CodeSnippetProps {
   title?: string
   language?: string
   className?: string
+}
+
+function HighlightedCode({ code, language }: { code: string; language: string }) {
+  const [html, setHtml] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setHtml(null)
+
+    void highlightCode(code, language).then((result) => {
+      if (!cancelled) setHtml(result)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [code, language])
+
+  if (!html) {
+    return (
+      <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-muted-foreground">
+        <code>{code}</code>
+      </pre>
+    )
+  }
+
+  return (
+    <div
+      className={cn(
+        "shiki-code overflow-x-auto p-4 text-xs leading-relaxed",
+        "[&_.shiki]:!bg-transparent [&_.shiki]:m-0 [&_.shiki]:overflow-x-auto [&_.shiki]:p-0",
+        "[&_.shiki_code]:font-mono [&_.shiki_code]:text-[0.8125rem] [&_.shiki_code]:leading-relaxed",
+      )}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
 }
 
 export function CodeSnippet({ code, title, language = "typescript", className }: CodeSnippetProps) {
@@ -32,9 +70,7 @@ export function CodeSnippet({ code, title, language = "typescript", className }:
             <CopyButton value={code} label="Code copied" />
           </div>
         )}
-        <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-foreground">
-          <code>{code}</code>
-        </pre>
+        <HighlightedCode code={code} language={language} />
       </div>
     </div>
   )

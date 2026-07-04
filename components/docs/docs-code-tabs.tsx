@@ -3,11 +3,19 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 
-interface DocsCodeTabsProps {
-  tabs: { id: string; label: string; code: string }[]
+export interface DocsCodeTab {
+  id: string
+  label: string
+  code: string
+  language?: string
 }
 
-export function DocsCodeTabs({ tabs }: DocsCodeTabsProps) {
+interface DocsCodeTabsProps {
+  tabs: DocsCodeTab[]
+  language?: string
+}
+
+export function DocsCodeTabs({ tabs, language = "typescript" }: DocsCodeTabsProps) {
   return (
     <Tabs defaultValue={tabs[0]?.id} className="w-full">
       <TabsList className="h-auto w-full flex-wrap justify-start gap-1 bg-surface p-1">
@@ -23,7 +31,7 @@ export function DocsCodeTabs({ tabs }: DocsCodeTabsProps) {
       </TabsList>
       {tabs.map((tab) => (
         <TabsContent key={tab.id} value={tab.id} className="mt-3">
-          <CodeSnippet code={tab.code} />
+          <CodeSnippet code={tab.code} language={tab.language ?? language} />
         </TabsContent>
       ))}
     </Tabs>
