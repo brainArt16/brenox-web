@@ -10,10 +10,9 @@ export function LandingNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navLinks = [
-    { name: "UI Kit", href: "/ui-kit" },
-    { name: "Developers", href: "/developers" },
+    { name: "Features", href: "/#features" },
     { name: "Docs", href: "/docs" },
-    { name: "Pricing", href: "/pricing" },
+    { name: "Pricing", href: "/#pricing" },
   ]
 
   return (

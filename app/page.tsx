@@ -1,5 +1,25 @@
-import { redirect } from "next/navigation"
+import { LandingNav } from "@/components/landing/nav"
+import {
+  HeroSection,
+  FeaturesSection,
+  DeveloperSection,
+  PricingSection,
+  CTASection,
+  Footer,
+} from "@/components/landing/sections"
 
 export default function HomePage() {
-  redirect("/login")
+  return (
+    <div className="min-h-screen bg-background">
+      <LandingNav />
+      <main>
+        <HeroSection />
+        <FeaturesSection />
+        <DeveloperSection />
+        <PricingSection />
+        <CTASection />
+      </main>
+      <Footer />
+    </div>
+  )
 }

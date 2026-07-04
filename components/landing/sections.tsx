@@ -65,7 +65,7 @@ export function HeroSection() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="px-8 h-12 text-base">
-                <Link href="/developers">
+                <Link href="/docs">
                   View Documentation
                 </Link>
               </Button>
@@ -256,7 +256,7 @@ export function FeaturesSection() {
   ]
 
   return (
-    <section className="py-24 bg-surface">
+    <section id="features" className="py-24 bg-surface scroll-mt-16">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything you need to ship chat, fast</h2>
@@ -420,7 +420,7 @@ export function DeveloperSection() {
             </div>
             
             <Button asChild>
-              <Link href="/developers">
+              <Link href="/docs">
                 Explore Documentation
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
@@ -503,13 +503,13 @@ export function PricingSection() {
         "Dedicated infrastructure"
       ],
       cta: "Contact Sales",
-      href: "/contact",
+      href: "/register",
       highlighted: false
     }
   ]
 
   return (
-    <section className="py-24 bg-surface">
+    <section id="pricing" className="py-24 bg-surface scroll-mt-16">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple, transparent pricing</h2>
@@ -581,7 +581,7 @@ export function CTASection() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="px-8">
-                <Link href="/contact">Talk to Sales</Link>
+                <Link href="/register">Create an Account</Link>
               </Button>
             </div>
           </div>
@@ -594,28 +594,21 @@ export function CTASection() {
 export function Footer() {
   const links = {
     Product: [
-      { name: "UI Kit", href: "/ui-kit" },
-      { name: "Pricing", href: "/pricing" },
-      { name: "Changelog", href: "/changelog" },
-      { name: "Status", href: "/status" }
+      { name: "Features", href: "/#features" },
+      { name: "Pricing", href: "/#pricing" },
+      { name: "Developer Console", href: "/apps" },
     ],
     Developers: [
       { name: "Documentation", href: "/docs" },
-      { name: "API Reference", href: "/developers" },
-      { name: "SDKs", href: "/developers" },
-      { name: "Live Demo", href: "/app" }
+      { name: "TypeScript SDK", href: "/docs?sdk=typescript" },
+      { name: "React SDK", href: "/docs?sdk=react" },
+      { name: "Get Started", href: "/register" },
     ],
-    Company: [
-      { name: "About", href: "/about" },
-      { name: "Blog", href: "/blog" },
-      { name: "Careers", href: "/careers" },
-      { name: "Contact", href: "/contact" }
+    Account: [
+      { name: "Sign in", href: "/login" },
+      { name: "Register", href: "/register" },
+      { name: "Workspaces", href: "/workspaces" },
     ],
-    Legal: [
-      { name: "Privacy", href: "/privacy" },
-      { name: "Terms", href: "/terms" },
-      { name: "Security", href: "/security" }
-    ]
   }
 
   return (
@@ -655,7 +648,7 @@ export function Footer() {
         
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            2024 Brenox. All rights reserved.
+            2026 Brenox. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <Link href="https://github.com" className="text-muted-foreground hover:text-foreground transition-colors">
