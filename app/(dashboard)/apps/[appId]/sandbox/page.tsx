@@ -150,7 +150,7 @@ export default function SandboxPage() {
         <DocLinkCard
           title="BrenoxServer docs"
           description="Server SDK — provision users, channels, and messages."
-          href="/docs#sdk-server"
+          href="/docs?sdk=typescript#server"
           icon={BookOpen}
           className="lg:w-72"
         />

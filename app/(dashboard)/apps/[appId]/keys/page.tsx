@@ -157,7 +157,7 @@ export default function AppKeysPage() {
         <DocLinkCard
           title="BrenoxServer"
           description="Use your key with the server SDK on your backend."
-          href="/docs#sdk-server"
+          href="/docs?sdk=typescript#server"
           icon={BookOpen}
         />
         <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">

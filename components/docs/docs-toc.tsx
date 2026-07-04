@@ -2,18 +2,22 @@
 
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
-import { DOC_SECTIONS } from "@/lib/docs/content"
+import { getDocSectionsForSdk } from "@/lib/docs/sdk-registry"
 
 interface DocsTocProps {
+  sdkId: string
   className?: string
 }
 
-export function DocsToc({ className }: DocsTocProps) {
-  const [activeId, setActiveId] = useState<string>(DOC_SECTIONS[0].id)
+export function DocsToc({ sdkId, className }: DocsTocProps) {
+  const sections = getDocSectionsForSdk(sdkId)
+  const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "overview")
 
   useEffect(() => {
-    const sections = DOC_SECTIONS.map((s) => document.getElementById(s.id)).filter(Boolean)
-    if (sections.length === 0) return
+    const elements = sections
+      .map((s) => document.getElementById(s.id))
+      .filter(Boolean) as HTMLElement[]
+    if (elements.length === 0) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -25,16 +29,16 @@ export function DocsToc({ className }: DocsTocProps) {
       { rootMargin: "-20% 0px -60% 0px", threshold: [0, 0.25, 0.5] },
     )
 
-    sections.forEach((el) => observer.observe(el!))
+    elements.forEach((el) => observer.observe(el))
     return () => observer.disconnect()
-  }, [])
+  }, [sdkId, sections])
 
   return (
     <nav className={cn("space-y-0.5", className)}>
       <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
         On this page
       </p>
-      {DOC_SECTIONS.map((section) => (
+      {sections.map((section) => (
         <a
           key={section.id}
           href={`#${section.id}`}

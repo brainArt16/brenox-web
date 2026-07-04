@@ -1,15 +1,30 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { DOC_QUICK_LINKS } from "@/lib/docs/content"
+import { getDocSectionsForSdk } from "@/lib/docs/sdk-registry"
+import { useDocsSdk } from "@/components/docs/use-docs-sdk"
 
 export function DocsQuickNav() {
+  const { sdkId } = useDocsSdk()
+  const sections = getDocSectionsForSdk(sdkId).filter((s) =>
+    ["quickstart", "messaging", "calls", "framework", "webhooks"].includes(s.id),
+  )
+
   return (
     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none lg:hidden">
-      {DOC_QUICK_LINKS.map((link) => (
+      <a
+        href="#sdks"
+        className={cn(
+          "shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5",
+          "text-xs font-medium text-primary",
+        )}
+      >
+        SDKs
+      </a>
+      {sections.map((link) => (
         <a
           key={link.id}
-          href={link.href}
+          href={`#${link.id}`}
           className={cn(
             "shrink-0 rounded-full border border-border bg-surface px-3.5 py-1.5",
             "text-xs font-medium text-muted-foreground transition-colors",

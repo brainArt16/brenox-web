@@ -12,22 +12,26 @@ import {
   Webhook,
   Zap,
 } from "lucide-react"
+import { ALL_DOC_SECTIONS, getSdkOrDefault } from "./sdk-registry"
+import { getSnippetsForSdkSafe } from "./sdk-snippets"
 
-export const DOC_SECTIONS = [
-  { id: "overview", label: "Overview" },
-  { id: "quickstart", label: "Quick start" },
-  { id: "console", label: "Console setup" },
-  { id: "auth", label: "Authentication" },
-  { id: "messaging", label: "Messaging" },
-  { id: "realtime", label: "Realtime" },
-  { id: "calls", label: "Voice & video" },
-  { id: "server", label: "BrenoxServer" },
-  { id: "react", label: "React hooks" },
-  { id: "webhooks", label: "Webhooks" },
-  { id: "best-practices", label: "Best practices" },
-] as const
+export {
+  ALL_DOC_SECTIONS,
+  DEFAULT_SDK_ID,
+  SDK_CATEGORIES,
+  SDK_FEATURE_LABELS,
+  SDK_REGISTRY,
+  getAvailableSdks,
+  getDocSectionsForSdk,
+  getSdkById,
+  getSdkOrDefault,
+  getSdksByCategory,
+} from "./sdk-registry"
+export type { DocSectionId, SdkDefinition, SdkFeatureKey, SdkStatus } from "./sdk-registry"
+export { getSnippetsForSdk, getSnippetsForSdkSafe } from "./sdk-snippets"
+export type { SdkSnippets } from "./sdk-snippets"
 
-export type DocSectionId = (typeof DOC_SECTIONS)[number]["id"]
+export const DOC_SECTIONS = ALL_DOC_SECTIONS
 
 export const BRENOX_API_URL_PLACEHOLDER = "https://api.brenox.io"
 
@@ -241,172 +245,12 @@ export const BEST_PRACTICES = [
   },
 ] as const
 
+/** @deprecated use getSnippetsForSdkSafe(sdk) — kept for app overview snippet */
 export function getDocSnippets(apiUrl = BRENOX_API_URL_PLACEHOLDER) {
+  const s = getSnippetsForSdkSafe(getSdkOrDefault("typescript"), apiUrl)
   return {
-    install: `npm install @brenox/sdk
-npm install @brenox/react   # optional, for React hooks`,
-
-    env: `# Server-side (BrenoxServer)
-BRENOX_API_KEY=bx_test_your_sandbox_key
-
-# Optional — SDK defaults work out of the box
-BRENOX_API_URL=${apiUrl}
-NEXT_PUBLIC_BRENOX_API_URL=${apiUrl}   # browser / React`,
-
-    quickStart: `import { BrenoxClient, localStorageTokenStore } from "@brenox/sdk";
-
-const client = new BrenoxClient({
-  baseUrl: process.env.NEXT_PUBLIC_BRENOX_API_URL ?? "${apiUrl}",
-  tokenStore: localStorageTokenStore(),
-});
-
-// 1. Sign in your user
-await client.auth.login({ email: "user@example.com", password: "secret" });
-
-// 2. Open or create a channel
-const [workspace] = await client.workspaces.list();
-const channel = await client.channels.create(workspace.id, { name: "general" });
-
-// 3. Send a message
-await client.messages.send(workspace.id, channel.ID, {
-  content: "Hello from my app!",
-});`,
-
-    messaging: `// List history
-const messages = await client.messages.list(workspaceId, channelId, { limit: 50 });
-
-// Send with optional attachments
-await client.messages.send(workspaceId, channelId, {
-  content: "Check this out",
-  attachments: [uploadedFile],
-});
-
-// Presence
-await client.users.updateStatus({ status: "away" });`,
-
-    attachments: `const file = new File(["content"], "report.pdf", { type: "application/pdf" });
-
-const uploaded = await client.attachments.uploadFile(file, {
-  fileName: file.name,
-  mimeType: file.type,
-});
-
-await client.messages.send(workspaceId, channelId, {
-  content: "See attached",
-  attachments: [uploaded],
-});`,
-
-    realtime: `const conn = client.channel(workspaceId, channelId, {
-  origin: window.location.origin,
-});
-
-conn.on("message.new", (e) => appendMessage(e.payload));
-conn.on("typing.start", (e) => showTyping(e.payload.user_id));
-conn.on("presence.status", (e) => updatePresence(e.payload));
-
-await conn.connect();
-conn.sendMessage("Hello realtime!");
-conn.sendTyping(true);`,
-
-    calls: `const signaling = client.callSignaling(workspaceId, channelId, {
-  origin: window.location.origin,
-});
-
-signaling.on("call.offer", async (event) => {
-  // Your WebRTC: create RTCPeerConnection, setRemoteDescription, etc.
-  const pc = new RTCPeerConnection({ iceServers: [...] });
-  await pc.setRemoteDescription(JSON.parse(event.payload.sdp));
-  // ... answer and send back via signaling.sendAnswer()
-});
-
-await signaling.connect();
-
-// Voice or video
-const call = await signaling.initiate("video");
-signaling.sendOffer({ call_id: call.id, to_user_id: 2, sdp: localSdp });
-
-// In-call controls
-signaling.videoOn(call.id);
-signaling.screenStart(call.id);`,
-
-    callsNote: `// Brenox SDK provides signaling only:
-// ✓ initiate / join / leave
-// ✓ SDP offer/answer + ICE exchange
-// ✓ video on/off, screen share events
-//
-// You implement:
-// • RTCPeerConnection
-// • getUserMedia / getDisplayMedia
-// • STUN/TURN servers
-// • Call UI (mute, hang up, tiles)`,
-
-    server: `import { BrenoxServer } from "@brenox/sdk/server";
-
-const server = new BrenoxServer({
-  baseUrl: process.env.BRENOX_API_URL ?? "${apiUrl}",
-  apiKey: process.env.BRENOX_API_KEY!,
-});
-
-await server.users.provision({
-  external_id: "your-auth-user-123",
-  username: "alice",
-});
-
-const channel = await server.channels.create({ name: "support" });
-
-await server.messages.send({
-  channel_id: channel.id,
-  external_id: "your-auth-user-123",
-  content: "Your ticket has been opened.",
-});`,
-
-    react: `import { BrenoxClient } from "@brenox/sdk";
-import {
-  BrenoxProvider,
-  useMessages,
-  useNotifications,
-  useCallSignaling,
-} from "@brenox/react";
-
-const client = new BrenoxClient({
-  baseUrl: process.env.NEXT_PUBLIC_BRENOX_API_URL!,
-});
-
-function App() {
-  return (
-    <BrenoxProvider client={client}>
-      <Chat workspaceId={1} channelId={1} />
-    </BrenoxProvider>
-  );
-}
-
-function Chat({ workspaceId, channelId }) {
-  const { messages, sendMessage, connectionState } = useMessages(
-    workspaceId,
-    channelId,
-    { channel: { origin: window.location.origin } },
-  );
-
-  return (
-    <div>
-      <span>{connectionState}</span>
-      {messages.map((m) => <p key={m.id}>{m.content}</p>)}
-      <button onClick={() => sendMessage("Hi!")}>Send</button>
-    </div>
-  );
-}`,
-
-    webhookVerify: `import crypto from "crypto";
-
-export function verifyBrenoxWebhook(rawBody: string, signature: string, secret: string) {
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(rawBody)
-    .digest("hex");
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expected),
-  );
-}`,
+    ...s,
+    serverIntegration: s.server,
+    react: s.framework || (s as { react?: string }).react,
   }
 }

@@ -27,7 +27,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { getApps, getApp, getWorkspaces, getWorkspace, getChannels } from "@/lib/api"
-import { DOC_SECTIONS } from "@/lib/docs/content"
+import { DOC_SECTIONS, getDocSectionsForSdk, DEFAULT_SDK_ID } from "@/lib/docs/content"
 import { useAuth } from "@/providers/auth-provider"
 import type { App, Channel, WorkspaceListItem } from "@/lib/types"
 
@@ -86,6 +86,7 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
   const wsIdMatch = pathname.match(/^\/workspaces\/(\d+)/)
   const wsId = wsIdMatch ? Number(wsIdMatch[1]) : null
   const activeChannelId = searchParams.get("channel")
+  const docsSdkId = searchParams.get("sdk") ?? DEFAULT_SDK_ID
 
   useEffect(() => {
     if (pathname.startsWith("/apps")) {
@@ -294,8 +295,11 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
             Documentation
           </NavLink>
           {pathname.startsWith("/docs") &&
-            DOC_SECTIONS.map((section) => (
-              <DocSubLink key={section.id} href={`/docs#${section.id}`}>
+            getDocSectionsForSdk(docsSdkId).map((section) => (
+              <DocSubLink
+                key={section.id}
+                href={`/docs?sdk=${docsSdkId}#${section.id}`}
+              >
                 {section.label}
               </DocSubLink>
             ))}
