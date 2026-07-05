@@ -32,7 +32,7 @@ export const chatDemo: DemoResource = {
     "Embed-first chat demo: backend provisions users with BrenoxServer, frontend chats with BrenoxClient — messaging, voice/video calls, Alice & Bob in two tabs.",
   tags: ["React", "Embed", "WebRTC", "Realtime"],
   status: "live",
-  sdkPackages: ["@brenox/react@0.1.2", "@brenox/sdk@0.1.2"],
+  sdkPackages: ["@brenox/react@0.1.3", "@brenox/sdk@0.1.3"],
   githubUrl: CHAT_GITHUB_URL,
   steps: CHAT_DEMO_STEPS,
 }
