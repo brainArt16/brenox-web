@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRight, ExternalLink, FileCode, Github, Lightbulb, Play } from "lucide-react"
+import { ArrowRight, ExternalLink, FileCode, Github, Lightbulb } from "lucide-react"
 import { DocSection } from "@/components/docs/doc-section"
 import { DocsCallout } from "@/components/docs/docs-callout"
 import { ResourcesToc } from "@/components/resources/resources-toc"
@@ -62,15 +62,9 @@ export function DemoTutorialView({ demo }: DemoTutorialViewProps) {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild>
-                <a href={demo.liveDemoUrl} target="_blank" rel="noopener noreferrer">
-                  <Play className="mr-2 h-4 w-4" />
-                  Try live demo
-                </a>
-              </Button>
-              <Button variant="outline" asChild>
                 <a href={demo.githubUrl} target="_blank" rel="noopener noreferrer">
                   <Github className="mr-2 h-4 w-4" />
-                  View on GitHub
+                  Clone &amp; run locally
                   <ExternalLink className="ml-2 h-3.5 w-3.5" />
                 </a>
               </Button>
@@ -84,26 +78,19 @@ export function DemoTutorialView({ demo }: DemoTutorialViewProps) {
           </div>
         </div>
 
-        <DocsCallout icon={Lightbulb} title="Three surfaces" variant="tip">
-          This tutorial lives on brenox-web. The{" "}
-          <a
-            href={demo.liveDemoUrl}
-            className="font-medium text-primary hover:underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            live demo
-          </a>{" "}
-          is a separate runnable app. Full source is on{" "}
+        <DocsCallout icon={Lightbulb} title="Run it yourself" variant="tip">
+          This is a hands-on tutorial. The demo runs locally — it needs a backend
+          embed API (your API key) plus the Brenox engine, so it isn&apos;t hosted
+          here. Clone the{" "}
           <a
             href={demo.githubUrl}
             className="font-medium text-primary hover:underline"
             target="_blank"
             rel="noopener noreferrer"
           >
-            GitHub
-          </a>
-          .
+            GitHub repo
+          </a>{" "}
+          and follow the steps below to run Alice &amp; Bob in two tabs.
         </DocsCallout>
 
         <section>
@@ -173,15 +160,6 @@ export function DemoTutorialView({ demo }: DemoTutorialViewProps) {
                   Quick links
                 </p>
                 <a
-                  href={demo.liveDemoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-primary hover:underline"
-                >
-                  <Play className="h-3.5 w-3.5" />
-                  Try live demo
-                </a>
-                <a
                   href={demo.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -190,6 +168,13 @@ export function DemoTutorialView({ demo }: DemoTutorialViewProps) {
                   <Github className="h-3.5 w-3.5" />
                   GitHub source
                 </a>
+                <Link
+                  href="/docs?sdk=react"
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ArrowRight className="h-3.5 w-3.5" />
+                  SDK docs
+                </Link>
               </div>
             </div>
           </aside>

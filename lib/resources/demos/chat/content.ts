@@ -173,7 +173,7 @@ Set \`BRENOX_API_KEY\` and \`BRENOX_API_URL=http://localhost:8080\` in \`.env\`.
 - \`WS_ALLOWED_ORIGINS\` must include **both** \`localhost:5173\` and \`127.0.0.1:5173\`
 - Raise \`API_RATE_LIMIT_PER_MINUTE\` / \`HTTP_RATE_LIMIT_PER_IP\` if you hit 429 during dev
 
-**Production:** deploy the embed API on your backend; sync the static UI to \`breno-x.com/demos/chat\` with \`npm run sync:web-static\`.`,
+**Production:** host the static UI on your own domain and deploy the embed API (\`server/index.mjs\`) on your backend — it holds the API key and issues session tokens. This tutorial is not a hosted playground; clone the repo and run it locally.`,
     snippetKey: "runDeploy",
     files: ["README.md", "vite.config.ts", ".env.example"],
   },

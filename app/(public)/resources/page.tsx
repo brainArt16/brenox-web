@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, ExternalLink, Github, Play } from "lucide-react"
+import { ArrowRight, ExternalLink, Github } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DEMO_CATALOG, getLiveDemos } from "@/lib/resources/catalog"
@@ -21,8 +21,8 @@ export default function ResourcesHubPage() {
               SDK demos & tutorials
             </h1>
             <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
-              Step-by-step build guides with code snippets, live demos, and GitHub source. Each
-              tutorial walks from scaffold to deploy the live app is a separate runnable project.
+              Step-by-step build guides with code snippets and GitHub source. Each tutorial walks
+              from scaffold to deploy; clone the repo to run the demo locally.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button variant="outline" asChild>
@@ -72,15 +72,9 @@ export default function ResourcesHubPage() {
                     </Link>
                   </Button>
                   <Button size="sm" variant="outline" asChild>
-                    <a href={demo.liveDemoUrl} target="_blank" rel="noopener noreferrer">
-                      <Play className="mr-1.5 h-3.5 w-3.5" />
-                      Try live
-                    </a>
-                  </Button>
-                  <Button size="sm" variant="ghost" asChild>
                     <a href={demo.githubUrl} target="_blank" rel="noopener noreferrer">
                       <Github className="mr-1.5 h-3.5 w-3.5" />
-                      GitHub
+                      Clone &amp; run
                       <ExternalLink className="ml-1 h-3 w-3" />
                     </a>
                   </Button>

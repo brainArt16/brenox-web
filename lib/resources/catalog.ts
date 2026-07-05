@@ -17,7 +17,6 @@ export interface DemoResource {
   tags: string[]
   status: "live" | "coming-soon"
   sdkPackages: string[]
-  liveDemoUrl: string
   githubUrl: string
   steps: DemoStep[]
 }
@@ -25,8 +24,6 @@ export interface DemoResource {
 export const RESOURCES_HUB_URL = "https://www.breno-x.com/resources"
 export const CHAT_TUTORIAL_URL = "https://www.breno-x.com/resources/demos/chat"
 export const CHAT_GITHUB_URL = "https://github.com/brainArt16/brenox-demo-chat"
-
-const CHAT_LIVE_DEMO_URL = process.env.NEXT_PUBLIC_DEMO_CHAT_URL ?? "https://www.breno-x.com/demos/chat"
 
 export const chatDemo: DemoResource = {
   id: "chat",
@@ -36,7 +33,6 @@ export const chatDemo: DemoResource = {
   tags: ["React", "Embed", "WebRTC", "Realtime"],
   status: "live",
   sdkPackages: ["@brenox/react@0.1.2", "@brenox/sdk@0.1.2"],
-  liveDemoUrl: CHAT_LIVE_DEMO_URL,
   githubUrl: CHAT_GITHUB_URL,
   steps: CHAT_DEMO_STEPS,
 }
