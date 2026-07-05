@@ -32,8 +32,19 @@ export interface SdkVersionDoc {
 export const SDK_VERSION_CATALOG: Record<string, SdkVersionDoc[]> = {
   typescript: [
     {
-      version: "0.1.1",
+      version: "0.1.3",
       status: "current",
+      released: "2026-07-05",
+      highlights: [
+        "BrenoxServer.sessions.create() — issue embed JWTs via POST /v1/sessions",
+        "CreateSessionInput and DeveloperSession types on @brenox/sdk/server",
+        "Embed-first flow: backend provisions users, frontend receives session tokens",
+      ],
+      installPackages: "@brenox/sdk@0.1.3",
+    },
+    {
+      version: "0.1.1",
+      status: "supported",
       released: "2026-07-04",
       highlights: [
         "npm README and package metadata with live documentation links",
@@ -57,8 +68,18 @@ export const SDK_VERSION_CATALOG: Record<string, SdkVersionDoc[]> = {
   ],
   react: [
     {
-      version: "0.1.1",
+      version: "0.1.3",
       status: "current",
+      released: "2026-07-05",
+      highlights: [
+        "Published alongside @brenox/sdk@0.1.3",
+        "useCallSignaling unchanged — pairs with embed session tokens from your backend",
+      ],
+      installPackages: "@brenox/react@0.1.3 @brenox/sdk@0.1.3",
+    },
+    {
+      version: "0.1.1",
+      status: "supported",
       released: "2026-07-04",
       highlights: [
         "npm README with links to live React SDK documentation",

@@ -39,6 +39,14 @@ function applyVersionInstall(
   return { ...snippets, install: formatInstallCommand(version.installPackages) }
 }
 
+function hasSessionsApi(version?: SdkVersionDoc): boolean {
+  if (!version) return true
+  const [major, minor, patch] = version.version.split(".").map(Number)
+  if (major !== 0) return major > 0
+  if (minor !== 1) return minor > 1
+  return patch >= 3
+}
+
 function typescriptSnippets(apiUrl: string, version?: SdkVersionDoc): SdkSnippets {
   const base: SdkSnippets = {
     install: formatInstallCommand("@brenox/sdk"),
@@ -106,6 +114,14 @@ const server = new BrenoxServer({
 });
 
 await server.users.provision({ external_id: "user-123", username: "alice" });
+${hasSessionsApi(version) ? `
+// Embed flow — issue a user JWT for your frontend (never expose the API key in the browser)
+const session = await server.sessions.create({
+  external_id: "user-123",
+  channel_id: 1,
+});
+// Return session.token to BrenoxClient in the browser
+` : ""}
 await server.messages.send({
   channel_id: 1,
   external_id: "user-123",
