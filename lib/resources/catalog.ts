@@ -33,8 +33,8 @@ export const chatDemo: DemoResource = {
   id: "chat",
   title: "Live Chat",
   description:
-    "Build a React chat app with @brenox/react and @brenox/sdk — auth, workspaces, channels, realtime messaging, typing, presence, notifications, and attachments.",
-  tags: ["React", "Messaging", "Realtime", "Tutorial"],
+    "Embed-first chat demo: your backend provisions users with BrenoxServer, your frontend chats with BrenoxClient — try Alice & Bob in two browsers.",
+  tags: ["React", "Embed", "BrenoxServer", "Realtime"],
   status: "live",
   sdkPackages: ["@brenox/react@0.1.2", "@brenox/sdk@0.1.2"],
   liveDemoUrl: CHAT_LIVE_DEMO_URL,
