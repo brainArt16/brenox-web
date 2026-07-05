@@ -26,8 +26,7 @@ export const RESOURCES_HUB_URL = "https://www.breno-x.com/resources"
 export const CHAT_TUTORIAL_URL = "https://www.breno-x.com/resources/demos/chat"
 export const CHAT_GITHUB_URL = "https://github.com/brainArt16/brenox-demo-chat"
 
-const CHAT_LIVE_DEMO_URL =
-  process.env.NEXT_PUBLIC_DEMO_CHAT_URL ?? "https://www.breno-x.com/demos/chat"
+const CHAT_LIVE_DEMO_URL = process.env.NEXT_PUBLIC_DEMO_CHAT_URL ?? "https://www.breno-x.com/demos/chat"
 
 export const chatDemo: DemoResource = {
   id: "chat",

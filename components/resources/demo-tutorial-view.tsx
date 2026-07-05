@@ -7,6 +7,7 @@ import { DocsCallout } from "@/components/docs/docs-callout"
 import { ResourcesToc } from "@/components/resources/resources-toc"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { FlowSteps } from "@/components/shared/flow-steps"
+import { ProseBlock } from "@/components/shared/prose-block"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import type { DemoResource } from "@/lib/resources/catalog"
@@ -15,93 +16,6 @@ import { getChatSnippet } from "@/lib/resources/demos/chat/snippets"
 function getSnippet(demoId: string, key: string) {
   if (demoId === "chat") return getChatSnippet(key)
   return undefined
-}
-
-function ProseBlock({ text }: { text: string }) {
-  const blocks = text.split("\n\n")
-
-  return (
-    <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
-      {blocks.map((block, index) => {
-        if (block.startsWith("| Surface |")) {
-          const rows = block.split("\n").filter((line) => line.startsWith("|") && !line.includes("---"))
-          return (
-            <div key={index} className="overflow-x-auto rounded-xl border border-border">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-surface">
-                    {rows[0]
-                      ?.split("|")
-                      .filter(Boolean)
-                      .map((cell, i) => (
-                        <th key={i} className="px-4 py-2 font-medium text-foreground">
-                          {cell.trim()}
-                        </th>
-                      ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.slice(1).map((row, rowIndex) => (
-                    <tr key={rowIndex} className="border-b border-border last:border-0">
-                      {row
-                        .split("|")
-                        .filter(Boolean)
-                        .map((cell, i) => (
-                          <td key={i} className="px-4 py-2">
-                            {cell.trim().startsWith("[") ? (
-                              <span
-                                dangerouslySetInnerHTML={{
-                                  __html: cell
-                                    .trim()
-                                    .replace(
-                                      /\[([^\]]+)\]\(([^)]+)\)/g,
-                                      '<a href="$2" class="font-medium text-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>',
-                                    ),
-                                }}
-                              />
-                            ) : (
-                              <code className="font-mono text-xs">{cell.trim()}</code>
-                            )}
-                          </td>
-                        ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )
-        }
-
-        if (block.startsWith("**") && block.includes("**")) {
-          const [heading, ...rest] = block.split("\n")
-          const headingText = heading.replace(/\*\*/g, "")
-          return (
-            <div key={index}>
-              <p className="font-medium text-foreground">{headingText}</p>
-              {rest.length > 0 && (
-                <p className="mt-2 whitespace-pre-wrap">{rest.join("\n")}</p>
-              )}
-            </div>
-          )
-        }
-
-        const html = block
-          .replace(/`([^`]+)`/g, '<code class="font-mono text-xs text-foreground">$1</code>')
-          .replace(
-            /\[([^\]]+)\]\(([^)]+)\)/g,
-            '<a href="$2" class="font-medium text-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>',
-          )
-
-        return (
-          <p
-            key={index}
-            className="whitespace-pre-wrap"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-        )
-      })}
-    </div>
-  )
 }
 
 interface DemoTutorialViewProps {

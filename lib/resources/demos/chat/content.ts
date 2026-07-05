@@ -108,7 +108,7 @@ Mark items read with \`markRead(id)\` or \`markAllRead()\`.`,
     id: "attachments",
     number: 9,
     title: "Attachments",
-    description: "Upload files and attach to messages.",
+    description: "Upload files and attach them to messages.",
     prose: `Upload via \`client.attachments.uploadFile\`, send the message over REST, then \`attachToMessage\`. List files with \`listByMessage\` for download links.
 
 Presigned URLs are handled by Brenox — your app only uploads the file bytes.`,

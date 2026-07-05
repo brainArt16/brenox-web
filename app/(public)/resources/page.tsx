@@ -22,7 +22,7 @@ export default function ResourcesHubPage() {
             </h1>
             <p className="mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
               Step-by-step build guides with code snippets, live demos, and GitHub source. Each
-              tutorial walks from scaffold to deploy — the live app is a separate runnable project.
+              tutorial walks from scaffold to deploy the live app is a separate runnable project.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button variant="outline" asChild>
