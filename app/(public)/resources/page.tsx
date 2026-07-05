@@ -109,25 +109,6 @@ export default function ResourcesHubPage() {
             </div>
           </section>
         )}
-
-        <section className="rounded-xl border border-border bg-surface p-6 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">Local development</p>
-          <ul className="mt-3 space-y-2">
-            <li>
-              Tutorial hub:{" "}
-              <code className="font-mono text-xs">http://localhost:3000/resources</code>
-            </li>
-            <li>
-              Chat tutorial:{" "}
-              <code className="font-mono text-xs">http://localhost:3000/resources/demos/chat</code>
-            </li>
-            <li>
-              Live demo app:{" "}
-              <code className="font-mono text-xs">http://localhost:5173</code> with{" "}
-              <code className="font-mono text-xs">VITE_BRENOX_API_URL=http://localhost:8080</code>
-            </li>
-          </ul>
-        </section>
       </div>
     </div>
   )
