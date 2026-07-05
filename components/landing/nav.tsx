@@ -11,6 +11,7 @@ export function LandingNav() {
   const navLinks = [
     { name: "Features", href: "/#features" },
     { name: "Docs", href: "/docs" },
+    { name: "Resources", href: "/resources" },
     { name: "Pricing", href: "/#pricing" },
   ]
 

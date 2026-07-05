@@ -6,6 +6,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async rewrites() {
+    return [
+      { source: "/demos/chat", destination: "/demos/chat/index.html" },
+      { source: "/demos/chat/", destination: "/demos/chat/index.html" },
+    ]
+  },
   async redirects() {
     return [
       { source: "/app", destination: "/workspaces", permanent: false },

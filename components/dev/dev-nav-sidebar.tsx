@@ -11,6 +11,7 @@ import {
   Lock,
   Plus,
   BookOpen,
+  Boxes,
   Bell,
   Settings,
   Users,
@@ -122,7 +123,7 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
   const headerTitle =
     app?.name ??
     workspace?.name ??
-    (pathname.startsWith("/settings") ? "Settings" : pathname.startsWith("/docs") ? "Documentation" : pathname.startsWith("/notifications") ? "Notifications" : "Developer Console")
+    (pathname.startsWith("/settings") ? "Settings" : pathname.startsWith("/docs") ? "Documentation" : pathname.startsWith("/resources") ? "Resources" : pathname.startsWith("/notifications") ? "Notifications" : "Developer Console")
 
   return (
     <aside
@@ -294,6 +295,9 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
           </div>
           <NavLink href="/docs" active={pathname.startsWith("/docs")} icon={BookOpen}>
             Documentation
+          </NavLink>
+          <NavLink href="/resources" active={pathname.startsWith("/resources")} icon={Boxes}>
+            Resources
           </NavLink>
           {pathname.startsWith("/docs") &&
             getDocSectionsForSdk(docsSdkId).map((section) => {

@@ -19,8 +19,11 @@ export function DocsPublicShell({ children }: { children: React.ReactNode }) {
               </div>
               <span className="font-bold text-lg">Brenox</span>
             </Link>
-            <Link href="/docs" className="text-sm font-medium text-foreground">
+            <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground">
               Documentation
+            </Link>
+            <Link href="/resources" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              Resources
             </Link>
           </div>
 
