@@ -4,8 +4,10 @@ export type ChatSnippetKey =
   | "sessionTokens"
   | "embedLauncher"
   | "sdkClient"
+  | "channelSession"
   | "realtimeMessaging"
   | "typingPresence"
+  | "voiceVideoCalls"
   | "notifications"
   | "attachments"
   | "runDeploy"
@@ -24,7 +26,13 @@ export const CHAT_SNIPPETS: Record<ChatSnippetKey, DemoSnippet> = {
 cd brenox-demo-chat
 npm install
 cp .env.example .env
-# Add your bx_test_* key from www.breno-x.com/apps → API Keys`,
+# Add bx_test_* key from www.breno-x.com/apps → API Keys
+
+# Terminal 1 — embed API (loads .env automatically)
+npm run dev:server
+
+# Terminal 2 — chat UI
+npm run dev`,
   },
   embedBackend: {
     title: "Bootstrap room with BrenoxServer",
@@ -39,7 +47,11 @@ const server = new BrenoxServer({
 async function ensureRoom() {
   await server.users.provision({ external_id: "demo-alice", username: "Alice" });
   await server.users.provision({ external_id: "demo-bob", username: "Bob" });
-  const channel = await server.channels.create({ name: "general" });
+  const channel = await server.channels.create(
+    { name: "general" },
+    "demo-channel-general", // idempotency key
+  );
+  // Persist workspaceId + channelId to server/.demo-room.json
   return { workspaceId: channel.workspace_id, channelId: channel.id };
 }`,
   },
@@ -67,17 +79,26 @@ const response = await fetch("/api/session", {
 const { token, workspace_id, channel_id } = await response.json();
 
 await client.setToken(token);
-// → open chat UI with workspace_id + channel_id`,
+// → open chat UI with workspace_id + channel_id
+// Use sessionStorage so Alice and Bob can run in separate tabs`,
   },
   sdkClient: {
-    title: "BrenoxClient + provider",
+    title: "BrenoxClient + per-tab session storage",
     language: "typescript",
-    code: `import { BrenoxClient, localStorageTokenStore } from "@brenox/sdk";
+    code: `import { BrenoxClient, type TokenStore } from "@brenox/sdk";
 import { BrenoxProvider } from "@brenox/react";
+
+function sessionStorageTokenStore(key: string): TokenStore {
+  return {
+    getToken: () => sessionStorage.getItem(key),
+    setToken: (value) =>
+      value ? sessionStorage.setItem(key, value) : sessionStorage.removeItem(key),
+  };
+}
 
 export const brenoxClient = new BrenoxClient({
   baseUrl: import.meta.env.VITE_BRENOX_API_URL ?? "https://api.breno-x.com",
-  tokenStore: localStorageTokenStore("brenox_demo_chat_token"),
+  tokenStore: sessionStorageTokenStore("brenox_demo_chat_token"),
 });
 
 export default function App() {
@@ -88,15 +109,33 @@ export default function App() {
   );
 }`,
   },
-  realtimeMessaging: {
-    title: "Single WebSocket + REST history",
+  channelSession: {
+    title: "One WebSocket for chat + calls",
     language: "typescript",
-    code: `const { connection, connectionState, connect } = useChannel(
-  workspaceId,
-  channelId,
-);
+    code: `import { useCallSignaling } from "@brenox/react";
 
-useEffect(() => { void connect(); }, [connect]);
+export function ChannelSessionProvider({ workspaceId, channelId, children }) {
+  const { signaling, connectionState, initiate, join, leave } = useCallSignaling(
+    workspaceId,
+    channelId,
+    { autoConnect: true },
+  );
+
+  const connection = signaling?.channel ?? null;
+  // ChatPanel + CallPanel share this connection
+  return (
+    <ChannelSessionContext.Provider
+      value={{ connection, signaling, connectionState, initiate, join, leave }}
+    >
+      {children}
+    </ChannelSessionContext.Provider>
+  );
+}`,
+  },
+  realtimeMessaging: {
+    title: "Shared connection + REST history",
+    language: "typescript",
+    code: `const { connection, connectionState } = useChannelSession();
 
 useEffect(() => {
   if (!connection) return;
@@ -117,17 +156,40 @@ if (connectionState === "connected") {
     code: `function handleDraftChange(value: string) {
   setDraft(value);
   if (connectionState !== "connected") return;
-  startTyping();
+  connection?.startTyping();
   window.setTimeout(() => {
-    if (connection?.connectionState === "connected") stopTyping();
+    if (connection?.connectionState === "connected") connection.stopTyping();
   }, 1500);
 }`,
+  },
+  voiceVideoCalls: {
+    title: "Signaling + WebRTC mesh",
+    language: "typescript",
+    code: `const { signaling, initiate, join, leave } = useChannelSession();
+
+// Alice starts a video call
+const call = await initiate("video");
+const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+
+// Bob joins when he receives call.join on the WebSocket
+await join(call.id);
+
+// Exchange SDP/ICE via signaling (you implement RTCPeerConnection)
+signaling?.on("call.offer", async (event) => {
+  // setRemoteDescription → createAnswer → sendAnswer
+});
+signaling?.sendOffer({ call_id: call.id, to_user_id: bobId, sdp: localSdp });
+
+// Optional STUN/TURN — VITE_ICE_SERVERS in .env
+const pc = new RTCPeerConnection({
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+});`,
   },
   notifications: {
     title: "useNotifications",
     language: "typescript",
     code: `const { notifications, markRead, markAllRead } = useNotifications({
-  pollIntervalMs: 30_000,
+  pollIntervalMs: 60_000,
 });`,
   },
   attachments: {
@@ -141,15 +203,20 @@ const message = await client.messages.send(workspaceId, channelId, { content: te
 await client.attachments.attachToMessage(workspaceId, channelId, message.id, [uploaded]);`,
   },
   runDeploy: {
-    title: "Run locally (two users)",
+    title: "Run locally + engine dev settings",
     language: "bash",
-    code: `# Terminal 1 — embed API (needs BRENOX_API_KEY in .env)
+    code: `# Terminal 1 — embed API
 npm run dev:server
 
 # Terminal 2 — chat UI
 npm run dev
-# Open http://localhost:5173/demos/chat/
-# → Alice in one window, Bob in incognito`,
+# http://localhost:5173/demos/chat/
+# Alice in tab 1, Bob in tab 2
+
+# brenox-engine/.env (restart engine after editing)
+WS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+API_RATE_LIMIT_PER_MINUTE=1000
+HTTP_RATE_LIMIT_PER_IP=2000`,
   },
 }
 

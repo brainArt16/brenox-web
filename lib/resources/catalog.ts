@@ -32,8 +32,8 @@ export const chatDemo: DemoResource = {
   id: "chat",
   title: "Live Chat",
   description:
-    "Embed-first chat demo: your backend provisions users with BrenoxServer, your frontend chats with BrenoxClient - try Alice & Bob in two browsers.",
-  tags: ["React", "Embed", "BrenoxServer", "Realtime"],
+    "Embed-first chat demo: backend provisions users with BrenoxServer, frontend chats with BrenoxClient — messaging, voice/video calls, Alice & Bob in two tabs.",
+  tags: ["React", "Embed", "WebRTC", "Realtime"],
   status: "live",
   sdkPackages: ["@brenox/react@0.1.2", "@brenox/sdk@0.1.2"],
   liveDemoUrl: CHAT_LIVE_DEMO_URL,
