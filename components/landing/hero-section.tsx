@@ -35,8 +35,8 @@ export function HeroSection() {
 
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             <Button asChild size="lg" className="px-8 h-12 text-base">
-              <Link href="/register">
-                Start Free
+              <Link href="/#pricing">
+                View Plans
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
