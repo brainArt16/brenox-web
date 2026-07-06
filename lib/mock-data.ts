@@ -4,6 +4,8 @@ export const mockUser: UserProfile = {
   id: 1,
   email: 'dev@example.com',
   username: 'devuser',
+  platform_role: 'user',
+  suspended: false,
   created_at: '2024-01-15T10:00:00Z',
 }
 

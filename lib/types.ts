@@ -1,7 +1,60 @@
+export type PlatformRole = "user" | "support" | "admin"
+
 export interface UserProfile {
   id: number
   email: string
   username: string
+  platform_role: PlatformRole
+  suspended: boolean
+  created_at: string
+}
+
+export interface AdminOverview {
+  users: number
+  workspaces: number
+  apps: number
+}
+
+export interface AdminUser {
+  id: number
+  email: string
+  username: string
+  platform_role: PlatformRole
+  suspended: boolean
+  created_at: string
+  workspace_count?: number
+  app_count?: number
+}
+
+export interface AdminWorkspace {
+  id: number
+  name: string
+  slug: string
+  owner_id: number
+  created_at: string
+  member_count?: number
+  channel_count?: number
+}
+
+export interface AdminApp {
+  id: number
+  name: string
+  slug: string
+  workspace_id: number
+  owner_id: number
+  owner_email: string
+  created_at: string
+}
+
+export interface AdminAuditLog {
+  id: number
+  user_id?: number
+  app_id?: number
+  action: string
+  method: string
+  path: string
+  ip_address?: string
+  status_code?: number
   created_at: string
 }
 

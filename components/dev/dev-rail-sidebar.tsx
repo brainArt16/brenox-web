@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { m } from "framer-motion"
-import { LayoutGrid, Boxes, BookOpen, Bell, Settings } from "lucide-react"
+import { LayoutGrid, Boxes, BookOpen, Bell, Settings, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { getNotifications } from "@/lib/api"
+import { isPlatformAdmin } from "@/lib/engine/admin"
 import { useAuth } from "@/providers/auth-provider"
 
 const railItems = [
@@ -41,6 +42,7 @@ export function DevRailSidebar() {
     if (href === "/workspaces") return pathname.startsWith("/workspaces")
     if (href === "/docs") return pathname.startsWith("/docs")
     if (href === "/notifications") return pathname.startsWith("/notifications")
+    if (href === "/admin") return pathname.startsWith("/admin")
     return pathname.startsWith(href)
   }
 
@@ -94,6 +96,9 @@ export function DevRailSidebar() {
           {railItems.map((item) => (
             <RailButton key={item.id} href={item.href} icon={item.icon} label={item.label} />
           ))}
+          {isPlatformAdmin(user?.platform_role) && (
+            <RailButton href="/admin" icon={Shield} label="Platform Admin" />
+          )}
           <div className="my-1 h-px w-8 bg-sidebar-border" />
           <RailButton href="/notifications" icon={Bell} label="Notifications" badge={unread} />
         </div>
