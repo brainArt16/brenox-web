@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { PageHeader } from "@/components/layout/page-header"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -50,9 +51,17 @@ export default function AdminWorkspacesPage() {
             <TableBody>
               {workspaces.map((workspace) => (
                 <TableRow key={workspace.id}>
-                  <TableCell className="font-medium">{workspace.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link href={`/admin/workspaces/${workspace.id}`} className="hover:underline">
+                      {workspace.name}
+                    </Link>
+                  </TableCell>
                   <TableCell className="font-mono text-sm">{workspace.slug}</TableCell>
-                  <TableCell>{workspace.owner_id}</TableCell>
+                  <TableCell>
+                    <Link href={`/admin/users/${workspace.owner_id}`} className="hover:underline">
+                      {workspace.owner_id}
+                    </Link>
+                  </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(workspace.created_at).toLocaleDateString()}
                   </TableCell>

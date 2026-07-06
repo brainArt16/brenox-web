@@ -5,6 +5,8 @@ import type {
   AdminOverview,
   AdminUser,
   AdminWorkspace,
+  AdminWorkspaceMember,
+  ApiKey,
   PlatformRole,
 } from "@/lib/types"
 
@@ -45,12 +47,53 @@ export async function getAdminWorkspace(workspaceId: number): Promise<AdminWorks
   return engineFetch<AdminWorkspace>(`/api/admin/workspaces/${workspaceId}`)
 }
 
+export async function listAdminWorkspaceMembers(
+  workspaceId: number
+): Promise<AdminWorkspaceMember[]> {
+  const data = await engineFetch<{ members: AdminWorkspaceMember[] }>(
+    `/api/admin/workspaces/${workspaceId}/members`
+  )
+  return data.members
+}
+
 export async function listAdminApps(): Promise<AdminApp[]> {
   const data = await engineFetch<{ apps: AdminApp[] }>("/api/admin/apps")
   return data.apps
 }
 
-export async function listAdminAuditLogs(): Promise<AdminAuditLog[]> {
-  const data = await engineFetch<{ audit_logs: AdminAuditLog[] }>("/api/admin/audit-logs")
+export async function getAdminApp(appId: number): Promise<AdminApp> {
+  return engineFetch<AdminApp>(`/api/admin/apps/${appId}`)
+}
+
+export async function listAdminAppKeys(appId: number): Promise<ApiKey[]> {
+  const data = await engineFetch<{ keys: ApiKey[] }>(`/api/admin/apps/${appId}/keys`)
+  return data.keys
+}
+
+export async function revokeAdminAppKey(appId: number, keyId: number): Promise<void> {
+  await engineFetch<void>(`/api/admin/apps/${appId}/keys/${keyId}`, {
+    method: "DELETE",
+  })
+}
+
+export type AdminAuditLogFilters = {
+  user_id?: number
+  action?: string
+  limit?: number
+  offset?: number
+}
+
+export async function listAdminAuditLogs(
+  filters: AdminAuditLogFilters = {}
+): Promise<AdminAuditLog[]> {
+  const params = new URLSearchParams()
+  if (filters.user_id != null) params.set("user_id", String(filters.user_id))
+  if (filters.action) params.set("action", filters.action)
+  if (filters.limit != null) params.set("limit", String(filters.limit))
+  if (filters.offset != null) params.set("offset", String(filters.offset))
+  const query = params.toString()
+  const data = await engineFetch<{ audit_logs: AdminAuditLog[] }>(
+    `/api/admin/audit-logs${query ? `?${query}` : ""}`
+  )
   return data.audit_logs
 }

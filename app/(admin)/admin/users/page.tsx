@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { PageHeader } from "@/components/layout/page-header"
 import { Input } from "@/components/ui/input"
@@ -103,8 +104,10 @@ export default function AdminUsersPage() {
               {users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
-                    <div className="font-medium">{user.username}</div>
-                    <div className="text-sm text-muted-foreground">{user.email}</div>
+                    <Link href={`/admin/users/${user.id}`} className="hover:underline">
+                      <div className="font-medium">{user.username}</div>
+                      <div className="text-sm text-muted-foreground">{user.email}</div>
+                    </Link>
                   </TableCell>
                   <TableCell>
                     {canWrite && user.id !== currentUser?.id ? (

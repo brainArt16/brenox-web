@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { PageHeader } from "@/components/layout/page-header"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -51,11 +52,21 @@ export default function AdminAppsPage() {
               {apps.map((app) => (
                 <TableRow key={app.id}>
                   <TableCell>
-                    <div className="font-medium">{app.name}</div>
-                    <div className="font-mono text-sm text-muted-foreground">{app.slug}</div>
+                    <Link href={`/admin/apps/${app.id}`} className="hover:underline">
+                      <div className="font-medium">{app.name}</div>
+                      <div className="font-mono text-sm text-muted-foreground">{app.slug}</div>
+                    </Link>
                   </TableCell>
-                  <TableCell className="text-sm">{app.owner_email}</TableCell>
-                  <TableCell>{app.workspace_id}</TableCell>
+                  <TableCell className="text-sm">
+                    <Link href={`/admin/users/${app.owner_id}`} className="hover:underline">
+                      {app.owner_email}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/admin/workspaces/${app.workspace_id}`} className="hover:underline">
+                      {app.workspace_id}
+                    </Link>
+                  </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(app.created_at).toLocaleDateString()}
                   </TableCell>

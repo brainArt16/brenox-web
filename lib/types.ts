@@ -49,12 +49,22 @@ export interface AdminApp {
 export interface AdminAuditLog {
   id: number
   user_id?: number
+  username?: string
   app_id?: number
   action: string
   method: string
   path: string
   ip_address?: string
   status_code?: number
+  created_at: string
+}
+
+export interface AdminWorkspaceMember {
+  id: number
+  user_id: number
+  username: string
+  email: string
+  role: string
   created_at: string
 }
 
