@@ -1,5 +1,5 @@
 import { getEngineBaseUrl } from "./config"
-import { EngineApiError } from "./errors"
+import { EngineApiError, sanitizeClientMessage } from "./errors"
 import { clearToken, getToken, isPersistentSession, setToken } from "./session"
 
 type EngineFetchOptions = RequestInit & {
@@ -41,11 +41,11 @@ async function refreshAccessToken(): Promise<string | null> {
 async function parseErrorMessage(res: Response): Promise<string> {
   try {
     const body = (await res.json()) as { error?: string }
-    if (body.error) return body.error
+    if (body.error) return sanitizeClientMessage(body.error)
   } catch {
     // ignore JSON parse failures
   }
-  return res.statusText || "Request failed"
+  return sanitizeClientMessage(res.statusText || "Request failed")
 }
 
 export async function engineFetch<T>(
