@@ -18,6 +18,7 @@ import {
   Webhook,
   FlaskConical,
   ExternalLink,
+  CreditCard,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -163,7 +164,7 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
                     <NavLink
                       key={a.id}
                       href={`/apps/${a.id}`}
-                      active={appId === a.id && !pathname.includes("/keys") && !pathname.includes("/webhooks") && !pathname.includes("/sandbox")}
+                      active={appId === a.id && !pathname.includes("/keys") && !pathname.includes("/webhooks") && !pathname.includes("/sandbox") && !pathname.includes("/billing")}
                       icon={LayoutGrid}
                     >
                       {a.name}
@@ -190,6 +191,9 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
                   </NavLink>
                   <NavLink href={`/apps/${appId}/sandbox`} active={pathname.endsWith("/sandbox")} icon={FlaskConical}>
                     Sandbox
+                  </NavLink>
+                  <NavLink href={`/apps/${appId}/billing`} active={pathname.endsWith("/billing")} icon={CreditCard}>
+                    Billing
                   </NavLink>
                   <NavLink href={`/workspaces/${app.workspace_id}`} active={false} icon={ExternalLink}>
                     Open workspace

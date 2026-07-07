@@ -22,10 +22,18 @@ export async function getAppById(appId: number): Promise<App | null> {
   }
 }
 
-export async function createAppRequest(name: string, slug?: string): Promise<App> {
+export async function createAppRequest(
+  name: string,
+  slug?: string,
+  planSlug?: string
+): Promise<App> {
   return engineFetch<App>("/api/apps", {
     method: "POST",
-    body: JSON.stringify({ name, slug: slug ?? "" }),
+    body: JSON.stringify({
+      name,
+      slug: slug ?? "",
+      plan_slug: planSlug ?? "",
+    }),
   })
 }
 

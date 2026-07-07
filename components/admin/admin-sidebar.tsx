@@ -8,6 +8,8 @@ import {
   Boxes,
   LayoutGrid,
   ScrollText,
+  Settings,
+  CreditCard,
   ArrowLeft,
   Shield,
 } from "lucide-react"
@@ -18,7 +20,9 @@ const navItems = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/workspaces", label: "Workspaces", icon: Boxes },
   { href: "/admin/apps", label: "Apps", icon: LayoutGrid },
+  { href: "/admin/billing", label: "Billing", icon: CreditCard },
   { href: "/admin/audit", label: "Audit Logs", icon: ScrollText },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ]
 
 export function AdminSidebar() {

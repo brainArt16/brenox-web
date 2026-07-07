@@ -62,7 +62,7 @@ function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <Link href="/login" className="mb-8 flex items-center justify-center gap-2">
+      <Link href="/" className="mb-8 flex items-center justify-center gap-2">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
           <Zap className="h-6 w-6 text-primary-foreground" />
         </div>

@@ -6,6 +6,7 @@ import { DevRailSidebar } from "@/components/dev/dev-rail-sidebar"
 import { DevNavSidebar } from "@/components/dev/dev-nav-sidebar"
 import { DevMobileNav } from "@/components/dev/dev-mobile-nav"
 import { AuthGuard } from "@/components/auth/auth-guard"
+import { MaintenanceBanner } from "@/components/shared/maintenance-banner"
 import { cn } from "@/lib/utils"
 
 function NavSidebarFallback() {
@@ -31,6 +32,7 @@ function DashboardMain({ children }: { children: ReactNode }) {
             : "p-4 sm:p-6 md:max-w-5xl md:mx-auto md:w-full"
         )}
       >
+        <MaintenanceBanner />
         {children}
       </div>
     </main>

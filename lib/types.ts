@@ -68,6 +68,66 @@ export interface AdminWorkspaceMember {
   created_at: string
 }
 
+export interface Plan {
+  slug: string
+  name: string
+  price_cents: number
+  price_display: string
+  messages_limit: number
+  connections_limit: number
+  retention_days: number
+  webhooks_enabled: boolean
+  video_calls_enabled: boolean
+  moderation_enabled: boolean
+}
+
+export interface AppSubscription {
+  plan_slug: string
+  plan_name: string
+  status: string
+  price_cents: number
+  messages_limit: number
+  connections_limit: number
+  retention_days: number
+  webhooks_enabled: boolean
+  video_calls_enabled: boolean
+  moderation_enabled: boolean
+  current_period_end?: string
+  needs_payment: boolean
+}
+
+export interface AppUsage {
+  messages_this_month: number
+  messages_limit: number
+}
+
+export interface AppBilling {
+  app_id: number
+  subscription: AppSubscription
+  usage: AppUsage
+}
+
+export interface PlatformStatus {
+  maintenance_mode: boolean
+  maintenance_message?: string
+}
+
+export interface PlatformSettings {
+  maintenance_mode: boolean
+  maintenance_message: string
+}
+
+export interface AdminSubscription {
+  app_id: number
+  app_name: string
+  app_slug: string
+  plan_slug: string
+  plan_name: string
+  status: string
+  current_period_end?: string
+  messages_this_month: number
+}
+
 export interface App {
   id: number
   name: string

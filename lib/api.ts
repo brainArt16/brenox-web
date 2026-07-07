@@ -45,8 +45,8 @@ export async function getApp(appId: number): Promise<App | null> {
   return getAppById(appId)
 }
 
-export async function createApp(name: string, slug?: string): Promise<App> {
-  return createAppRequest(name, slug)
+export async function createApp(name: string, slug?: string, planSlug?: string): Promise<App> {
+  return createAppRequest(name, slug, planSlug)
 }
 
 // API Keys

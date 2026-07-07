@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { m } from "framer-motion"
 import { Zap, Eye, EyeOff, Loader2, Check, X } from "lucide-react"
@@ -65,6 +65,8 @@ function PasswordStrength({ password }: { password: string }) {
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const selectedPlan = searchParams.get("plan")
   const { register } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -116,7 +118,10 @@ export default function RegisterPage() {
         },
         true
       )
-      router.replace("/apps")
+      if (selectedPlan && ["starter", "growth", "scale"].includes(selectedPlan)) {
+        sessionStorage.setItem("brenox_selected_plan", selectedPlan)
+      }
+      router.replace(selectedPlan ? `/apps/new?plan=${selectedPlan}` : "/apps")
     } catch (error) {
       toast.error(getErrorMessage(error, "Registration failed"))
     } finally {
@@ -132,7 +137,7 @@ export default function RegisterPage() {
       transition={{ duration: 0.4 }}
     >
       {/* Logo */}
-      <Link href="/login" className="flex items-center justify-center gap-2 mb-8">
+      <Link href="/" className="flex items-center justify-center gap-2 mb-8">
         <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
           <Zap className="w-6 h-6 text-primary-foreground" />
         </div>
@@ -143,7 +148,11 @@ export default function RegisterPage() {
       <div className="bg-card border border-border rounded-xl p-8 shadow-xl">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold">Create your account</h1>
-          <p className="text-muted-foreground mt-1">Get started with the Brenox developer console</p>
+          <p className="text-muted-foreground mt-1">
+            {selectedPlan
+              ? `Get started on the ${selectedPlan} plan`
+              : "Get started with the Brenox developer console"}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

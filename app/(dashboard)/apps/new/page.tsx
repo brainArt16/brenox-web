@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Loader2, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -21,6 +21,8 @@ function slugify(name: string) {
 
 export default function NewAppPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const planFromUrl = searchParams.get("plan")
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
   const [slugTouched, setSlugTouched] = useState(false)
@@ -35,9 +37,19 @@ export default function NewAppPage() {
 
     setIsLoading(true)
     try {
-      const app = await createApp(name.trim(), slug.trim() || slugify(name))
-      toast.success("App created — generate a sandbox key next")
-      router.replace(`/apps/${app.id}/keys`)
+      const planSlug =
+        planFromUrl ||
+        (typeof window !== "undefined"
+          ? sessionStorage.getItem("brenox_selected_plan") ?? undefined
+          : undefined)
+      const app = await createApp(name.trim(), slug.trim() || slugify(name), planSlug ?? undefined)
+      if (planSlug) {
+        sessionStorage.removeItem("brenox_selected_plan")
+        router.replace(`/apps/${app.id}/billing`)
+      } else {
+        toast.success("App created — generate a sandbox key next")
+        router.replace(`/apps/${app.id}/keys`)
+      }
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to create app"))
     } finally {
