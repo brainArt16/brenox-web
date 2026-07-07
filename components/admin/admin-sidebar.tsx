@@ -10,6 +10,7 @@ import {
   ScrollText,
   Settings,
   CreditCard,
+  Tags,
   ArrowLeft,
   Shield,
 } from "lucide-react"
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/admin/workspaces", label: "Workspaces", icon: Boxes },
   { href: "/admin/apps", label: "Apps", icon: LayoutGrid },
   { href: "/admin/billing", label: "Billing", icon: CreditCard },
+  { href: "/admin/plans", label: "Plans", icon: Tags },
   { href: "/admin/audit", label: "Audit Logs", icon: ScrollText },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ]

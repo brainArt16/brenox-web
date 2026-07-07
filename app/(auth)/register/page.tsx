@@ -118,7 +118,7 @@ export default function RegisterPage() {
         },
         true
       )
-      if (selectedPlan && ["starter", "growth", "scale"].includes(selectedPlan)) {
+      if (selectedPlan) {
         sessionStorage.setItem("brenox_selected_plan", selectedPlan)
       }
       router.replace(selectedPlan ? `/apps/new?plan=${selectedPlan}` : "/apps")

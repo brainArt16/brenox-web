@@ -1,8 +1,8 @@
 import { engineFetch } from "./client"
-import type { AppBilling, Plan, PlatformSettings, PlatformStatus } from "@/lib/types"
+import type { AdminPlan, AppBilling, Plan, PlatformSettings, PlatformStatus } from "@/lib/types"
 
 export async function listPlans(): Promise<Plan[]> {
-  const data = await engineFetch<{ plans: Plan[] }>("/api/plans")
+  const data = await engineFetch<{ plans: Plan[] }>("/api/plans", { auth: false })
   return data.plans
 }
 
@@ -56,4 +56,44 @@ export async function updateAdminAppSubscription(
     method: "PATCH",
     body: JSON.stringify(body),
   })
+}
+
+export async function listAdminPlans(): Promise<AdminPlan[]> {
+  const data = await engineFetch<{ plans: AdminPlan[] }>("/api/admin/plans")
+  return data.plans
+}
+
+export type PlanUpsertBody = {
+  slug?: string
+  name?: string
+  description?: string
+  price_cents?: number
+  stripe_price_id?: string
+  messages_limit?: number
+  connections_limit?: number
+  retention_days?: number
+  webhooks_enabled?: boolean
+  video_calls_enabled?: boolean
+  moderation_enabled?: boolean
+  is_active?: boolean
+  is_highlighted?: boolean
+  sort_order?: number
+}
+
+export async function createAdminPlan(body: PlanUpsertBody & { slug: string; name: string; price_cents: number; messages_limit: number; connections_limit: number; retention_days: number }): Promise<AdminPlan> {
+  return engineFetch<AdminPlan>("/api/admin/plans", {
+    method: "POST",
+    body: JSON.stringify(body),
+  })
+}
+
+export async function updateAdminPlan(slug: string, body: PlanUpsertBody): Promise<AdminPlan> {
+  return engineFetch<AdminPlan>(`/api/admin/plans/${slug}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  })
+}
+
+export async function deleteAdminPlan(slug: string): Promise<void> {
+  await engineFetch<void>(`/api/admin/plans/${slug}`, { method: "DELETE" })
 }

@@ -71,6 +71,7 @@ export interface AdminWorkspaceMember {
 export interface Plan {
   slug: string
   name: string
+  description?: string
   price_cents: number
   price_display: string
   messages_limit: number
@@ -79,6 +80,14 @@ export interface Plan {
   webhooks_enabled: boolean
   video_calls_enabled: boolean
   moderation_enabled: boolean
+  is_highlighted?: boolean
+  sort_order?: number
+}
+
+export interface AdminPlan extends Plan {
+  stripe_price_id?: string
+  is_active: boolean
+  subscription_count: number
 }
 
 export interface AppSubscription {
