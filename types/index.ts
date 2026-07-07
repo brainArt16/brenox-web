@@ -118,4 +118,5 @@ export interface ApiKey {
   environment: 'development' | 'production'
   createdAt: Date
   lastUsedAt?: Date
+  expiresAt?: Date
 }

@@ -189,12 +189,12 @@ export const BROWSER_ORIGINS_STEPS = [
 
 export const BROWSER_ORIGINS_RULES = [
   {
-    title: "Full origin only",
-    body: "Scheme + host + optional port — no paths, query strings, or trailing slash. Example: https://app.example.com",
+    title: "HTTPS hostnames",
+    body: "Use full HTTPS origins with hostnames — no paths, query strings, trailing slash, or IP addresses. Example: https://app.example.com",
   },
   {
-    title: "localhost vs 127.0.0.1",
-    body: "Browsers treat http://localhost:3000 and http://127.0.0.1:3000 as different origins. Add both if you use both.",
+    title: "Local development exception",
+    body: "HTTP is accepted only for localhost and loopback IPs such as http://localhost:3000 or http://127.0.0.1:5173.",
   },
   {
     title: "Per-app allowlist",

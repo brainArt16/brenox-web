@@ -193,6 +193,7 @@ export default function AppKeysPage() {
                 <TableHead>Type</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Last used</TableHead>
+                <TableHead>Expires</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -219,6 +220,9 @@ export default function AppKeysPage() {
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {key.last_used_at ? new Date(key.last_used_at).toLocaleDateString() : "—"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {key.expires_at ? new Date(key.expires_at).toLocaleDateString() : "—"}
                     </TableCell>
                     <TableCell>
                       {revoked ? (

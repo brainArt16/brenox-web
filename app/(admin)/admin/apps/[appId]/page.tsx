@@ -155,6 +155,7 @@ export default function AdminAppDetailPage() {
                 <TableHead>Environment</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Last used</TableHead>
+                <TableHead>Expires</TableHead>
                 {canWrite && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
@@ -177,6 +178,11 @@ export default function AdminAppDetailPage() {
                     {key.last_used_at
                       ? new Date(key.last_used_at).toLocaleString()
                       : "Never"}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {key.expires_at
+                      ? new Date(key.expires_at).toLocaleString()
+                      : "—"}
                   </TableCell>
                   {canWrite && (
                     <TableCell className="text-right">

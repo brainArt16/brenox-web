@@ -57,8 +57,9 @@ export function AllowedOriginsEditor({ app, onSaved }: AllowedOriginsEditorProps
       <div className="space-y-2">
         <h2 className="font-semibold">Allowed browser origins</h2>
         <p className="text-sm text-muted-foreground">
-          Add each domain where your frontend calls Brenox from the browser, for example{" "}
+          Add each HTTPS hostname where your frontend calls Brenox from the browser, for example{" "}
           <code className="rounded bg-muted px-1 py-0.5">https://app.example.com</code>.
+          HTTP is allowed only for localhost/loopback development origins.{" "}
           Server-side <code className="rounded bg-muted px-1 py-0.5">/v1</code> calls do not need this.{" "}
           <Link href="/docs#browser-origins" className="font-medium text-primary hover:underline">
             Documentation
