@@ -155,21 +155,28 @@ export default function AppKeysPage() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <DocLinkCard
+          title="API keys guide"
+          description="Sandbox vs live prefixes, limits, expiry, rotation, and embed session flow."
+          href="/docs#api-keys"
+          icon={Key}
+        />
+        <DocLinkCard
           title="BrenoxServer"
           description="Use your key with the server SDK on your backend."
           href="/docs?sdk=typescript#server"
           icon={BookOpen}
         />
-        <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+      </div>
+
+      <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
           <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
           <div>
             <p className="text-sm font-medium">{activeCount} active key{activeCount !== 1 ? "s" : ""}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Revoke keys you no longer use. Secrets are shown once at creation.
+              Revoke keys you no longer use. Secrets are shown once at creation. Sandbox keys expire after 90 days by default.
             </p>
           </div>
         </div>
-      </div>
 
       {keys.length === 0 ? (
         <EmptyState

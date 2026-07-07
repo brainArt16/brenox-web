@@ -56,6 +56,7 @@ export const DOC_QUICK_LINKS = [
   { id: "quickstart", label: "Quick start", href: "#quickstart" },
   { id: "browser-origins", label: "Browser origins", href: "#browser-origins" },
   { id: "sandbox", label: "Sandbox vs live", href: "#sandbox" },
+  { id: "api-keys", label: "API keys", href: "#api-keys" },
   { id: "messaging", label: "Messaging", href: "#messaging" },
   { id: "calls", label: "Calls", href: "#calls" },
   { id: "react", label: "React", href: "#react" },
@@ -256,14 +257,125 @@ export const SANDBOX_LANES_RULES = [
     body: "Users, channels, and messages in sandbox never appear in live (and vice versa), even with the same external_id.",
   },
   {
-    title: "Sandbox is free to test",
-    body: "Sandbox traffic does not count toward plan message quotas and does not fire webhooks.",
+    title: "Sandbox is bounded",
+    body: "Sandbox keys are for development — hard caps, lower rate limits, key expiry, and data cleanup apply. See API keys for defaults.",
   },
   {
     title: "JWT lane lock",
     body: "Embed session tokens include key_env. Browser clients cannot access the other workspace for that app.",
   },
 ] as const
+
+export const API_KEYS_STEPS = [
+  {
+    number: 1,
+    title: "Open API Keys",
+    description: "Developer console → Apps → your app → API Keys.",
+  },
+  {
+    number: 2,
+    title: "Choose environment",
+    description: "Enable sandbox for bx_test_* (development) or leave off for bx_live_* (production traffic).",
+  },
+  {
+    number: 3,
+    title: "Copy the secret once",
+    description: "The full key is shown only at creation. Store it in your secret manager — Brenox stores a hash, not the plaintext.",
+  },
+  {
+    number: 4,
+    title: "Use on your backend only",
+    description: "Initialize BrenoxServer with the key. Issue user JWTs via sessions.create for browser clients.",
+  },
+  {
+    number: 5,
+    title: "Rotate before expiry",
+    description: "Sandbox keys expire after 90 days by default. Create a new key, deploy, then revoke the old one.",
+  },
+] as const
+
+export const API_KEYS_TYPES = [
+  {
+    prefix: "bx_test_*",
+    label: "Sandbox",
+    workspace: "sandbox_workspace_id",
+    billing: "Not counted toward plan quotas",
+    webhooks: "Not delivered",
+    rateLimit: "30 requests/min per key (default)",
+    expiry: "expires_at set — default 90 days",
+    useFor: "Local dev, CI, staging integrations against api.breno-x.com",
+  },
+  {
+    prefix: "bx_live_*",
+    label: "Live",
+    workspace: "workspace_id",
+    billing: "Plan message quotas apply",
+    webhooks: "Delivered for registered events",
+    rateLimit: "120 requests/min per key (default)",
+    expiry: "No automatic expiry",
+    useFor: "Production backends serving real users",
+  },
+] as const
+
+export const API_KEYS_RULES = [
+  {
+    title: "Prefix is the lane",
+    body: "The key prefix is fixed at creation. bx_test_* always routes /v1 to the sandbox workspace; bx_live_* routes to live. You cannot convert a key between lanes.",
+  },
+  {
+    title: "Server-only credential",
+    body: "Never embed bx_* keys in frontend code, mobile apps, or public repos. Browsers use short-lived JWTs from BrenoxServer.sessions.create.",
+  },
+  {
+    title: "/v1 vs console routes",
+    body: "API keys authenticate Developer API routes (/v1/users, /v1/sessions, /v1/channels, /v1/messages). Creating and revoking keys requires a user JWT via /api/apps/:id/keys.",
+  },
+  {
+    title: "Auth header styles",
+    body: "Send the key as Authorization: Bearer bx_... (default) or X-API-Key: bx_.... BrenoxServer uses Bearer by default.",
+  },
+  {
+    title: "Sandbox hard caps",
+    body: "Per app in the sandbox lane: up to 100 users, 20 channels, and 1000 messages (defaults). Hitting a cap returns 403 sandbox limit exceeded.",
+  },
+  {
+    title: "Sandbox data TTL",
+    body: "Messages older than 30 days (default) are purged from sandbox workspaces. Empty channels past that age are removed. Live data is not auto-deleted.",
+  },
+  {
+    title: "Revocation is immediate",
+    body: "Revoke a key in the console or via DELETE /api/apps/:id/keys/:key_id. In-flight requests may finish; new requests with that key fail with 401.",
+  },
+] as const
+
+export const API_KEYS_EXAMPLE = `# Create a sandbox key (console JWT — not the API key itself)
+curl -s -X POST https://api.breno-x.com/api/apps/1/keys \\
+  -H "Authorization: Bearer <console-jwt>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"ci","sandbox":true}'
+
+# Response includes secret once + expires_at for sandbox keys
+{
+  "id": 4,
+  "key_prefix": "bx_test_abc123",
+  "is_sandbox": true,
+  "expires_at": "2026-10-06T00:00:00Z",
+  "secret": "bx_test_..."
+}
+
+# Backend — BrenoxServer (Node)
+import { BrenoxServer } from "@brenox/sdk/server";
+
+const server = new BrenoxServer({
+  baseUrl: process.env.BRENOX_API_URL!,
+  apiKey: process.env.BRENOX_API_KEY!, // bx_test_* or bx_live_*
+});
+
+const session = await server.sessions.create({
+  external_id: "user-42",
+  channel_id: 1,
+});
+// Return session.token to BrenoxClient — never the API key`
 
 export const SANDBOX_LANES_EXAMPLE = `# Sandbox (local / CI)
 BRENOX_API_KEY=bx_test_...
@@ -533,7 +645,7 @@ export const BEST_PRACTICES = [
   {
     icon: Shield,
     title: "Never expose API keys",
-    body: "Use BrenoxClient + JWT in browsers. BrenoxServer + bx_* keys only on your server.",
+    body: "Use BrenoxClient + JWT in browsers. BrenoxServer + bx_* keys only on your server. Rotate sandbox keys before expires_at.",
   },
   {
     icon: Smartphone,
@@ -543,7 +655,7 @@ export const BEST_PRACTICES = [
   {
     icon: Zap,
     title: "Sandbox first",
-    body: "Use bx_test_* keys in development. Switch to bx_live_* only in production.",
+    body: "Use bx_test_* keys in development — same API host, bounded caps and expiry. Switch to bx_live_* for production backends.",
   },
 ] as const
 

@@ -6,6 +6,7 @@ import {
   ExternalLink,
   Globe,
   Info,
+  KeyRound,
   Layers,
   Lightbulb,
   Loader2,
@@ -32,6 +33,10 @@ import {
   BROWSER_ORIGINS_RULES,
   BROWSER_ORIGINS_STEPS,
   CONSOLE_STEPS,
+  API_KEYS_EXAMPLE,
+  API_KEYS_RULES,
+  API_KEYS_STEPS,
+  API_KEYS_TYPES,
   REACT_HOOKS,
   SANDBOX_LANES_EXAMPLE,
   SANDBOX_LANES_RULES,
@@ -255,29 +260,109 @@ function DocsPageContent() {
                     Apps → your app
                   </Link>
                   . Pass <code className="font-mono text-xs">session.workspace_id</code> to BrenoxClient — it
-                  matches the API key lane automatically.
+                  matches the API key lane automatically. See{" "}
+                  <a href="#api-keys" className="font-medium text-primary hover:underline">
+                    API keys
+                  </a>{" "}
+                  for limits, expiry, and rotation.
+                </DocsCallout>
+              </DocSection>
+            )}
+
+            {has("api-keys") && (
+              <DocSection
+                id="api-keys"
+                title="API keys"
+                badge="BrenoxServer"
+                description="Server credentials for /v1 automation and embed session issuance. Prefix determines sandbox vs live — same API host, different data lane."
+              >
+                <FlowSteps steps={API_KEYS_STEPS} />
+                <div className="overflow-x-auto rounded-xl border border-border">
+                  <table className="w-full min-w-[640px] text-left text-sm">
+                    <thead className="border-b border-border bg-muted/40">
+                      <tr>
+                        <th className="px-4 py-3 font-medium">Type</th>
+                        <th className="px-4 py-3 font-medium">Prefix</th>
+                        <th className="px-4 py-3 font-medium">Workspace</th>
+                        <th className="px-4 py-3 font-medium">Billing</th>
+                        <th className="px-4 py-3 font-medium">Rate limit</th>
+                        <th className="px-4 py-3 font-medium">Expiry</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {API_KEYS_TYPES.map((row) => (
+                        <tr key={row.prefix} className="border-b border-border last:border-0">
+                          <td className="px-4 py-3 font-medium">{row.label}</td>
+                          <td className="px-4 py-3 font-mono text-xs">{row.prefix}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{row.workspace}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{row.billing}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{row.rateLimit}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{row.expiry}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {API_KEYS_TYPES.map((row) => (
+                    <div key={row.label} className="rounded-xl border border-border bg-card p-4">
+                      <p className="text-sm font-medium text-foreground">{row.label} keys</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                        Webhooks: {row.webhooks}. Use for {row.useFor}.
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {API_KEYS_RULES.map((rule) => (
+                    <div key={rule.title} className="rounded-xl border border-border bg-card p-4">
+                      <p className="text-sm font-medium text-foreground">{rule.title}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{rule.body}</p>
+                    </div>
+                  ))}
+                </div>
+                <CodeSnippet code={API_KEYS_EXAMPLE} title="Create, configure, and use keys" language="bash" />
+                <DocsCallout icon={KeyRound} title="Manage keys in console" variant="tip">
+                  <Link href={keysHref} className="font-medium text-primary hover:underline">
+                    Apps → your app → API Keys
+                  </Link>{" "}
+                  to create, list, and revoke keys. Sandbox keys show an{" "}
+                  <code className="font-mono text-xs">expires_at</code> date — rotate before it passes.
+                </DocsCallout>
+                <DocsCallout icon={Info} title="SDK production guard" variant="warning">
+                  <code className="font-mono text-xs">@brenox/sdk/server</code> throws if you use{" "}
+                  <code className="font-mono text-xs">bx_test_*</code> with{" "}
+                  <code className="font-mono text-xs">NODE_ENV=production</code>. That protects your deploy
+                  config — the API still accepts sandbox keys for dev/CI against the production host.
                 </DocsCallout>
               </DocSection>
             )}
 
             {has("auth") && isAvailable && (
-              <DocSection id="auth" title="Authentication" description="Two credential types - one for users, one for your server.">
+              <DocSection id="auth" title="Authentication" description="Two credential types — user JWTs in the browser, API keys on your server.">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="rounded-xl border border-border bg-card p-5">
                     <p className="font-mono text-xs text-muted-foreground">
                       {sdk.role === "framework" ? "Via @brenox/sdk" : sdk.packageName}
                     </p>
-                    <p className="mt-2 text-sm font-medium text-foreground">User sessions</p>
+                    <p className="mt-2 text-sm font-medium text-foreground">User sessions (JWT)</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      End users sign in through the SDK. Tokens persist and refresh automatically.
+                      End users get short-lived tokens from your backend via{" "}
+                      <code className="font-mono text-xs">BrenoxServer.sessions</code>. BrenoxClient stores and
+                      refreshes them. Embed tokens include <code className="font-mono text-xs">key_env</code> so
+                      browsers stay in the correct lane.
                     </p>
                   </div>
                   <div className="rounded-xl border border-border bg-card p-5">
                     <p className="font-mono text-xs text-muted-foreground">BrenoxServer</p>
                     <p className="mt-2 text-sm font-medium text-foreground">Server API keys</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      Keys from App → API Keys. Never expose{" "}
-                      <code className="font-mono text-xs">bx_*</code> in client code.
+                      <code className="font-mono text-xs">bx_test_*</code> or{" "}
+                      <code className="font-mono text-xs">bx_live_*</code> from App → API Keys. Never expose in
+                      client code.{" "}
+                      <a href="#api-keys" className="font-medium text-primary hover:underline">
+                        Full key guide →
+                      </a>
                     </p>
                   </div>
                 </div>
