@@ -76,3 +76,13 @@ export async function createWebhookRequest(
 export async function deleteWebhookRequest(appId: number, webhookId: number): Promise<void> {
   await engineFetch(`/api/apps/${appId}/webhooks/${webhookId}`, { method: "DELETE" })
 }
+
+export async function updateAllowedOriginsRequest(
+  appId: number,
+  allowedOrigins: string[]
+): Promise<App> {
+  return engineFetch<App>(`/api/apps/${appId}/origins`, {
+    method: "PATCH",
+    body: JSON.stringify({ allowed_origins: allowedOrigins }),
+  })
+}

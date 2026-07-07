@@ -11,6 +11,7 @@ import { StatCard } from "@/components/shared/stat-card"
 import { FlowSteps } from "@/components/shared/flow-steps"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { CopyButton } from "@/components/shared/copy-button"
+import { AllowedOriginsEditor } from "@/components/apps/allowed-origins-editor"
 import { getApp, getApiKeys, getWebhooks } from "@/lib/api"
 import { getDocSnippets } from "@/lib/docs/content"
 import type { App } from "@/lib/types"
@@ -89,6 +90,8 @@ export default function AppOverviewPage() {
           ]}
         />
       </section>
+
+      <AllowedOriginsEditor app={app} onSaved={setApp} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Button variant="outline" className="h-auto flex-col gap-2 py-5" asChild>

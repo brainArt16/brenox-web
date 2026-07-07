@@ -144,6 +144,7 @@ export interface App {
   workspace_id: number
   owner_id: number
   created_at: string
+  allowed_origins?: string[]
 }
 
 export interface ApiKey {
