@@ -27,6 +27,7 @@ import {
   Moon,
   Sun,
 } from "lucide-react"
+import { useTheme } from "next-themes"
 
 interface SearchCommandProps {
   open?: boolean
@@ -36,6 +37,8 @@ interface SearchCommandProps {
 export function SearchCommand({ open, onOpenChange }: SearchCommandProps) {
   const [isOpen, setIsOpen] = useState(open ?? false)
   const router = useRouter()
+  const { resolvedTheme, setTheme } = useTheme()
+  const isDark = resolvedTheme === "dark"
 
   useEffect(() => {
     if (open !== undefined) {
@@ -164,9 +167,17 @@ export function SearchCommand({ open, onOpenChange }: SearchCommandProps) {
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
           </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => {})}>
-            <Moon className="mr-2 h-4 w-4" />
-            <span>Toggle Theme</span>
+          <CommandItem
+            onSelect={() =>
+              runCommand(() => setTheme(isDark ? "light" : "dark"))
+            }
+          >
+            {isDark ? (
+              <Sun className="mr-2 h-4 w-4" />
+            ) : (
+              <Moon className="mr-2 h-4 w-4" />
+            )}
+            <span>{isDark ? "Light mode" : "Dark mode"}</span>
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push("/login"))}>
             <LogOut className="mr-2 h-4 w-4" />

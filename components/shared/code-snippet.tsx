@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTheme } from "next-themes"
 import { CopyButton } from "@/components/shared/copy-button"
-import { highlightCode } from "@/lib/shiki/highlighter"
+import { highlightCode, type HighlightTheme } from "@/lib/shiki/highlighter"
 import { cn } from "@/lib/utils"
 
 interface CodeSnippetProps {
@@ -21,20 +22,22 @@ export function HighlightedCode({
   language: string
   className?: string
 }) {
+  const { resolvedTheme } = useTheme()
+  const highlightTheme: HighlightTheme = resolvedTheme === "light" ? "light" : "dark"
   const [html, setHtml] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
     setHtml(null)
 
-    void highlightCode(code, language).then((result) => {
+    void highlightCode(code, language, highlightTheme).then((result) => {
       if (!cancelled) setHtml(result)
     })
 
     return () => {
       cancelled = true
     }
-  }, [code, language])
+  }, [code, language, highlightTheme])
 
   if (!html) {
     return (
@@ -68,7 +71,7 @@ function HighlightedCodeInner({ code, language }: { code: string; language: stri
 
 export function CodeSnippet({ code, title, language = "typescript", className }: CodeSnippetProps) {
   return (
-    <div className={cn("overflow-hidden rounded-xl border border-border bg-surface", className)}>
+    <div className={cn("overflow-hidden rounded-xl border border-border bg-muted/50", className)}>
       {(title || language) && (
         <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
           <div className="flex items-center gap-2">

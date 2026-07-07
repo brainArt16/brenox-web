@@ -7,6 +7,7 @@ import { LayoutGrid, Boxes, BookOpen, Bell, Settings, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { DevNavSidebar } from "@/components/dev/dev-nav-sidebar"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { cn } from "@/lib/utils"
 
 const bottomNav = [
@@ -41,9 +42,12 @@ export function DevMobileNav() {
           </SheetContent>
         </Sheet>
         <span className="text-lg font-semibold tracking-tight">Brenox</span>
-        <Link href="/notifications" className="relative p-2" aria-label="Notifications">
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <Link href="/notifications" className="relative p-2" aria-label="Notifications">
           <Bell className="h-5 w-5 text-muted-foreground" />
-        </Link>
+          </Link>
+        </div>
       </header>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/90 backdrop-blur-md md:hidden">

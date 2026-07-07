@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { useAuth } from "@/providers/auth-provider"
 
 export function DocsPublicShell({ children }: { children: React.ReactNode }) {
@@ -28,6 +29,7 @@ export function DocsPublicShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             {!isLoading && isAuthenticated ? (
               <>
                 <span className="hidden text-sm text-muted-foreground sm:inline">

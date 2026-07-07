@@ -15,6 +15,7 @@ import {
   Shield,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 
 const navItems = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
@@ -63,7 +64,11 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      <div className="border-t border-border p-3">
+      <div className="border-t border-border p-3 space-y-2">
+        <div className="flex items-center justify-between px-2 py-1">
+          <span className="text-xs text-muted-foreground">Theme</span>
+          <ThemeToggle className="h-8 w-8" />
+        </div>
         <Link
           href="/apps"
           className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary/50 hover:text-foreground"

@@ -18,6 +18,7 @@ import {
 import { getNotifications } from "@/lib/api"
 import { isPlatformAdmin } from "@/lib/engine/admin"
 import { useAuth } from "@/providers/auth-provider"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 
 const railItems = [
   { id: "apps", href: "/apps", icon: LayoutGrid, label: "Apps" },
@@ -104,6 +105,7 @@ export function DevRailSidebar() {
         </div>
 
         <div className="flex flex-col items-center gap-2 px-3">
+          <ThemeToggle className="rounded-xl" />
           <div className="my-1 h-px w-8 bg-sidebar-border" />
           <DropdownMenu>
             <Tooltip>

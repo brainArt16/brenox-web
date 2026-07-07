@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Zap, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 
 export function LandingNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -38,6 +39,7 @@ export function LandingNav() {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
+          <ThemeToggle />
           <Button variant="ghost" asChild>
             <Link href="/login">Sign in</Link>
           </Button>
@@ -68,6 +70,10 @@ export function LandingNav() {
                 {link.name}
               </Link>
             ))}
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-muted-foreground">Theme</span>
+              <ThemeToggle />
+            </div>
             <div className="pt-4 border-t border-border space-y-2">
               <Button variant="outline" className="w-full" asChild>
                 <Link href="/login">Sign in</Link>

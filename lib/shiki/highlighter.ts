@@ -1,6 +1,11 @@
 import { codeToHtml, getSingletonHighlighter } from "shiki/bundle/web"
 
-const THEME = "github-dark" as const
+const SHIKI_THEMES = {
+  dark: "github-dark",
+  light: "github-light",
+} as const
+
+export type HighlightTheme = keyof typeof SHIKI_THEMES
 
 const SUPPORTED_LANGS = [
   "typescript",
@@ -33,7 +38,7 @@ let highlighterReady: Promise<void> | null = null
 function ensureHighlighter() {
   if (!highlighterReady) {
     highlighterReady = getSingletonHighlighter({
-      themes: [THEME],
+      themes: [SHIKI_THEMES.dark, SHIKI_THEMES.light],
       langs: [...SUPPORTED_LANGS],
     }).then(() => undefined)
   }
@@ -47,13 +52,18 @@ export function normalizeHighlightLang(lang: string): string {
   return "typescript"
 }
 
-export async function highlightCode(code: string, lang: string): Promise<string> {
+export async function highlightCode(
+  code: string,
+  lang: string,
+  theme: HighlightTheme = "dark",
+): Promise<string> {
   await ensureHighlighter()
   const language = normalizeHighlightLang(lang)
+  const shikiTheme = SHIKI_THEMES[theme]
 
   try {
-    return await codeToHtml(code, { lang: language, theme: THEME })
+    return await codeToHtml(code, { lang: language, theme: shikiTheme })
   } catch {
-    return await codeToHtml(code, { lang: "text", theme: THEME })
+    return await codeToHtml(code, { lang: "text", theme: shikiTheme })
   }
 }
