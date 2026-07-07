@@ -25,9 +25,9 @@ export function DeveloperCodePreview() {
         <span className="ml-4 font-mono text-xs text-muted-foreground">App.tsx</span>
       </div>
 
-      <div className="flex min-w-0">
+      <div className="flex min-w-0 bg-[var(--code-surface)]">
         <div
-          className="hidden shrink-0 select-none border-r border-border bg-surface py-4 pl-4 pr-3 text-right font-mono text-[0.8125rem] leading-relaxed text-muted-foreground/40 sm:block"
+          className="hidden shrink-0 select-none border-r border-[var(--code-border)] bg-[var(--code-header)] py-4 pl-4 pr-3 text-right font-mono text-[0.8125rem] leading-relaxed text-muted-foreground/50 sm:block"
           aria-hidden
         >
           {Array.from({ length: lineCount }, (_, i) => (

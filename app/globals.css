@@ -54,6 +54,9 @@
   --offline: #4A4239;
   --recording: #8B2E2E;
   --card-shadow: none;
+  --code-surface: #0a0a0a;
+  --code-header: #120D08;
+  --code-border: #2A1E12;
 }
 
 .dark {
@@ -95,6 +98,9 @@
   --offline: #4A4239;
   --recording: #8B2E2E;
   --card-shadow: none;
+  --code-surface: #0a0a0a;
+  --code-header: #120D08;
+  --code-border: #2A1E12;
 }
 
 .light {
@@ -144,6 +150,9 @@
   --away: oklch(0.666 0.179 58.318);
   --offline: oklch(0.708 0 0);
   --recording: oklch(0.577 0.245 27.325);
+  --code-surface: #ffffff;
+  --code-header: oklch(0.975 0.004 264);
+  --code-border: oklch(0.86 0.008 264);
 }
 
 @theme inline {
@@ -195,6 +204,9 @@
   --color-away: var(--away);
   --color-offline: var(--offline);
   --color-recording: var(--recording);
+  --color-code-surface: var(--code-surface);
+  --color-code-header: var(--code-header);
+  --color-code-border: var(--code-border);
 }
 
 @layer base {
@@ -208,6 +220,29 @@
   /* Light-mode elevation for card surfaces */
   .light :is([data-slot="card"], .bg-card.rounded-xl.border) {
     box-shadow: var(--card-shadow);
+  }
+
+  /* Shiki dual-theme: switch token colors when html has .dark */
+  html.dark .shiki-code .shiki,
+  html.dark .shiki-code .shiki span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+  }
+
+  html.dark .shiki-code .shiki {
+    background-color: var(--code-surface) !important;
+  }
+
+  .light .shiki-code .shiki,
+  .light .shiki-code .shiki span {
+    background-color: transparent !important;
+  }
+
+  .light .shiki-code .shiki {
+    background-color: var(--code-surface) !important;
   }
   
   /* Custom scrollbar for chat feeds */
