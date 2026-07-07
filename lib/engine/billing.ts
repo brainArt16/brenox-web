@@ -48,6 +48,10 @@ export async function updateAdminPlatformSettings(
   })
 }
 
+export async function getAdminAppBilling(appId: number): Promise<AppBilling> {
+  return engineFetch<AppBilling>(`/api/admin/apps/${appId}/billing`)
+}
+
 export async function updateAdminAppSubscription(
   appId: number,
   body: { plan_slug?: string; status?: string }

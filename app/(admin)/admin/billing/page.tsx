@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { PageHeader } from "@/components/layout/page-header"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
@@ -18,15 +19,19 @@ import {
   listAdminSubscriptions,
 } from "@/lib/engine/billing"
 import { getErrorMessage } from "@/lib/engine/errors"
+import { useAuth } from "@/providers/auth-provider"
 import { toast } from "sonner"
 import type { AdminSubscription } from "@/lib/types"
 
 export default function AdminBillingPage() {
+  const { user: currentUser } = useAuth()
+  const canWrite = currentUser?.platform_role === "admin"
   const [activeCount, setActiveCount] = useState(0)
   const [subscriptions, setSubscriptions] = useState<AdminSubscription[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  function load() {
+    setLoading(true)
     Promise.all([getAdminBillingOverview(), listAdminSubscriptions()])
       .then(([overview, subs]) => {
         setActiveCount(overview.active_subscriptions)
@@ -34,6 +39,10 @@ export default function AdminBillingPage() {
       })
       .catch((error) => toast.error(getErrorMessage(error, "Failed to load billing")))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    load()
   }, [])
 
   return (
@@ -59,6 +68,7 @@ export default function AdminBillingPage() {
                 <TableHead>Plan</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Messages (month)</TableHead>
+                {canWrite && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -79,6 +89,13 @@ export default function AdminBillingPage() {
                   <TableCell>
                     {sub.messages_this_month.toLocaleString()}
                   </TableCell>
+                  {canWrite && (
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="outline" asChild>
+                        <Link href={`/admin/apps/${sub.app_id}#subscription`}>Manage</Link>
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

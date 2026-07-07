@@ -20,6 +20,7 @@ import {
   listAdminAppKeys,
   revokeAdminAppKey,
 } from "@/lib/engine/admin"
+import { AdminSubscriptionEditor } from "@/components/admin/admin-subscription-editor"
 import { getErrorMessage } from "@/lib/engine/errors"
 import { useAuth } from "@/providers/auth-provider"
 import { toast } from "sonner"
@@ -114,6 +115,8 @@ export default function AdminAppDetailPage() {
           </p>
         </div>
       </div>
+
+      <AdminSubscriptionEditor appId={appId} canWrite={canWrite} />
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
