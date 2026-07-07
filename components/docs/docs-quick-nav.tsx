@@ -7,7 +7,7 @@ import { useDocsSdk } from "@/components/docs/use-docs-sdk"
 export function DocsQuickNav() {
   const { sdkId } = useDocsSdk()
   const sections = getDocSectionsForSdk(sdkId).filter((s) =>
-    ["quickstart", "messaging", "calls", "framework", "webhooks"].includes(s.id),
+    ["quickstart", "browser-origins", "messaging", "calls", "framework", "webhooks"].includes(s.id),
   )
 
   return (

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
   ExternalLink,
+  Globe,
   Info,
   Layers,
   Lightbulb,
@@ -27,6 +28,9 @@ import { FlowSteps } from "@/components/shared/flow-steps"
 import { useAuth } from "@/providers/auth-provider"
 import {
   BEST_PRACTICES,
+  BROWSER_ORIGINS_EXAMPLE,
+  BROWSER_ORIGINS_RULES,
+  BROWSER_ORIGINS_STEPS,
   CONSOLE_STEPS,
   REACT_HOOKS,
   SDK_REGISTRY,
@@ -52,13 +56,15 @@ function DocsPageContent() {
     })
   }, [isAuthenticated])
 
-  const { sandboxHref, keysHref, webhooksHref, newAppHref } = useMemo(() => {
+  const { sandboxHref, keysHref, webhooksHref, newAppHref, originsHref } = useMemo(() => {
     const appsBase = gatePath("/apps", isAuthenticated)
+    const appOverview =
+      isAuthenticated && firstAppId ? `/apps/${firstAppId}` : appsBase
     return {
       sandboxHref:
         isAuthenticated && firstAppId
           ? `/apps/${firstAppId}/sandbox`
-          : gatePath("/apps", isAuthenticated),
+          : appsBase,
       keysHref:
         isAuthenticated && firstAppId
           ? `/apps/${firstAppId}/keys`
@@ -68,6 +74,7 @@ function DocsPageContent() {
           ? `/apps/${firstAppId}/webhooks`
           : appsBase,
       newAppHref: gatePath("/apps/new", isAuthenticated),
+      originsHref: appOverview,
     }
   }, [firstAppId, isAuthenticated])
 
@@ -79,8 +86,10 @@ function DocsPageContent() {
         : step.number === 2
           ? keysHref
           : step.number === 3
-            ? sandboxHref
-            : step.href,
+            ? originsHref
+            : step.number === 4
+              ? sandboxHref
+              : step.href,
     active: step.number === 1,
   }))
 
@@ -175,8 +184,48 @@ function DocsPageContent() {
             )}
 
             {has("console") && (
-              <DocSection id="console" title="Console setup" description="Four steps from zero to a working integration.">
+              <DocSection id="console" title="Console setup" description="Five steps from zero to a working integration.">
                 <FlowSteps steps={consoleSteps} />
+              </DocSection>
+            )}
+
+            {has("browser-origins") && (
+              <DocSection
+                id="browser-origins"
+                title="Browser origins"
+                badge="CORS + WebSocket"
+                description="Browser clients must load from an origin on your app's allowlist. Configure this in the developer console before users can connect."
+              >
+                <FlowSteps steps={BROWSER_ORIGINS_STEPS} />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {BROWSER_ORIGINS_RULES.map((rule) => (
+                    <div key={rule.title} className="rounded-xl border border-border bg-card p-4">
+                      <p className="text-sm font-medium text-foreground">{rule.title}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{rule.body}</p>
+                    </div>
+                  ))}
+                </div>
+                <CodeSnippet
+                  code={BROWSER_ORIGINS_EXAMPLE}
+                  title="Example allowlist"
+                  language="bash"
+                />
+                <DocsCallout icon={Globe} title="Where to configure" variant="tip">
+                  Open{" "}
+                  <Link href={originsHref} className="font-medium text-primary hover:underline">
+                    Apps → your app → Allowed browser origins
+                  </Link>
+                  . Save after adding each domain. Embed session tokens from BrenoxServer include{" "}
+                  <code className="font-mono text-xs">app_id</code> so Brenox can match the request{" "}
+                  <code className="font-mono text-xs">Origin</code> header to this list.
+                </DocsCallout>
+                <DocsCallout icon={Info} title="Troubleshooting" variant="warning">
+                  CORS or WebSocket failures from the browser usually mean the page origin is missing from
+                  the allowlist, or you opened the app via a different host (e.g.{" "}
+                  <code className="font-mono text-xs">127.0.0.1</code> vs{" "}
+                  <code className="font-mono text-xs">localhost</code>). Server-side{" "}
+                  <code className="font-mono text-xs">/v1</code> calls with API keys are not affected.
+                </DocsCallout>
               </DocSection>
             )}
 

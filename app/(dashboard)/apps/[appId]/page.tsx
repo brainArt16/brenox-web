@@ -153,7 +153,7 @@ export default function AppOverviewPage() {
         <Badge className="border-warning/30 bg-warning/20 text-warning">Sandbox</Badge>
         <Badge className="border-primary/50 bg-primary/30 text-foreground">Live</Badge>
         <span className="text-sm text-muted-foreground">
-          Configure CORS and WS_ALLOWED_ORIGINS for browser clients.
+          Add allowed browser origins on the app overview before shipping a web client.
         </span>
       </div>
     </div>

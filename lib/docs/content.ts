@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react"
 import {
   Bell,
+  Globe,
   MessageSquare,
   Mic,
   Paperclip,
@@ -53,6 +54,7 @@ export const DOC_SECTIONS = ALL_DOC_SECTIONS
 
 export const DOC_QUICK_LINKS = [
   { id: "quickstart", label: "Quick start", href: "#quickstart" },
+  { id: "browser-origins", label: "Browser origins", href: "#browser-origins" },
   { id: "messaging", label: "Messaging", href: "#messaging" },
   { id: "calls", label: "Calls", href: "#calls" },
   { id: "react", label: "React", href: "#react" },
@@ -141,17 +143,84 @@ export const CONSOLE_STEPS = [
   },
   {
     number: 3,
+    title: "Allow browser origins",
+    description: "List every domain where your frontend calls Brenox (REST + WebSocket).",
+    href: "/apps",
+  },
+  {
+    number: 4,
     title: "Try sandbox",
     description: "Dry-run server SDK operations before wiring your backend.",
     href: "/apps",
   },
   {
-    number: 4,
+    number: 5,
     title: "Install SDK",
     description: "Add @brenox/sdk to your frontend and backend.",
     href: "#quickstart",
   },
 ] as const
+
+export const BROWSER_ORIGINS_STEPS = [
+  {
+    number: 1,
+    title: "Open your app",
+    description: "Developer console → Apps → select the app that owns your chat UI.",
+  },
+  {
+    number: 2,
+    title: "Add each origin",
+    description:
+      "Under Allowed browser origins, enter the full URL users load — e.g. https://app.example.com.",
+  },
+  {
+    number: 3,
+    title: "Save",
+    description: "Changes apply within about a minute. Add localhost origins for local dev.",
+  },
+  {
+    number: 4,
+    title: "Issue embed sessions",
+    description:
+      "Use BrenoxServer.sessions on your backend. User JWTs include app_id so Brenox can match the origin.",
+  },
+] as const
+
+export const BROWSER_ORIGINS_RULES = [
+  {
+    title: "Full origin only",
+    body: "Scheme + host + optional port — no paths, query strings, or trailing slash. Example: https://app.example.com",
+  },
+  {
+    title: "localhost vs 127.0.0.1",
+    body: "Browsers treat http://localhost:3000 and http://127.0.0.1:3000 as different origins. Add both if you use both.",
+  },
+  {
+    title: "Per-app allowlist",
+    body: "Each app stores up to 20 origins. Customer domains are configured here — not in Brenox engine env vars.",
+  },
+  {
+    title: "Platform vs customer",
+    body: "The Brenox console (breno-x.com) uses platform CORS env vars. Your product domains use the per-app list.",
+  },
+  {
+    title: "Server SDK exempt",
+    body: "Backend /v1 calls with bx_* API keys are not subject to browser CORS. Only browser clients need allowed origins.",
+  },
+  {
+    title: "Pass origin in the SDK",
+    body: "Set origin: window.location.origin on channel and call-signaling connections so WebSocket upgrades are checked.",
+  },
+] as const
+
+export const BROWSER_ORIGINS_EXAMPLE = `# Allowed browser origins (App → Overview)
+https://app.example.com
+https://staging.example.com
+http://localhost:3000
+http://127.0.0.1:3000
+
+# Production demo chat
+https://demo-chat.breno-x.com`
 
 export const REACT_HOOKS = [
   {
@@ -217,7 +286,8 @@ export const REALTIME_FLOW_STEPS = [
   {
     step: 2,
     title: "Connect",
-    description: "Open a channel-scoped WebSocket with origin for CORS.",
+    description:
+      "Open a channel-scoped WebSocket with origin: window.location.origin — must be on your app's allowed origins list.",
   },
   {
     step: 3,
@@ -298,7 +368,10 @@ export const REALTIME_EVENT_GROUPS: RealtimeEventGroup[] = [
     events: [
       { name: "call.join", description: "Participant joined the call room." },
       { name: "call.leave", description: "Participant left the call." },
-      { name: "call.end", description: "Call ended for everyone." },
+      {
+        name: "call.end",
+        description: "Call ended for everyone — fired when one or fewer participants remain after a leave.",
+      },
       { name: "call.offer", description: "SDP offer from a peer.", payload: "{ call_id, sdp, to_user_id }" },
       { name: "call.answer", description: "SDP answer from a peer.", payload: "{ call_id, sdp }" },
       { name: "call.ice", description: "ICE candidate exchange.", payload: "{ call_id, candidate }" },
@@ -393,6 +466,11 @@ export const SDK_PACKAGES = [
 ] as const
 
 export const BEST_PRACTICES = [
+  {
+    icon: Globe,
+    title: "Allowlist browser origins",
+    body: "Before shipping a web client, add every production and staging domain under App → Allowed browser origins. Missing origins block REST and WebSocket from the browser.",
+  },
   {
     icon: Shield,
     title: "Never expose API keys",

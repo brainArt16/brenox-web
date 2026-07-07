@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowRight, Radio, RefreshCw, Wifi, WifiOff } from "lucide-react"
+import Link from "next/link"
+import { ArrowRight, Globe, Radio, RefreshCw, Wifi, WifiOff } from "lucide-react"
 import { DocSection } from "@/components/docs/doc-section"
 import { DocsCallout } from "@/components/docs/docs-callout"
 import { DocsCodeTabs } from "@/components/docs/docs-code-tabs"
@@ -257,6 +258,15 @@ export function DocsRealtimeSection({
         ) : (
           <> call <code className="font-mono text-xs">conn.connect()</code> after handlers are registered.</>
         )}
+      </DocsCallout>
+
+      <DocsCallout icon={Globe} title="Browser origins required" variant="info">
+        WebSocket upgrades and browser REST calls are allowed only from origins on your app&apos;s
+        allowlist. Add each frontend URL under{" "}
+        <Link href="#browser-origins" className="font-medium text-primary hover:underline">
+          Browser origins
+        </Link>{" "}
+        before testing from the browser.
       </DocsCallout>
 
       <div className="rounded-xl border border-dashed border-border bg-surface/50 p-4">

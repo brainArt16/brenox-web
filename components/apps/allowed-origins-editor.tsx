@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -58,7 +59,10 @@ export function AllowedOriginsEditor({ app, onSaved }: AllowedOriginsEditorProps
         <p className="text-sm text-muted-foreground">
           Add each domain where your frontend calls Brenox from the browser, for example{" "}
           <code className="rounded bg-muted px-1 py-0.5">https://app.example.com</code>.
-          Server-side <code className="rounded bg-muted px-1 py-0.5">/v1</code> calls do not need this.
+          Server-side <code className="rounded bg-muted px-1 py-0.5">/v1</code> calls do not need this.{" "}
+          <Link href="/docs#browser-origins" className="font-medium text-primary hover:underline">
+            Documentation
+          </Link>
         </p>
       </div>
 

@@ -203,7 +203,7 @@ const message = await client.messages.send(workspaceId, channelId, { content: te
 await client.attachments.attachToMessage(workspaceId, channelId, message.id, [uploaded]);`,
   },
   runDeploy: {
-    title: "Run locally + engine dev settings",
+    title: "Run locally + allowed origins",
     language: "bash",
     code: `# Terminal 1 — embed API
 npm run dev:server
@@ -213,8 +213,11 @@ npm run dev
 # http://localhost:5173/demos/chat/
 # Alice in tab 1, Bob in tab 2
 
-# brenox-engine/.env (restart engine after editing)
-WS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+# Developer console → Apps → your app → Allowed browser origins
+http://localhost:5173
+http://127.0.0.1:5173
+
+# Optional: brenox-engine/.env rate limits during dev
 API_RATE_LIMIT_PER_MINUTE=1000
 HTTP_RATE_LIMIT_PER_IP=2000`,
   },

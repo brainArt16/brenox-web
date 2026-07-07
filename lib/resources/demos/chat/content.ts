@@ -168,12 +168,12 @@ Set \`BRENOX_API_KEY\` and \`BRENOX_API_URL=http://localhost:8080\` in \`.env\`.
 
 **Try two users:** Alice in one tab, Bob in another — both land in \`#general\`. Try a video call: Alice starts, Bob joins.
 
-**Engine dev settings** — add to \`brenox-engine/.env\` and restart the engine:
+**Engine dev settings** — for local Brenox engine only:
 
-- \`WS_ALLOWED_ORIGINS\` must include **both** \`localhost:5173\` and \`127.0.0.1:5173\`
-- Raise \`API_RATE_LIMIT_PER_MINUTE\` / \`HTTP_RATE_LIMIT_PER_IP\` if you hit 429 during dev
+- In the **developer console**, open your app and add allowed origins: \`http://localhost:5173\` and \`http://127.0.0.1:5173\` (both — browsers treat them as different hosts)
+- Raise \`API_RATE_LIMIT_PER_MINUTE\` / \`HTTP_RATE_LIMIT_PER_IP\` in \`brenox-engine/.env\` if you hit 429 during dev
 
-**Production:** host the static UI on your own domain and deploy the embed API (\`server/index.mjs\`) on your backend — it holds the API key and issues session tokens. This tutorial is not a hosted playground; clone the repo and run it locally.`,
+**Production:** host the static UI on your own domain, add that origin to the app's allowlist, and deploy the embed API (\`server/index.mjs\`) on your backend — it holds the API key and issues session tokens.`,
     snippetKey: "runDeploy",
     files: ["README.md", "vite.config.ts", ".env.example"],
   },

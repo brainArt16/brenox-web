@@ -55,7 +55,10 @@ BRENOX_API_KEY=bx_test_your_sandbox_key
 
 # Optional
 BRENOX_API_URL=${apiUrl}
-NEXT_PUBLIC_BRENOX_API_URL=${apiUrl}`,
+NEXT_PUBLIC_BRENOX_API_URL=${apiUrl}
+
+# Browser clients — add each frontend origin in the developer console:
+# Apps → your app → Allowed browser origins (not engine env vars)`,
     quickStart: `import { BrenoxClient, localStorageTokenStore } from "@brenox/sdk";
 
 const client = new BrenoxClient({
