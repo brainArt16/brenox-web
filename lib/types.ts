@@ -41,6 +41,7 @@ export interface AdminApp {
   name: string
   slug: string
   workspace_id: number
+  sandbox_workspace_id?: number
   owner_id: number
   owner_email: string
   created_at: string
@@ -145,6 +146,7 @@ export interface App {
   owner_id: number
   created_at: string
   allowed_origins?: string[]
+  sandbox_workspace_id?: number
 }
 
 export interface ApiKey {

@@ -123,6 +123,7 @@ const session = await server.sessions.create({
   external_id: "user-123",
   channel_id: 1,
 });
+// session.workspace_id + session.environment match your API key lane (sandbox or live)
 // Return session.token to BrenoxClient in the browser
 ` : ""}
 await server.messages.send({

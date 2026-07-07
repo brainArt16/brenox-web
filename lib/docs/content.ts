@@ -55,6 +55,7 @@ export const DOC_SECTIONS = ALL_DOC_SECTIONS
 export const DOC_QUICK_LINKS = [
   { id: "quickstart", label: "Quick start", href: "#quickstart" },
   { id: "browser-origins", label: "Browser origins", href: "#browser-origins" },
+  { id: "sandbox", label: "Sandbox vs live", href: "#sandbox" },
   { id: "messaging", label: "Messaging", href: "#messaging" },
   { id: "calls", label: "Calls", href: "#calls" },
   { id: "react", label: "React", href: "#react" },
@@ -132,7 +133,7 @@ export const CONSOLE_STEPS = [
   {
     number: 1,
     title: "Create app",
-    description: "Register an app to get its own workspace.",
+    description: "Register an app — Brenox provisions live and sandbox workspaces.",
     href: "/apps/new",
   },
   {
@@ -221,6 +222,64 @@ http://127.0.0.1:3000
 
 # Production demo chat
 https://demo-chat.breno-x.com`
+
+export const SANDBOX_LANES_STEPS = [
+  {
+    number: 1,
+    title: "Create sandbox key",
+    description: "Apps → API Keys → create with sandbox enabled (bx_test_* prefix).",
+  },
+  {
+    number: 2,
+    title: "Develop against production API",
+    description: "Point BrenoxServer at https://api.breno-x.com — sandbox keys use the sandbox workspace automatically.",
+  },
+  {
+    number: 3,
+    title: "Issue embed sessions",
+    description: "POST /v1/sessions returns workspace_id + environment. Pass workspace_id to the browser SDK.",
+  },
+  {
+    number: 4,
+    title: "Ship with live key",
+    description: "Swap to bx_live_* in production backends. BrenoxServer throws if bx_test_* is used with NODE_ENV=production.",
+  },
+] as const
+
+export const SANDBOX_LANES_RULES = [
+  {
+    title: "Same API host",
+    body: "Sandbox and live keys both call api.breno-x.com. Isolation is per-app workspace — not separate deployments.",
+  },
+  {
+    title: "Separate data",
+    body: "Users, channels, and messages in sandbox never appear in live (and vice versa), even with the same external_id.",
+  },
+  {
+    title: "Sandbox is free to test",
+    body: "Sandbox traffic does not count toward plan message quotas and does not fire webhooks.",
+  },
+  {
+    title: "JWT lane lock",
+    body: "Embed session tokens include key_env. Browser clients cannot access the other workspace for that app.",
+  },
+] as const
+
+export const SANDBOX_LANES_EXAMPLE = `# Sandbox (local / CI)
+BRENOX_API_KEY=bx_test_...
+BRENOX_API_URL=https://api.breno-x.com
+
+# Production backend
+BRENOX_API_KEY=bx_live_...
+BRENOX_API_URL=https://api.breno-x.com
+
+# Session response (sandbox key)
+{
+  "token": "eyJ...",
+  "workspace_id": 12,
+  "environment": "sandbox",
+  "user": { "external_id": "user-1" }
+}`
 
 export const REACT_HOOKS = [
   {

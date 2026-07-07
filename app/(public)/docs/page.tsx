@@ -33,6 +33,9 @@ import {
   BROWSER_ORIGINS_STEPS,
   CONSOLE_STEPS,
   REACT_HOOKS,
+  SANDBOX_LANES_EXAMPLE,
+  SANDBOX_LANES_RULES,
+  SANDBOX_LANES_STEPS,
   SDK_REGISTRY,
   WEBHOOK_EVENTS,
 } from "@/lib/docs/content"
@@ -225,6 +228,34 @@ function DocsPageContent() {
                   <code className="font-mono text-xs">127.0.0.1</code> vs{" "}
                   <code className="font-mono text-xs">localhost</code>). Server-side{" "}
                   <code className="font-mono text-xs">/v1</code> calls with API keys are not affected.
+                </DocsCallout>
+              </DocSection>
+            )}
+
+            {has("sandbox") && (
+              <DocSection
+                id="sandbox"
+                title="Sandbox vs live"
+                badge="Data lanes"
+                description="Use bx_test_* keys against the same production API host. Brenox routes each key to its own workspace — sandbox data never mixes with live."
+              >
+                <FlowSteps steps={SANDBOX_LANES_STEPS} />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {SANDBOX_LANES_RULES.map((rule) => (
+                    <div key={rule.title} className="rounded-xl border border-border bg-card p-4">
+                      <p className="text-sm font-medium text-foreground">{rule.title}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{rule.body}</p>
+                    </div>
+                  ))}
+                </div>
+                <CodeSnippet code={SANDBOX_LANES_EXAMPLE} title="Keys and session response" language="bash" />
+                <DocsCallout icon={Layers} title="Console" variant="tip">
+                  Each app shows live and sandbox workspace IDs under{" "}
+                  <Link href={gatePath("/apps", isAuthenticated)} className="font-medium text-primary hover:underline">
+                    Apps → your app
+                  </Link>
+                  . Pass <code className="font-mono text-xs">session.workspace_id</code> to BrenoxClient — it
+                  matches the API key lane automatically.
                 </DocsCallout>
               </DocSection>
             )}

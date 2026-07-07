@@ -21,6 +21,7 @@ import {
   revokeAdminAppKey,
 } from "@/lib/engine/admin"
 import { AdminSubscriptionEditor } from "@/components/admin/admin-subscription-editor"
+import { AppWorkspacesCard } from "@/components/apps/app-workspaces-card"
 import { getErrorMessage } from "@/lib/engine/errors"
 import { useAuth } from "@/providers/auth-provider"
 import { toast } from "sonner"
@@ -91,7 +92,7 @@ export default function AdminAppDetailPage() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-3 max-w-2xl text-sm">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-3xl text-sm">
         <div className="rounded-xl border border-border p-4">
           <p className="text-muted-foreground">Owner</p>
           <p className="font-medium mt-1">
@@ -101,11 +102,23 @@ export default function AdminAppDetailPage() {
           </p>
         </div>
         <div className="rounded-xl border border-border p-4">
-          <p className="text-muted-foreground">Workspace</p>
+          <p className="text-muted-foreground">Live workspace</p>
           <p className="font-medium mt-1">
             <Link href={`/admin/workspaces/${app.workspace_id}`} className="hover:underline">
               #{app.workspace_id}
             </Link>
+          </p>
+        </div>
+        <div className="rounded-xl border border-border p-4">
+          <p className="text-muted-foreground">Sandbox workspace</p>
+          <p className="font-medium mt-1">
+            {app.sandbox_workspace_id ? (
+              <Link href={`/admin/workspaces/${app.sandbox_workspace_id}`} className="hover:underline">
+                #{app.sandbox_workspace_id}
+              </Link>
+            ) : (
+              "—"
+            )}
           </p>
         </div>
         <div className="rounded-xl border border-border p-4">
@@ -115,6 +128,12 @@ export default function AdminAppDetailPage() {
           </p>
         </div>
       </div>
+
+      <AppWorkspacesCard
+        liveWorkspaceId={app.workspace_id}
+        sandboxWorkspaceId={app.sandbox_workspace_id}
+        workspaceLinkPrefix="/admin/workspaces"
+      />
 
       <AdminSubscriptionEditor appId={appId} canWrite={canWrite} />
 

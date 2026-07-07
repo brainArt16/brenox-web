@@ -12,6 +12,7 @@ import { FlowSteps } from "@/components/shared/flow-steps"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { CopyButton } from "@/components/shared/copy-button"
 import { AllowedOriginsEditor } from "@/components/apps/allowed-origins-editor"
+import { AppWorkspacesCard } from "@/components/apps/app-workspaces-card"
 import { getApp, getApiKeys, getWebhooks } from "@/lib/api"
 import { getDocSnippets } from "@/lib/docs/content"
 import type { App } from "@/lib/types"
@@ -76,7 +77,7 @@ export default function AppOverviewPage() {
         <StatCard label="Active keys" value={keyCount} icon={Key} />
         <StatCard label="Sandbox keys" value={sandboxCount} icon={FlaskConical} />
         <StatCard label="Webhooks" value={webhookCount} icon={Webhook} />
-        <StatCard label="Workspace" value={`#${app.workspace_id}`} icon={Boxes} />
+        <StatCard label="Live workspace" value={`#${app.workspace_id}`} icon={Boxes} />
       </div>
 
       <section className="space-y-4">
@@ -86,12 +87,17 @@ export default function AppOverviewPage() {
             { number: 1, title: "Create key", description: "Generate a sandbox bx_test_ key", href: `/apps/${app.id}/keys`, active: keyCount === 0 },
             { number: 2, title: "Test SDK", description: "Try BrenoxServer in sandbox", href: `/apps/${app.id}/sandbox`, active: keyCount > 0 },
             { number: 3, title: "Add webhook", description: "Receive realtime events", href: `/apps/${app.id}/webhooks`, active: false },
-            { number: 4, title: "Open workspace", description: "See messages live", href: `/workspaces/${app.workspace_id}`, active: false },
+            { number: 4, title: "Live workspace", description: "Production messages & channels", href: `/workspaces/${app.workspace_id}`, active: false },
           ]}
         />
       </section>
 
       <AllowedOriginsEditor app={app} onSaved={setApp} />
+
+      <AppWorkspacesCard
+        liveWorkspaceId={app.workspace_id}
+        sandboxWorkspaceId={app.sandbox_workspace_id}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Button variant="outline" className="h-auto flex-col gap-2 py-5" asChild>
@@ -115,7 +121,7 @@ export default function AppOverviewPage() {
         <Button variant="outline" className="h-auto flex-col gap-2 py-5" asChild>
           <Link href={`/workspaces/${app.workspace_id}`}>
             <ExternalLink className="h-5 w-5" />
-            <span>Workspace</span>
+            <span>Live workspace</span>
           </Link>
         </Button>
       </div>
@@ -130,8 +136,17 @@ export default function AppOverviewPage() {
               <CopyButton value={app.slug} />
             </dd>
           </div>
+          {app.sandbox_workspace_id ? (
+            <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
+              <dt className="text-muted-foreground">Sandbox workspace</dt>
+              <dd className="flex items-center gap-1 font-mono">
+                {app.sandbox_workspace_id}
+                <CopyButton value={String(app.sandbox_workspace_id)} />
+              </dd>
+            </div>
+          ) : null}
           <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
-            <dt className="text-muted-foreground">Workspace ID</dt>
+            <dt className="text-muted-foreground">Live workspace</dt>
             <dd className="flex items-center gap-1 font-mono">
               {app.workspace_id}
               <CopyButton value={String(app.workspace_id)} />
@@ -153,7 +168,7 @@ export default function AppOverviewPage() {
         <Badge className="border-warning/30 bg-warning/20 text-warning">Sandbox</Badge>
         <Badge className="border-primary/50 bg-primary/30 text-foreground">Live</Badge>
         <span className="text-sm text-muted-foreground">
-          Add allowed browser origins on the app overview before shipping a web client.
+          Use sandbox keys for dev/CI — they only touch the sandbox workspace. Ship live keys in production.
         </span>
       </div>
     </div>
