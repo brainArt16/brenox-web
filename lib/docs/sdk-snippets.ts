@@ -201,6 +201,69 @@ signaling?.on("call.offer", (e) => { /* WebRTC */ });`,
   return applyVersionInstall(merged, version)
 }
 
+
+function pythonSnippets(apiUrl: string, version?: SdkVersionDoc): SdkSnippets {
+  const installPkg = version?.installPackages ?? "brenox-sdk"
+  const base: SdkSnippets = {
+    install: `pip install ${installPkg}`,
+    env: `# BrenoxServer (API key — never expose in browsers)
+BRENOX_API_KEY=bx_test_your_sandbox_key
+
+# Optional
+BRENOX_API_URL=${apiUrl}`,
+    quickStart: `import os
+from brenox import BrenoxServer
+
+server = BrenoxServer(
+    base_url=os.environ.get("BRENOX_API_URL", "${apiUrl}"),
+    api_key=os.environ["BRENOX_API_KEY"],
+)
+
+user = server.users.provision(external_id="user-123", username="alice")
+channel = server.channels.create(name="general")
+server.messages.send(
+    channel_id=channel.id,
+    external_id="user-123",
+    content="Hello from Python!",
+)`,
+    messaging: `messages = server.messages.list(channel_id=channel.id, limit=50)
+
+server.messages.send(
+    channel_id=channel.id,
+    external_id="user-123",
+    content="Ticket opened",
+)`,
+    attachments: "",
+    realtime: "",
+    calls: "",
+    callsNote: "",
+    server: `from brenox import BrenoxServer
+
+server = BrenoxServer(
+    base_url=os.environ["BRENOX_API_URL"],
+    api_key=os.environ["BRENOX_API_KEY"],
+)
+
+server.users.provision(external_id="user-123", username="alice")
+
+# Embed flow — JWT for @brenox/react (never ship the API key to browsers)
+session = server.sessions.create(external_id="user-123", channel_id=1)
+# Return session.token to your frontend`,
+    framework: "",
+    webhookVerify: `import hmac
+import hashlib
+
+def verify_brenox_webhook(raw_body: bytes, signature: str, secret: str) -> bool:
+    expected = hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(signature, expected)`,
+  }
+  if (version?.installPackages) {
+    return { ...base, install: `pip install ${version.installPackages}` }
+  }
+  return base
+}
+
+
 function comingSoonSnippets(sdk: SdkDefinition): Partial<SdkSnippets> {
   return {
     install: sdk.installCommand ?? `# ${sdk.packageName} — coming soon`,
@@ -229,5 +292,6 @@ export function getSnippetsForSdkSafe(
 ): SdkSnippets | Partial<SdkSnippets> {
   if (sdk.status === "coming_soon") return comingSoonSnippets(sdk)
   if (sdk.id === "react") return reactSnippets(apiUrl, version)
+  if (sdk.id === "python") return pythonSnippets(apiUrl, version)
   return typescriptSnippets(apiUrl, version)
 }

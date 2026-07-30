@@ -99,7 +99,19 @@ export const SDK_VERSION_CATALOG: Record<string, SdkVersionDoc[]> = {
       installPackages: "@brenox/react@0.1.0 @brenox/sdk@0.1.0",
     },
   ],
-  python: [],
+  python: [
+    {
+      version: "0.1.0",
+      status: "current",
+      released: "2026-07-30",
+      highlights: [
+        "Initial release — BrenoxServer for FastAPI, Django, and scripts",
+        "Provision users, create channels, send/list messages via /v1",
+        "sessions.create() issues embed JWTs for @brenox/react frontends",
+      ],
+      installPackages: "brenox-sdk==0.1.0",
+    },
+  ],
   go: [],
   flutter: [],
   vue: [],
