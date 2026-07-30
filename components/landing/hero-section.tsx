@@ -12,10 +12,6 @@ import { Button } from "@/components/ui/button"
 export function HeroSection() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/15 rounded-full blur-3xl" />
-      </div>
 
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -63,11 +59,13 @@ export function HeroSection() {
 
         <div className="mt-16 relative animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-150 fill-mode-both">
           <div className="relative mx-auto max-w-5xl rounded-xl border border-border bg-card/50 backdrop-blur-sm overflow-hidden shadow-2xl">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-surface/50">
-              <div className="w-3 h-3 rounded-full bg-destructive/60" />
-              <div className="w-3 h-3 rounded-full bg-warning/60" />
-              <div className="w-3 h-3 rounded-full bg-success/60" />
-              <span className="ml-4 text-xs text-muted-foreground font-mono">
+            <div className="relative flex items-center px-4 py-3 border-b border-border bg-surface/50">
+              <div className="flex items-center gap-1.5" aria-hidden>
+                <span className="size-3 rounded-full bg-[#ff5f57]" />
+                <span className="size-3 rounded-full bg-[#febc2e]" />
+                <span className="size-3 rounded-full bg-[#28c840]" />
+              </div>
+              <span className="pointer-events-none absolute inset-x-0 text-center text-xs text-muted-foreground font-mono">
                 your-app.com — powered by @brenox/react UI Kit
               </span>
             </div>

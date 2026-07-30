@@ -10,6 +10,17 @@ interface CodeSnippetProps {
   title?: string
   language?: string
   className?: string
+  showLineNumbers?: boolean
+}
+
+function MacTrafficLights() {
+  return (
+    <div className="flex shrink-0 items-center gap-1.5" aria-hidden>
+      <span className="size-3 rounded-full bg-[#ff5f57] shadow-[inset_0_-0.5px_0.5px_rgba(0,0,0,0.25)]" />
+      <span className="size-3 rounded-full bg-[#febc2e] shadow-[inset_0_-0.5px_0.5px_rgba(0,0,0,0.25)]" />
+      <span className="size-3 rounded-full bg-[#28c840] shadow-[inset_0_-0.5px_0.5px_rgba(0,0,0,0.25)]" />
+    </div>
+  )
 }
 
 export function HighlightedCode({
@@ -40,7 +51,7 @@ export function HighlightedCode({
     return (
       <pre
         className={cn(
-          "overflow-x-auto bg-[var(--code-surface)] p-4 font-mono text-[0.8125rem] leading-relaxed text-foreground",
+          "overflow-x-auto bg-[var(--code-surface)] p-4 font-mono text-[0.8125rem] leading-relaxed text-[#abb2bf]",
           className,
         )}
       >
@@ -62,34 +73,55 @@ export function HighlightedCode({
   )
 }
 
-export function CodeSnippet({ code, title, language = "typescript", className }: CodeSnippetProps) {
+export function CodeSnippet({
+  code,
+  title,
+  language = "typescript",
+  className,
+  showLineNumbers = false,
+}: CodeSnippetProps) {
+  const lineCount = code.split("\n").length
+  const label = title ?? language
+
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl border border-[var(--code-border)] bg-card shadow-[var(--card-shadow)]",
+        "overflow-hidden rounded-xl border border-[var(--code-border)] bg-[var(--code-surface)] shadow-lg shadow-black/25",
         className,
       )}
     >
-      {(title || language) && (
-        <div className="flex items-center justify-between border-b border-[var(--code-border)] bg-[var(--code-header)] px-4 py-2.5">
-          <div className="flex items-center gap-2">
-            {title && <span className="text-xs font-medium text-foreground">{title}</span>}
-            {language && (
-              <span className="rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                {language}
-              </span>
-            )}
-          </div>
-          <CopyButton value={code} label="Code copied" />
+      <div className="relative flex items-center border-b border-[var(--code-border)] bg-[var(--code-header)] px-4 py-3">
+        <MacTrafficLights />
+        {label && (
+          <span className="pointer-events-none absolute inset-x-0 text-center font-mono text-xs text-[var(--code-chrome-fg)]">
+            {label}
+          </span>
+        )}
+        <div className="relative z-10 ml-auto">
+          <CopyButton
+            value={code}
+            label="Code copied"
+            className="size-7 text-[var(--code-chrome-fg)] hover:bg-white/10 hover:text-white"
+          />
         </div>
-      )}
-      <div className="relative">
-        {!title && !language && (
-          <div className="absolute right-2 top-2 z-10">
-            <CopyButton value={code} label="Code copied" />
+      </div>
+
+      <div className="relative flex min-w-0">
+        {showLineNumbers && (
+          <div
+            className="hidden shrink-0 select-none border-r border-[var(--code-border)] bg-[var(--code-header)] py-4 pl-4 pr-3 text-right font-mono text-[0.8125rem] leading-relaxed text-[var(--code-chrome-fg)]/60 sm:block"
+            aria-hidden
+          >
+            {Array.from({ length: lineCount }, (_, i) => (
+              <div key={i}>{i + 1}</div>
+            ))}
           </div>
         )}
-        <HighlightedCode code={code} language={language} />
+        <HighlightedCode
+          code={code}
+          language={language}
+          className={cn("min-w-0 flex-1", showLineNumbers && "[&_.shiki]:pl-3")}
+        />
       </div>
     </div>
   )
