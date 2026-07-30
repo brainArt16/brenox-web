@@ -4,13 +4,13 @@ import {
   Video,
   Code2,
   Shield,
-  Zap,
   ArrowRight,
   Check,
   Terminal,
   Globe,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Logo } from "@/components/brand/logo"
 import { DeveloperCodePreview } from "@/components/landing/developer-code-preview"
 import { PricingSection } from "@/components/landing/pricing-section"
 
@@ -100,7 +100,7 @@ function FeaturesSection() {
   ]
 
   return (
-    <section id="features" className="py-24 bg-surface scroll-mt-16">
+    <section id="features" className="py-8 bg-surface scroll-mt-4">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything you need to ship chat, fast</h2>
@@ -130,7 +130,7 @@ function FeaturesSection() {
 
 function DeveloperSection() {
   return (
-    <section className="py-24">
+    <section className="py-8">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -202,7 +202,7 @@ function TestimonialsSection() {
   ]
 
   return (
-    <section id="testimonials" className="py-24 bg-surface scroll-mt-16">
+    <section id="testimonials" className="py-8 bg-surface scroll-mt-4">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Loved by builders shipping fast</h2>
@@ -236,7 +236,7 @@ function TestimonialsSection() {
 
 function CTASection() {
   return (
-    <section className="py-24">
+    <section className="py-8">
       <div className="container mx-auto px-4">
         <div className="relative rounded-2xl bg-gradient-to-br from-primary/20 via-background to-accent/20 border border-border p-12 text-center overflow-hidden">
           <div className="absolute inset-0 bg-grid-pattern opacity-5" />
@@ -284,16 +284,11 @@ function Footer() {
   }
 
   return (
-    <footer className="py-12 border-t border-border">
+    <footer className="py-8 border-t border-border">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Zap className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-lg">Brenox</span>
-            </Link>
+            <Logo size="sm" className="mb-4" />
             <p className="text-sm text-muted-foreground">
               Low-code chat infrastructure. SDKs and UI Kit for web, mobile, and desktop apps.
             </p>

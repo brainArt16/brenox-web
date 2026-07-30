@@ -2,9 +2,10 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Zap, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { Logo } from "@/components/brand/logo"
 
 export function LandingNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -19,12 +20,7 @@ export function LandingNav() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <Zap className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="font-bold text-lg">Brenox</span>
-        </Link>
+        <Logo size="md" priority />
 
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (

@@ -4,12 +4,13 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { m } from "framer-motion"
-import { Zap, Eye, EyeOff, Loader2, Check, X } from "lucide-react"
+import { Eye, EyeOff, Loader2, Check, X } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Logo } from "@/components/brand/logo"
 import { useAuth } from "@/providers/auth-provider"
 import { getErrorMessage } from "@/lib/engine/errors"
 
@@ -136,13 +137,7 @@ export default function RegisterPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Logo */}
-      <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-        <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-          <Zap className="w-6 h-6 text-primary-foreground" />
-        </div>
-        <span className="font-bold text-2xl">Brenox</span>
-      </Link>
+      <Logo size="lg" className="mb-8 justify-center" />
 
       {/* Card */}
       <div className="bg-card border border-border rounded-xl p-8 shadow-xl">

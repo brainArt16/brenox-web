@@ -2,14 +2,15 @@
 
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useState } from "react"
+import { Suspense, useState, type SubmitEvent } from "react"
 import { m } from "framer-motion"
-import { Zap, Eye, EyeOff, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Logo } from "@/components/brand/logo"
 import { useAuth } from "@/providers/auth-provider"
 import { getErrorMessage } from "@/lib/engine/errors"
 
@@ -26,7 +27,7 @@ function LoginForm() {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
     setErrors({})
@@ -62,13 +63,9 @@ function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <Link href="/" className="mb-8 flex items-center justify-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-          <Zap className="h-6 w-6 text-primary-foreground" />
-        </div>
-        <span className="text-2xl font-bold">Brenox</span>
-      </Link>
-
+      <div className="flex justify-center">
+      <Logo size="md" className="mb-8" />
+      </div>
       <div className="rounded-xl border border-border bg-card p-8 shadow-xl">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold">Welcome back</h1>

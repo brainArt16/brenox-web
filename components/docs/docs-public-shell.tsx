@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { Logo } from "@/components/brand/logo"
 import { useAuth } from "@/providers/auth-provider"
 
 export function DocsPublicShell({ children }: { children: React.ReactNode }) {
@@ -14,12 +14,7 @@ export function DocsPublicShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
         <nav className="container mx-auto flex h-14 items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <Zap className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-lg">Brenox</span>
-            </Link>
+            <Logo size="sm" />
             <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground">
               Documentation
             </Link>
