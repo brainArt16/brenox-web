@@ -28,8 +28,21 @@ export interface EngineVersionDoc {
 /** Engine release history — newest first */
 export const ENGINE_VERSION_CATALOG: EngineVersionDoc[] = [
   {
-    version: "1.0.0",
+    version: "1.1.0",
     status: "current",
+    released: "2026-07-31",
+    apiVersion: "v1",
+    baseUrl: "https://api.breno-x.com",
+    highlights: [
+      "Attachment content proxy — GET .../attachments/:id/content streams files with auth; storage paths stay hidden",
+      "Attachment url field returns the API content path instead of a presigned storage URL",
+      "message.new is broadcast for REST-created messages, so file sends appear in realtime",
+      "S3_PUBLIC_ENDPOINT for browser-facing presigned upload URLs behind Docker/MinIO",
+    ],
+  },
+  {
+    version: "1.0.0",
+    status: "supported",
     released: "2026-07-05",
     apiVersion: "v1",
     baseUrl: "https://api.breno-x.com",

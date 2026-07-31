@@ -32,8 +32,19 @@ export interface SdkVersionDoc {
 export const SDK_VERSION_CATALOG: Record<string, SdkVersionDoc[]> = {
   typescript: [
     {
-      version: "0.1.3",
+      version: "0.1.4",
       status: "current",
+      released: "2026-07-31",
+      highlights: [
+        "attachments.fetchContent() / createObjectUrl() — download files through the authenticated API, no storage URLs exposed",
+        "Attachment.url is now an API content path (engine ≥ 1.1.0), not a presigned storage URL",
+        "HttpClient.requestBlob() for binary responses with token refresh",
+      ],
+      installPackages: "@brenox/sdk@0.1.4",
+    },
+    {
+      version: "0.1.3",
+      status: "supported",
       released: "2026-07-05",
       highlights: [
         "BrenoxServer.sessions.create() — issue embed JWTs via POST /v1/sessions",

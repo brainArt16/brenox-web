@@ -90,7 +90,14 @@ await client.users.updateStatus({ status: "away" });`,
 await client.messages.send(workspaceId, channelId, {
   content: "See attached",
   attachments: [uploaded],
-});`,
+});
+
+// Display or download: bytes stream through the authenticated API,
+// so object-storage URLs are never exposed to the browser.
+const blobUrl = await client.attachments.createObjectUrl(
+  workspaceId, channelId, messageId, attachmentId,
+);
+imgEl.src = blobUrl; // revoke with URL.revokeObjectURL when done`,
     realtime: `const conn = client.channel(workspaceId, channelId, {
   origin: window.location.origin,
 });
