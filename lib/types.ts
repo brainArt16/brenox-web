@@ -78,6 +78,7 @@ export interface Plan {
   messages_limit: number
   connections_limit: number
   retention_days: number
+  max_apps: number
   webhooks_enabled: boolean
   video_calls_enabled: boolean
   moderation_enabled: boolean
@@ -91,7 +92,7 @@ export interface AdminPlan extends Plan {
   subscription_count: number
 }
 
-export interface AppSubscription {
+export interface AccountSubscription {
   plan_slug: string
   plan_name: string
   status: string
@@ -99,6 +100,7 @@ export interface AppSubscription {
   messages_limit: number
   connections_limit: number
   retention_days: number
+  max_apps: number
   webhooks_enabled: boolean
   video_calls_enabled: boolean
   moderation_enabled: boolean
@@ -106,16 +108,30 @@ export interface AppSubscription {
   needs_payment: boolean
 }
 
-export interface AppUsage {
+export interface AccountUsage {
   messages_this_month: number
   messages_limit: number
 }
 
-export interface AppBilling {
+export interface AppUsageBreakdown {
   app_id: number
-  subscription: AppSubscription
-  usage: AppUsage
+  app_name: string
+  app_slug: string
+  messages_this_month: number
 }
+
+export interface AccountBilling {
+  subscription: AccountSubscription
+  usage: AccountUsage
+  apps_count: number
+  apps_limit: number
+  app_usage: AppUsageBreakdown[]
+}
+
+/** @deprecated Use AccountBilling */
+export type AppBilling = AccountBilling
+/** @deprecated Use AccountSubscription */
+export type AppSubscription = AccountSubscription
 
 export interface PlatformStatus {
   maintenance_mode: boolean
@@ -128,13 +144,15 @@ export interface PlatformSettings {
 }
 
 export interface AdminSubscription {
-  app_id: number
-  app_name: string
-  app_slug: string
+  user_id: number
+  user_email: string
+  user_username: string
   plan_slug: string
   plan_name: string
   status: string
   current_period_end?: string
+  max_apps: number
+  apps_count: number
   messages_this_month: number
 }
 

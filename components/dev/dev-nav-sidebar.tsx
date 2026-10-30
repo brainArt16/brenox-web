@@ -7,7 +7,6 @@ import {
   Bell,
   BookOpen,
   Boxes,
-  CreditCard,
   ExternalLink,
   FlaskConical,
   Hash,
@@ -178,6 +177,13 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
           >
             Notifications
           </NavItem>
+          <NavItem
+            href="/settings/billing"
+            active={pathname.startsWith("/settings/billing")}
+            icon={Settings}
+          >
+            Billing
+          </NavItem>
           {showAdmin && (
             <NavItem href="/admin" active={pathname.startsWith("/admin")} icon={Shield}>
               Platform Admin
@@ -248,13 +254,6 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
                     icon={FlaskConical}
                   >
                     Sandbox
-                  </NavItem>
-                  <NavItem
-                    href={`/apps/${appId}/billing`}
-                    active={pathname.endsWith("/billing")}
-                    icon={CreditCard}
-                  >
-                    Billing
                   </NavItem>
                   <NavItem href={`/workspaces/${app.workspace_id}`} active={false} icon={ExternalLink}>
                     Open workspace
@@ -359,6 +358,13 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
               >
                 Account
               </NavItem>
+              <NavItem
+                href="/settings/billing"
+                active={pathname === "/settings/billing"}
+                icon={Settings}
+              >
+                Billing
+              </NavItem>
             </div>
           </>
         )}
@@ -389,6 +395,9 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
                   <Settings className="mr-2 h-4 w-4" />
                   Profile
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings/billing">Billing</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/docs">

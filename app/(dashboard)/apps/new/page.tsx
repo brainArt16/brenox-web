@@ -37,21 +37,18 @@ export default function NewAppPage() {
 
     setIsLoading(true)
     try {
-      const planSlug =
-        planFromUrl ||
-        (typeof window !== "undefined"
-          ? sessionStorage.getItem("brenox_selected_plan") ?? undefined
-          : undefined)
-      const app = await createApp(name.trim(), slug.trim() || slugify(name), planSlug ?? undefined)
-      if (planSlug) {
+      if (planFromUrl || sessionStorage.getItem("brenox_selected_plan")) {
         sessionStorage.removeItem("brenox_selected_plan")
-        router.replace(`/apps/${app.id}/billing`)
-      } else {
-        toast.success("App created — generate a sandbox key next")
-        router.replace(`/apps/${app.id}/keys`)
       }
+      const app = await createApp(name.trim(), slug.trim() || slugify(name))
+      toast.success("App created — generate a sandbox key next")
+      router.replace(`/apps/${app.id}/keys`)
     } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to create app"))
+      const message = getErrorMessage(error, "Failed to create app")
+      toast.error(message)
+      if (message.toLowerCase().includes("app limit")) {
+        router.push("/settings/billing")
+      }
     } finally {
       setIsLoading(false)
     }

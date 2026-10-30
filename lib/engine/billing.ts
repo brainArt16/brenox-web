@@ -1,5 +1,12 @@
 import { engineFetch } from "./client"
-import type { AdminPlan, AppBilling, Plan, PlatformSettings, PlatformStatus } from "@/lib/types"
+import type {
+  AccountBilling,
+  AdminPlan,
+  AdminSubscription,
+  Plan,
+  PlatformSettings,
+  PlatformStatus,
+} from "@/lib/types"
 
 export async function listPlans(): Promise<Plan[]> {
   const data = await engineFetch<{ plans: Plan[] }>("/api/plans", { auth: false })
@@ -10,15 +17,12 @@ export async function getPlatformStatus(): Promise<PlatformStatus> {
   return engineFetch<PlatformStatus>("/api/platform/status")
 }
 
-export async function getAppBilling(appId: number): Promise<AppBilling> {
-  return engineFetch<AppBilling>(`/api/apps/${appId}/billing`)
+export async function getAccountBilling(): Promise<AccountBilling> {
+  return engineFetch<AccountBilling>("/api/billing")
 }
 
-export async function createBillingCheckout(
-  appId: number,
-  planSlug: string
-): Promise<{ url: string }> {
-  return engineFetch<{ url: string }>(`/api/apps/${appId}/billing/checkout`, {
+export async function createBillingCheckout(planSlug: string): Promise<{ url: string }> {
+  return engineFetch<{ url: string }>("/api/billing/checkout", {
     method: "POST",
     body: JSON.stringify({ plan_slug: planSlug }),
   })
@@ -28,10 +32,10 @@ export async function getAdminBillingOverview(): Promise<{ active_subscriptions:
   return engineFetch("/api/admin/billing/overview")
 }
 
-export async function listAdminSubscriptions() {
-  const data = await engineFetch<{
-    subscriptions: import("@/lib/types").AdminSubscription[]
-  }>("/api/admin/billing/subscriptions")
+export async function listAdminSubscriptions(): Promise<AdminSubscription[]> {
+  const data = await engineFetch<{ subscriptions: AdminSubscription[] }>(
+    "/api/admin/billing/subscriptions"
+  )
   return data.subscriptions
 }
 
@@ -48,15 +52,15 @@ export async function updateAdminPlatformSettings(
   })
 }
 
-export async function getAdminAppBilling(appId: number): Promise<AppBilling> {
-  return engineFetch<AppBilling>(`/api/admin/apps/${appId}/billing`)
+export async function getAdminUserBilling(userId: number): Promise<AccountBilling> {
+  return engineFetch<AccountBilling>(`/api/admin/users/${userId}/billing`)
 }
 
-export async function updateAdminAppSubscription(
-  appId: number,
+export async function updateAdminUserSubscription(
+  userId: number,
   body: { plan_slug?: string; status?: string }
-): Promise<AppBilling> {
-  return engineFetch<AppBilling>(`/api/admin/apps/${appId}/subscription`, {
+): Promise<AccountBilling> {
+  return engineFetch<AccountBilling>(`/api/admin/users/${userId}/subscription`, {
     method: "PATCH",
     body: JSON.stringify(body),
   })
@@ -76,6 +80,7 @@ export type PlanUpsertBody = {
   messages_limit?: number
   connections_limit?: number
   retention_days?: number
+  max_apps?: number
   webhooks_enabled?: boolean
   video_calls_enabled?: boolean
   moderation_enabled?: boolean
@@ -84,7 +89,17 @@ export type PlanUpsertBody = {
   sort_order?: number
 }
 
-export async function createAdminPlan(body: PlanUpsertBody & { slug: string; name: string; price_cents: number; messages_limit: number; connections_limit: number; retention_days: number }): Promise<AdminPlan> {
+export async function createAdminPlan(
+  body: PlanUpsertBody & {
+    slug: string
+    name: string
+    price_cents: number
+    messages_limit: number
+    connections_limit: number
+    retention_days: number
+    max_apps: number
+  }
+): Promise<AdminPlan> {
   return engineFetch<AdminPlan>("/api/admin/plans", {
     method: "POST",
     body: JSON.stringify(body),

@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { AdminSubscriptionEditor } from "@/components/admin/admin-subscription-editor"
 import { getAdminUser, updateAdminUser } from "@/lib/engine/admin"
 import { getErrorMessage } from "@/lib/engine/errors"
 import { useAuth } from "@/providers/auth-provider"
@@ -152,6 +153,8 @@ export default function AdminUserDetailPage() {
           </dl>
         </div>
       </div>
+
+      <AdminSubscriptionEditor userId={userId} canWrite={canWrite} />
     </div>
   )
 }

@@ -135,7 +135,7 @@ export default function AdminAppDetailPage() {
         workspaceLinkPrefix="/admin/workspaces"
       />
 
-      <AdminSubscriptionEditor appId={appId} canWrite={canWrite} />
+      <AdminSubscriptionEditor userId={app.owner_id} canWrite={canWrite} />
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">

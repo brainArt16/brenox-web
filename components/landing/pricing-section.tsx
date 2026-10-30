@@ -8,8 +8,11 @@ import { listPlans } from "@/lib/engine/billing"
 import type { Plan } from "@/lib/types"
 
 function planFeatures(plan: Plan): string[] {
+  const appsLabel =
+    plan.max_apps < 0 ? "Unlimited apps" : `${plan.max_apps} app${plan.max_apps === 1 ? "" : "s"}`
   const features = [
-    `${plan.messages_limit.toLocaleString()} messages/month`,
+    appsLabel,
+    `${plan.messages_limit.toLocaleString()} shared messages/month`,
     `${plan.connections_limit.toLocaleString()} concurrent connections`,
     `${plan.retention_days}-day message history`,
   ]
@@ -63,7 +66,9 @@ export function PricingSection() {
                 </div>
                 <div className="mb-6">
                   <span className="text-4xl font-bold">{plan.price_display}</span>
-                  <span className="text-muted-foreground">/month</span>
+                  {plan.price_cents > 0 && (
+                    <span className="text-muted-foreground">/month</span>
+                  )}
                 </div>
                 <ul className="space-y-3 mb-8">
                   {planFeatures(plan).map((feature) => (

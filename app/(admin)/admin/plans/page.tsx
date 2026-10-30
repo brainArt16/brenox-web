@@ -26,6 +26,7 @@ type PlanDraft = {
   messages_limit: string
   connections_limit: string
   retention_days: string
+  max_apps: string
   sort_order: string
   webhooks_enabled: boolean
   video_calls_enabled: boolean
@@ -43,6 +44,7 @@ function toDraft(plan: AdminPlan): PlanDraft {
     messages_limit: String(plan.messages_limit),
     connections_limit: String(plan.connections_limit),
     retention_days: String(plan.retention_days),
+    max_apps: String(plan.max_apps ?? 1),
     sort_order: String(plan.sort_order ?? 0),
     webhooks_enabled: plan.webhooks_enabled,
     video_calls_enabled: plan.video_calls_enabled,
@@ -81,6 +83,7 @@ function PlanEditor({
         messages_limit: Number(draft.messages_limit),
         connections_limit: Number(draft.connections_limit),
         retention_days: Number(draft.retention_days),
+        max_apps: Number(draft.max_apps),
         sort_order: Number(draft.sort_order),
         webhooks_enabled: draft.webhooks_enabled,
         video_calls_enabled: draft.video_calls_enabled,
@@ -148,6 +151,10 @@ function PlanEditor({
         <div className="space-y-2">
           <Label>Retention (days)</Label>
           <Input value={draft.retention_days} disabled={!canWrite} onChange={(e) => setDraft({ ...draft, retention_days: e.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label>Max apps</Label>
+          <Input value={draft.max_apps} disabled={!canWrite} onChange={(e) => setDraft({ ...draft, max_apps: e.target.value })} />
         </div>
         <div className="space-y-2">
           <Label>Sort order</Label>
@@ -227,6 +234,7 @@ export default function AdminPlansPage() {
         messages_limit: 50000,
         connections_limit: 500,
         retention_days: 30,
+        max_apps: 2,
         is_active: true,
       })
       toast.success("Plan created")

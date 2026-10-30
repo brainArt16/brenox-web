@@ -49,10 +49,10 @@ export default function AdminBillingPage() {
     <div className="space-y-8">
       <PageHeader
         title="Billing"
-        description="Subscriptions and usage across all apps."
+        description="Account subscriptions and shared usage across the platform."
       />
 
-      <div className="rounded-xl border border-border p-6 max-w-xs">
+      <div className="max-w-xs rounded-xl border border-border p-6">
         <p className="text-sm text-muted-foreground">Active subscriptions</p>
         <p className="text-3xl font-semibold">{activeCount}</p>
       </div>
@@ -60,24 +60,27 @@ export default function AdminBillingPage() {
       {loading ? (
         <Skeleton className="h-64 w-full rounded-xl" />
       ) : (
-        <div className="rounded-xl border border-border overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl border border-border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>App</TableHead>
+                <TableHead>User</TableHead>
                 <TableHead>Plan</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Apps</TableHead>
                 <TableHead>Messages (month)</TableHead>
                 {canWrite && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {subscriptions.map((sub) => (
-                <TableRow key={sub.app_id}>
+                <TableRow key={sub.user_id}>
                   <TableCell>
-                    <Link href={`/admin/apps/${sub.app_id}`} className="hover:underline">
-                      <div className="font-medium">{sub.app_name}</div>
-                      <div className="text-xs text-muted-foreground font-mono">{sub.app_slug}</div>
+                    <Link href={`/admin/users/${sub.user_id}`} className="hover:underline">
+                      <div className="font-medium">{sub.user_email}</div>
+                      <div className="font-mono text-xs text-muted-foreground">
+                        {sub.user_username || `user #${sub.user_id}`}
+                      </div>
                     </Link>
                   </TableCell>
                   <TableCell>{sub.plan_name}</TableCell>
@@ -87,12 +90,13 @@ export default function AdminBillingPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {sub.messages_this_month.toLocaleString()}
+                    {sub.apps_count}/{sub.max_apps}
                   </TableCell>
+                  <TableCell>{sub.messages_this_month.toLocaleString()}</TableCell>
                   {canWrite && (
                     <TableCell className="text-right">
                       <Button size="sm" variant="outline" asChild>
-                        <Link href={`/admin/apps/${sub.app_id}#subscription`}>Manage</Link>
+                        <Link href={`/admin/users/${sub.user_id}#subscription`}>Manage</Link>
                       </Button>
                     </TableCell>
                   )}

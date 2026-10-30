@@ -14,34 +14,33 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
-  getAdminAppBilling,
+  getAdminUserBilling,
   listAdminPlans,
-  updateAdminAppSubscription,
+  updateAdminUserSubscription,
 } from "@/lib/engine/billing"
 import { getErrorMessage } from "@/lib/engine/errors"
 import { toast } from "sonner"
-import type { AdminPlan, AppBilling } from "@/lib/types"
+import type { AccountBilling, AdminPlan } from "@/lib/types"
 
 const SUBSCRIPTION_STATUSES = [
-  { value: "active", label: "Active", description: "Paid and in good standing" },
+  { value: "active", label: "Active", description: "In good standing — usage allowed" },
   { value: "trialing", label: "Trialing", description: "Trial period — usage allowed" },
-  { value: "incomplete", label: "Incomplete", description: "Checkout started — usage allowed" },
   { value: "past_due", label: "Past due", description: "Payment failed — usage blocked" },
   { value: "canceled", label: "Canceled", description: "Ended — usage blocked" },
 ] as const
 
 interface AdminSubscriptionEditorProps {
-  appId: number
+  userId: number
   canWrite: boolean
-  onSaved?: (billing: AppBilling) => void
+  onSaved?: (billing: AccountBilling) => void
 }
 
 export function AdminSubscriptionEditor({
-  appId,
+  userId,
   canWrite,
   onSaved,
 }: AdminSubscriptionEditorProps) {
-  const [billing, setBilling] = useState<AppBilling | null>(null)
+  const [billing, setBilling] = useState<AccountBilling | null>(null)
   const [plans, setPlans] = useState<AdminPlan[]>([])
   const [planSlug, setPlanSlug] = useState("")
   const [status, setStatus] = useState("")
@@ -52,7 +51,7 @@ export function AdminSubscriptionEditor({
     setLoading(true)
     try {
       const [billingData, planList] = await Promise.all([
-        getAdminAppBilling(appId),
+        getAdminUserBilling(userId),
         listAdminPlans(),
       ])
       setBilling(billingData)
@@ -64,12 +63,12 @@ export function AdminSubscriptionEditor({
     } finally {
       setLoading(false)
     }
-  }, [appId])
+  }, [userId])
 
   useEffect(() => {
-    if (!Number.isFinite(appId)) return
+    if (!Number.isFinite(userId)) return
     void load()
-  }, [appId, load])
+  }, [userId, load])
 
   const dirty =
     billing !== null &&
@@ -88,7 +87,7 @@ export function AdminSubscriptionEditor({
         body.status = status
       }
 
-      const updated = await updateAdminAppSubscription(appId, body)
+      const updated = await updateAdminUserSubscription(userId, body)
       setBilling(updated)
       setPlanSlug(updated.subscription.plan_slug)
       setStatus(updated.subscription.status)
@@ -108,7 +107,7 @@ export function AdminSubscriptionEditor({
   if (!billing) {
     return (
       <section className="rounded-xl border border-border bg-card p-6">
-        <p className="text-sm text-muted-foreground">No billing record for this app.</p>
+        <p className="text-sm text-muted-foreground">No billing record for this user.</p>
       </section>
     )
   }
@@ -123,17 +122,17 @@ export function AdminSubscriptionEditor({
   return (
     <section
       id="subscription"
-      className="scroll-mt-20 rounded-xl border border-border bg-card p-6 space-y-6"
+      className="scroll-mt-20 space-y-6 rounded-xl border border-border bg-card p-6"
     >
       <div className="space-y-1">
-        <h2 className="font-semibold">Subscription</h2>
+        <h2 className="font-semibold">Account subscription</h2>
         <p className="text-sm text-muted-foreground">
-          Override plan and status without Stripe. Changes apply immediately to quotas and feature
-          gates.
+          Override plan and status without Stripe. Shared quotas apply to all of this user&apos;s
+          apps.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+      <div className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border border-border p-4">
           <p className="text-muted-foreground">Current plan</p>
           <p className="mt-1 font-medium">{billing.subscription.plan_name}</p>
@@ -147,9 +146,9 @@ export function AdminSubscriptionEditor({
           </p>
         </div>
         <div className="rounded-lg border border-border p-4">
-          <p className="text-muted-foreground">Price</p>
+          <p className="text-muted-foreground">Apps</p>
           <p className="mt-1 font-medium">
-            ${(billing.subscription.price_cents / 100).toFixed(0)}/mo
+            {billing.apps_count}/{billing.apps_limit}
           </p>
         </div>
         <div className="rounded-lg border border-border p-4">
@@ -164,7 +163,7 @@ export function AdminSubscriptionEditor({
 
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Messages this month</span>
+          <span className="text-muted-foreground">Shared messages this month</span>
           <span>
             {billing.usage.messages_this_month.toLocaleString()} /{" "}
             {billing.usage.messages_limit.toLocaleString()}
@@ -174,7 +173,7 @@ export function AdminSubscriptionEditor({
       </div>
 
       {canWrite ? (
-        <div className="grid gap-4 sm:grid-cols-2 max-w-2xl border-t border-border pt-6">
+        <div className="grid max-w-2xl gap-4 border-t border-border pt-6 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="admin-plan">Plan</Label>
             <Select value={planSlug} onValueChange={setPlanSlug}>
@@ -192,8 +191,7 @@ export function AdminSubscriptionEditor({
             </Select>
             {selectedPlan ? (
               <p className="text-xs text-muted-foreground">
-                {selectedPlan.messages_limit.toLocaleString()} msgs ·{" "}
-                {selectedPlan.connections_limit.toLocaleString()} conn
+                {selectedPlan.max_apps} apps · {selectedPlan.messages_limit.toLocaleString()} msgs
                 {selectedPlan.webhooks_enabled ? " · webhooks" : ""}
                 {selectedPlan.video_calls_enabled ? " · video" : ""}
               </p>
@@ -226,7 +224,7 @@ export function AdminSubscriptionEditor({
           </div>
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground border-t border-border pt-4">
+        <p className="border-t border-border pt-4 text-sm text-muted-foreground">
           Platform admin role required to edit subscriptions.
         </p>
       )}
