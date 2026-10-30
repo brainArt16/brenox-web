@@ -116,6 +116,13 @@ export function AdminSubscriptionEditor({
     billing.usage.messages_limit > 0
       ? Math.min(100, (billing.usage.messages_this_month / billing.usage.messages_limit) * 100)
       : 0
+  const videoPct =
+    billing.usage.video_minutes_limit > 0
+      ? Math.min(
+          100,
+          (billing.usage.video_minutes_this_month / billing.usage.video_minutes_limit) * 100
+        )
+      : 0
 
   const selectedPlan = plans.find((plan) => plan.slug === planSlug)
 
@@ -172,6 +179,23 @@ export function AdminSubscriptionEditor({
         <Progress value={usagePct} className="h-2" />
       </div>
 
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Video minutes this month</span>
+          <span>
+            {(billing.usage.video_minutes_this_month ?? 0).toLocaleString()} /{" "}
+            {billing.usage.video_minutes_limit > 0
+              ? billing.usage.video_minutes_limit.toLocaleString()
+              : billing.subscription.video_calls_enabled
+                ? "∞"
+                : "off"}
+          </span>
+        </div>
+        {billing.usage.video_minutes_limit > 0 && (
+          <Progress value={videoPct} className="h-2" />
+        )}
+      </div>
+
       {canWrite ? (
         <div className="grid max-w-2xl gap-4 border-t border-border pt-6 sm:grid-cols-2">
           <div className="space-y-2">
@@ -193,7 +217,9 @@ export function AdminSubscriptionEditor({
               <p className="text-xs text-muted-foreground">
                 {selectedPlan.max_apps} apps · {selectedPlan.messages_limit.toLocaleString()} msgs
                 {selectedPlan.webhooks_enabled ? " · webhooks" : ""}
-                {selectedPlan.video_calls_enabled ? " · video" : ""}
+                {selectedPlan.video_calls_enabled
+                  ? ` · ${selectedPlan.video_minutes_limit.toLocaleString()} vid min · ${selectedPlan.max_call_participants} pax`
+                  : ""}
               </p>
             ) : null}
           </div>

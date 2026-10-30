@@ -69,6 +69,13 @@ export default function SettingsBillingPage() {
     billing.usage.messages_limit > 0
       ? Math.min(100, (billing.usage.messages_this_month / billing.usage.messages_limit) * 100)
       : 0
+  const videoPct =
+    billing.usage.video_minutes_limit > 0
+      ? Math.min(
+          100,
+          (billing.usage.video_minutes_this_month / billing.usage.video_minutes_limit) * 100
+        )
+      : 0
 
   const priceLabel =
     billing.subscription.price_cents === 0
@@ -79,7 +86,7 @@ export default function SettingsBillingPage() {
     <div className="space-y-8">
       <PageHeader
         title="Billing"
-        description="Account plan, shared message pool, and included apps."
+        description="Account plan, shared message pool, video minutes, and included apps."
         action={
           <Button variant="outline" asChild>
             <Link href="/settings/profile">Profile</Link>
@@ -100,6 +107,9 @@ export default function SettingsBillingPage() {
         <p className="text-sm text-muted-foreground">
           {priceLabel} · {billing.subscription.messages_limit.toLocaleString()} shared messages/mo ·{" "}
           {billing.apps_count}/{billing.apps_limit} apps
+          {billing.subscription.video_calls_enabled
+            ? ` · ${billing.subscription.video_minutes_limit.toLocaleString()} video min`
+            : " · video off"}
         </p>
       </div>
 
@@ -114,6 +124,28 @@ export default function SettingsBillingPage() {
         <Progress value={usagePct} className="h-2" />
       </div>
 
+      {billing.subscription.video_calls_enabled && (
+        <div className="rounded-xl border border-border p-6 space-y-3">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Video minutes this month</span>
+            <span>
+              {billing.usage.video_minutes_this_month.toLocaleString()} /{" "}
+              {billing.usage.video_minutes_limit > 0
+                ? billing.usage.video_minutes_limit.toLocaleString()
+                : "∞"}
+            </span>
+          </div>
+          {billing.usage.video_minutes_limit > 0 && (
+            <Progress value={videoPct} className="h-2" />
+          )}
+          {billing.subscription.max_call_participants > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Up to {billing.subscription.max_call_participants} participants per call
+            </p>
+          )}
+        </div>
+      )}
+
       {billing.app_usage.length > 0 && (
         <div className="rounded-xl border border-border p-6 space-y-3">
           <h2 className="font-medium">Usage by app</h2>
@@ -124,7 +156,10 @@ export default function SettingsBillingPage() {
                   {row.app_name}
                 </Link>
                 <span className="shrink-0 text-muted-foreground tabular-nums">
-                  {row.messages_this_month.toLocaleString()}
+                  {row.messages_this_month.toLocaleString()} msgs
+                  {row.video_minutes_this_month > 0
+                    ? ` · ${row.video_minutes_this_month.toLocaleString()} vid min`
+                    : ""}
                 </span>
               </li>
             ))}
@@ -150,7 +185,10 @@ export default function SettingsBillingPage() {
                   </p>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {plan.max_apps} apps · {plan.messages_limit.toLocaleString()} shared msgs
+                  {plan.max_apps} apps · {plan.messages_limit.toLocaleString()} msgs
+                  {plan.video_calls_enabled
+                    ? ` · ${plan.video_minutes_limit.toLocaleString()} vid min`
+                    : ""}
                 </p>
                 <Button
                   size="sm"

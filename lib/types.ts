@@ -79,6 +79,8 @@ export interface Plan {
   connections_limit: number
   retention_days: number
   max_apps: number
+  video_minutes_limit: number
+  max_call_participants: number
   webhooks_enabled: boolean
   video_calls_enabled: boolean
   moderation_enabled: boolean
@@ -101,6 +103,8 @@ export interface AccountSubscription {
   connections_limit: number
   retention_days: number
   max_apps: number
+  video_minutes_limit: number
+  max_call_participants: number
   webhooks_enabled: boolean
   video_calls_enabled: boolean
   moderation_enabled: boolean
@@ -111,6 +115,8 @@ export interface AccountSubscription {
 export interface AccountUsage {
   messages_this_month: number
   messages_limit: number
+  video_minutes_this_month: number
+  video_minutes_limit: number
 }
 
 export interface AppUsageBreakdown {
@@ -118,6 +124,7 @@ export interface AppUsageBreakdown {
   app_name: string
   app_slug: string
   messages_this_month: number
+  video_minutes_this_month: number
 }
 
 export interface AccountBilling {
@@ -154,6 +161,7 @@ export interface AdminSubscription {
   max_apps: number
   apps_count: number
   messages_this_month: number
+  video_minutes_this_month: number
 }
 
 export interface App {

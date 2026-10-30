@@ -17,7 +17,16 @@ function planFeatures(plan: Plan): string[] {
     `${plan.retention_days}-day message history`,
   ]
   if (plan.webhooks_enabled) features.push("Custom webhooks")
-  if (plan.video_calls_enabled) features.push("Video calls")
+  if (plan.video_calls_enabled) {
+    const mins =
+      plan.video_minutes_limit > 0
+        ? `${plan.video_minutes_limit.toLocaleString()} video minutes/month`
+        : "Video calls"
+    features.push(mins)
+    if (plan.max_call_participants > 0) {
+      features.push(`Up to ${plan.max_call_participants} call participants`)
+    }
+  }
   if (plan.moderation_enabled) features.push("Moderation tools")
   return features
 }

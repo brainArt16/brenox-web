@@ -68,7 +68,8 @@ export default function AdminBillingPage() {
                 <TableHead>Plan</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Apps</TableHead>
-                <TableHead>Messages (month)</TableHead>
+                <TableHead>Messages</TableHead>
+                <TableHead>Video min</TableHead>
                 {canWrite && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
@@ -93,6 +94,7 @@ export default function AdminBillingPage() {
                     {sub.apps_count}/{sub.max_apps}
                   </TableCell>
                   <TableCell>{sub.messages_this_month.toLocaleString()}</TableCell>
+                  <TableCell>{(sub.video_minutes_this_month ?? 0).toLocaleString()}</TableCell>
                   {canWrite && (
                     <TableCell className="text-right">
                       <Button size="sm" variant="outline" asChild>

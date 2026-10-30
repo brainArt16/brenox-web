@@ -81,6 +81,8 @@ export type PlanUpsertBody = {
   connections_limit?: number
   retention_days?: number
   max_apps?: number
+  video_minutes_limit?: number
+  max_call_participants?: number
   webhooks_enabled?: boolean
   video_calls_enabled?: boolean
   moderation_enabled?: boolean
