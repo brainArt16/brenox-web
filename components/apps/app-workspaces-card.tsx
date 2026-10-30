@@ -26,50 +26,61 @@ function Lane({
 }) {
   const isSandbox = tone === "sandbox"
   return (
-    <Link
-      href={href}
+    <div
       className={cn(
-        "group flex flex-col gap-3 rounded-xl border p-4 transition-all",
-        "hover:bg-surface-elevated",
-        isSandbox ? "border-warning/25 hover:border-warning/40" : "border-border hover:border-foreground/20"
+        "group relative flex flex-col overflow-hidden rounded-2xl border p-5 transition-all",
+        isSandbox
+          ? "border-warning/25 bg-warning/[0.03]"
+          : "border-border bg-surface/30"
       )}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent",
+          isSandbox ? "via-warning/50" : "via-foreground/25"
+        )}
+      />
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
           <div
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg",
-              isSandbox ? "bg-warning/15 text-warning" : "bg-surface-elevated text-muted-foreground"
+              "flex h-10 w-10 items-center justify-center rounded-xl",
+              isSandbox ? "bg-warning/15 text-warning" : "bg-foreground/10 text-foreground"
             )}
           >
-            {isSandbox ? <FlaskConical className="h-4 w-4" /> : <Radio className="h-4 w-4" />}
+            {isSandbox ? <FlaskConical className="h-5 w-5" /> : <Radio className="h-5 w-5" />}
           </div>
           <div>
             <Badge
               className={cn(
                 isSandbox
                   ? "border-warning/30 bg-warning/15 text-warning"
-                  : "border-primary/40 bg-primary/15 text-foreground"
+                  : "border-foreground/20 bg-foreground/10 text-foreground"
               )}
             >
               {label}
             </Badge>
-            <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
+            <p className="mt-1.5 text-xs text-muted-foreground">{subtitle}</p>
           </div>
         </div>
-        <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
       </div>
-      <div
-        className="flex items-center gap-1 font-mono text-sm"
-        onClick={(e) => e.preventDefault()}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        #{workspaceId}
-        <span onClick={(e) => e.stopPropagation()}>
+
+      <div className="mt-5 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
+        <div className="flex items-center gap-1.5 font-mono text-sm">
+          <span className="text-muted-foreground">#</span>
+          {workspaceId}
           <CopyButton value={String(workspaceId)} />
-        </span>
+        </div>
+        <Link
+          href={href}
+          className="inline-flex items-center gap-1 text-sm font-medium text-foreground underline-offset-4 hover:underline"
+        >
+          Open
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
-    </Link>
+    </div>
   )
 }
 
@@ -84,8 +95,8 @@ export function AppWorkspacesCard({
       description={
         <>
           Isolated live and sandbox workspaces on the same API.{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">bx_live_*</code> uses live;{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">bx_test_*</code> uses sandbox.
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">bx_live_*</code> → live ·{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">bx_test_*</code> → sandbox.
         </>
       }
     >
@@ -93,7 +104,7 @@ export function AppWorkspacesCard({
         <Lane
           href={`${workspaceLinkPrefix}/${liveWorkspaceId}`}
           label="Live"
-          subtitle="Production data"
+          subtitle="Production channels & messages"
           workspaceId={liveWorkspaceId}
           tone="live"
         />
@@ -101,12 +112,12 @@ export function AppWorkspacesCard({
           <Lane
             href={`${workspaceLinkPrefix}/${sandboxWorkspaceId}`}
             label="Sandbox"
-            subtitle="Test data only"
+            subtitle="Safe for keys, CI, and demos"
             workspaceId={sandboxWorkspaceId}
             tone="sandbox"
           />
         ) : (
-          <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+          <div className="rounded-2xl border border-dashed border-border p-5 text-sm text-muted-foreground">
             Sandbox workspace not provisioned yet.
           </div>
         )}

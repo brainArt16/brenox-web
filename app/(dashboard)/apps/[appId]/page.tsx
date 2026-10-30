@@ -3,19 +3,24 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { Key, Webhook, FlaskConical, ExternalLink, Boxes } from "lucide-react"
+import {
+  Boxes,
+  ExternalLink,
+  FlaskConical,
+  Key,
+  Webhook,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { PageHeader } from "@/components/layout/page-header"
 import { Panel } from "@/components/shared/panel"
-import { StatCard } from "@/components/shared/stat-card"
-import { QuickLinkTile } from "@/components/shared/quick-link-tile"
 import { FlowSteps } from "@/components/shared/flow-steps"
 import { CodeSnippet } from "@/components/shared/code-snippet"
 import { CopyButton } from "@/components/shared/copy-button"
 import { AllowedOriginsEditor } from "@/components/apps/allowed-origins-editor"
 import { AppWorkspacesCard } from "@/components/apps/app-workspaces-card"
+import { AppMetricCard } from "@/components/apps/app-metric-card"
+import { AppNavCard } from "@/components/apps/app-nav-card"
 import { getApp, getApiKeys, getWebhooks } from "@/lib/api"
 import { getDocSnippets } from "@/lib/docs/content"
 import type { App } from "@/lib/types"
@@ -45,12 +50,13 @@ export default function AppOverviewPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-16 w-72" />
+        <Skeleton className="h-40 w-full rounded-2xl" />
         <div className="grid gap-4 sm:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-24 rounded-xl" />
+            <Skeleton key={i} className="h-28 rounded-2xl" />
           ))}
         </div>
+        <Skeleton className="h-36 w-full rounded-2xl" />
       </div>
     )
   }
@@ -67,45 +73,110 @@ export default function AppOverviewPage() {
   }
 
   const snippet = getDocSnippets().serverIntegration
+  const hasKeys = keyCount > 0
+  const hasWebhooks = webhookCount > 0
+  const createdLabel = new Date(app.created_at).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        eyebrow="App"
-        title={app.name}
-        description={
-          <span className="inline-flex items-center gap-2 font-mono text-sm">
-            {app.slug}
-            <CopyButton value={app.slug} />
-          </span>
-        }
-        meta={
-          <div className="flex flex-wrap gap-2">
-            <Badge className="border-primary/40 bg-primary/15 text-foreground">Live</Badge>
-            <Badge className="border-warning/30 bg-warning/15 text-warning">Sandbox</Badge>
-          </div>
-        }
-        action={
-          <Button variant="outline" asChild>
-            <Link href={`/apps/${app.id}/keys`}>
-              <Key className="mr-2 h-4 w-4" />
-              API keys
-            </Link>
-          </Button>
-        }
-      />
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--card-shadow)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.06),transparent_55%)] dark:bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.07),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent" />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Active keys" value={keyCount} icon={Key} />
-        <StatCard label="Sandbox keys" value={sandboxCount} icon={FlaskConical} />
-        <StatCard label="Webhooks" value={webhookCount} icon={Webhook} />
-        <StatCard label="Live workspace" value={`#${app.workspace_id}`} icon={Boxes} />
+        <div className="relative flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0 space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                App
+              </p>
+              <Badge className="border-foreground/20 bg-foreground/10 text-foreground">Live</Badge>
+              <Badge className="border-warning/30 bg-warning/15 text-warning">Sandbox</Badge>
+            </div>
+
+            <div className="space-y-2">
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                {app.name}
+              </h1>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 font-mono">
+                  {app.slug}
+                  <CopyButton value={app.slug} />
+                </span>
+                <span className="text-border">·</span>
+                <span>Created {createdLabel}</span>
+                <span className="text-border">·</span>
+                <span className="font-mono text-xs">#{app.id}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href={`/apps/${app.id}/keys`}>
+                <Key className="mr-2 h-4 w-4" />
+                {hasKeys ? "Manage keys" : "Create key"}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href={`/apps/${app.id}/sandbox`}>
+                <FlaskConical className="mr-2 h-4 w-4" />
+                Sandbox
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href={`/workspaces/${app.workspace_id}`}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Live workspace
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Metrics */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <AppMetricCard
+          label="Active keys"
+          value={keyCount}
+          hint={hasKeys ? "Ready to integrate" : "Create your first key"}
+          icon={Key}
+          href={`/apps/${app.id}/keys`}
+        />
+        <AppMetricCard
+          label="Sandbox keys"
+          value={sandboxCount}
+          hint="bx_test_* only"
+          icon={FlaskConical}
+          href={`/apps/${app.id}/keys`}
+          tone="sandbox"
+        />
+        <AppMetricCard
+          label="Webhooks"
+          value={webhookCount}
+          hint={hasWebhooks ? "Endpoints configured" : "Optional next step"}
+          icon={Webhook}
+          href={`/apps/${app.id}/webhooks`}
+        />
+        <AppMetricCard
+          label="Live workspace"
+          value={`#${app.workspace_id}`}
+          hint="Production lane"
+          icon={Boxes}
+          href={`/workspaces/${app.workspace_id}`}
+          tone="live"
+        />
       </div>
 
-      <section className="space-y-4">
-        <h2 className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-          Integration flow
-        </h2>
+      {/* Setup flow */}
+      <Panel
+        title="Setup checklist"
+        description="Work through these once — then ship with live keys."
+      >
         <FlowSteps
           steps={[
             {
@@ -113,57 +184,68 @@ export default function AppOverviewPage() {
               title: "Create key",
               description: "Generate a sandbox bx_test_ key",
               href: `/apps/${app.id}/keys`,
-              active: keyCount === 0,
+              done: hasKeys,
+              active: !hasKeys,
             },
             {
               number: 2,
               title: "Test SDK",
               description: "Try BrenoxServer in sandbox",
               href: `/apps/${app.id}/sandbox`,
-              active: keyCount > 0,
+              done: false,
+              active: hasKeys && !hasWebhooks,
             },
             {
               number: 3,
               title: "Add webhook",
               description: "Receive realtime events",
               href: `/apps/${app.id}/webhooks`,
-              active: false,
+              done: hasWebhooks,
+              active: hasKeys && !hasWebhooks,
             },
             {
               number: 4,
               title: "Live workspace",
               description: "Production messages & channels",
               href: `/workspaces/${app.workspace_id}`,
-              active: false,
+              done: false,
+              active: hasKeys && hasWebhooks,
             },
           ]}
         />
-      </section>
+      </Panel>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <QuickLinkTile
+      {/* Navigation cards */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <AppNavCard
           href={`/apps/${app.id}/keys`}
           icon={Key}
           label="API Keys"
-          description="Sandbox and live credentials"
+          description="Sandbox and live credentials for SDK and /v1"
+          meta={`${keyCount} active`}
         />
-        <QuickLinkTile
+        <AppNavCard
           href={`/apps/${app.id}/webhooks`}
           icon={Webhook}
           label="Webhooks"
-          description="Push events to your backend"
+          description="Push message and presence events to your backend"
+          meta={`${webhookCount} configured`}
         />
-        <QuickLinkTile
+        <AppNavCard
           href={`/apps/${app.id}/sandbox`}
           icon={FlaskConical}
           label="Sandbox"
-          description="Safe playground for testing"
+          description="Safe playground for keys, CI, and demos"
+          meta="Test lane"
+          tone="sandbox"
         />
-        <QuickLinkTile
+        <AppNavCard
           href={`/workspaces/${app.workspace_id}`}
           icon={ExternalLink}
           label="Live workspace"
-          description="Channels and realtime chat"
+          description="Channels, members, and realtime chat"
+          meta={`#${app.workspace_id}`}
+          tone="live"
         />
       </div>
 
@@ -174,51 +256,15 @@ export default function AppOverviewPage() {
         sandboxWorkspaceId={app.sandbox_workspace_id}
       />
 
-      <Panel title="App details">
-        <dl className="space-y-0 text-sm">
-          <div className="flex items-center justify-between gap-4 border-b border-border py-3 first:pt-0">
-            <dt className="text-muted-foreground">Slug</dt>
-            <dd className="flex items-center gap-1 font-mono">
-              {app.slug}
-              <CopyButton value={app.slug} />
-            </dd>
-          </div>
-          <div className="flex items-center justify-between gap-4 border-b border-border py-3">
-            <dt className="text-muted-foreground">Live workspace</dt>
-            <dd className="flex items-center gap-1 font-mono">
-              {app.workspace_id}
-              <CopyButton value={String(app.workspace_id)} />
-            </dd>
-          </div>
-          {app.sandbox_workspace_id ? (
-            <div className="flex items-center justify-between gap-4 border-b border-border py-3">
-              <dt className="text-muted-foreground">Sandbox workspace</dt>
-              <dd className="flex items-center gap-1 font-mono">
-                {app.sandbox_workspace_id}
-                <CopyButton value={String(app.sandbox_workspace_id)} />
-              </dd>
-            </div>
-          ) : null}
-          <div className="flex items-center justify-between gap-4 pt-3">
-            <dt className="text-muted-foreground">Created</dt>
-            <dd>{new Date(app.created_at).toLocaleString()}</dd>
-          </div>
-        </dl>
-      </Panel>
-
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold">Getting started</h2>
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">Getting started</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Drop this into your server to provision users and open sessions.
+          </p>
+        </div>
         <CodeSnippet code={snippet} title="Server-side integration" />
       </section>
-
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface-elevated/80 px-5 py-4">
-        <Badge className="border-warning/30 bg-warning/15 text-warning">Sandbox</Badge>
-        <Badge className="border-primary/40 bg-primary/15 text-foreground">Live</Badge>
-        <span className="text-sm text-muted-foreground">
-          Use sandbox keys for dev/CI — they only touch the sandbox workspace. Ship live keys in
-          production.
-        </span>
-      </div>
     </div>
   )
 }

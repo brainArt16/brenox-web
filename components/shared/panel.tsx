@@ -21,7 +21,7 @@ export function Panel({
   return (
     <section
       className={cn(
-        "overflow-hidden rounded-xl border border-border bg-card shadow-[var(--card-shadow)]",
+        "overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--card-shadow)]",
         className
       )}
     >
