@@ -1,4 +1,7 @@
+"use client"
+
 import Link from "next/link"
+import { m } from "framer-motion"
 import {
   MessageSquare,
   Video,
@@ -14,48 +17,22 @@ import { Logo } from "@/components/brand/logo"
 import { DeveloperCodePreview } from "@/components/landing/developer-code-preview"
 import { PricingSection } from "@/components/landing/pricing-section"
 
+const fadeUp = {
+  initial: { opacity: 0, y: 18 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+}
+
 export function LandingBelowFold() {
   return (
     <>
-      {/* <TrustedBySection /> */}
       <FeaturesSection />
       <DeveloperSection />
-      {/* <TestimonialsSection /> */}
       <PricingSection />
       <CTASection />
       <Footer />
     </>
-  )
-}
-
-function TrustedBySection() {
-  const companies = [
-    "NovaStack",
-    "RelayHQ",
-    "Shipwright",
-    "Threadline",
-    "Pulsekit",
-    "Cloudforge",
-  ]
-
-  return (
-    <section className="py-16 border-y border-border bg-surface/50">
-      <div className="container mx-auto px-4">
-        <p className="text-center text-sm font-medium uppercase tracking-widest text-muted-foreground mb-10">
-          Trusted by teams building realtime products
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center">
-          {companies.map((company) => (
-            <div
-              key={company}
-              className="flex h-12 items-center justify-center rounded-lg border border-border/60 bg-card/40 px-4 text-sm font-semibold tracking-wide text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
-            >
-              {company}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
   )
 }
 
@@ -65,62 +42,75 @@ function FeaturesSection() {
       icon: Code2,
       title: "Pre-built UI Kit",
       description:
-        "Drop-in chat components and full templates — message lists, channel lists, threads, call screens. Themeable to match your brand.",
+        "Message lists, channels, threads, and call screens — themeable to match your product.",
     },
     {
       icon: MessageSquare,
-      title: "Realtime Messaging",
+      title: "Realtime messaging",
       description:
-        "Fully-working messaging out of the box: rich media, reactions, threads, typing indicators, and read receipts.",
+        "Media, reactions, threads, typing, and read receipts over a production WebSocket layer.",
     },
     {
       icon: Globe,
-      title: "Cross-Platform SDKs",
+      title: "Cross-platform SDKs",
       description:
-        "One platform, every surface. SDKs for React, JavaScript, iOS, Android, Flutter, and Electron desktop apps.",
+        "React, TypeScript, and more — one account, live + sandbox workspaces per app.",
     },
     {
       icon: Terminal,
-      title: "Headless Mode",
+      title: "Headless API",
       description:
-        "Bring your own UI. Use our realtime APIs and state hooks to power completely custom chat interfaces.",
+        "Hooks and REST for fully custom UIs without giving up realtime infrastructure.",
     },
     {
       icon: Video,
-      title: "Video & Voice Calls",
+      title: "Voice & video",
       description:
-        "Embed crystal-clear audio and HD video calling with screen sharing using a single component.",
+        "Signaling for calls with plan-based minutes and participant limits built in.",
     },
     {
       icon: Shield,
-      title: "Enterprise Security",
+      title: "Secure by default",
       description:
-        "End-to-end encryption, SOC 2 compliance, SSO, moderation tools, and role-based access control.",
+        "JWT auth, role-based access, origin allowlists, and isolated sandbox data lanes.",
     },
   ]
 
   return (
-    <section id="features" className="py-8 bg-surface scroll-mt-4">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything you need to ship chat, fast</h2>
-          <p className="text-muted-foreground text-lg">
-            Use pre-built components for instant integration, or build fully custom experiences on our SDKs. Your app, your UI, our infrastructure.
+    <section id="features" className="scroll-mt-20 border-t border-border bg-surface/40 py-24 sm:py-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <m.div {...fadeUp} className="mx-auto mb-14 max-w-2xl text-center">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            Ship chat without building the stack
+          </h2>
+          <p className="mt-3 text-base text-muted-foreground sm:text-lg">
+            Use drop-in components for speed, or headless APIs when you need full control.
           </p>
-        </div>
+        </m.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature) => (
-            <div
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature, index) => (
+            <m.div
               key={feature.title}
-              className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-colors"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{
+                duration: 0.45,
+                delay: index * 0.05,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-[var(--card-shadow)] transition-colors hover:border-foreground/20"
             >
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <feature.icon className="w-6 h-6 text-muted-foreground" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated text-muted-foreground transition-colors group-hover:text-foreground">
+                <feature.icon className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
-            </div>
+              <h3 className="text-base font-semibold">{feature.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {feature.description}
+              </p>
+            </m.div>
           ))}
         </div>
       </div>
@@ -130,104 +120,55 @@ function FeaturesSection() {
 
 function DeveloperSection() {
   return (
-    <section className="py-8">
-      <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-medium mb-6">
-              <Terminal className="w-4 h-4" />
-              Developer First
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">One component or full control — your choice</h2>
-            <p className="text-muted-foreground text-lg mb-6">
-              Drop in a complete chat experience with a single component, compose your layout from our UI Kit primitives, or go fully headless with hooks and SDKs.
+    <section className="py-24 sm:py-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <m.div {...fadeUp}>
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              Developer first
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+              One component — or full control
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Drop in a complete chat surface, compose UI kit primitives, or drive a custom
+              interface with the same realtime backend.
             </p>
 
-            <div className="space-y-4 mb-8">
+            <ul className="mt-8 space-y-4">
               {[
-                ["Drop-in Components", "ChatWindow, ChannelList, Thread, CallScreen — themeable and production-ready"],
-                ["Headless Hooks", "useChannel, useMessages, usePresence — realtime state for your own custom UI"],
-                ["Every Platform", "Type-safe SDKs for web, iOS, Android, Flutter, and desktop"],
+                ["Drop-in components", "ChatWindow, ChannelList, Thread — themeable and ready"],
+                ["Headless hooks", "useChannel, useMessages, usePresence for your own UI"],
+                ["Live + sandbox", "bx_live_* and bx_test_* keys on the same API host"],
               ].map(([title, description]) => (
-                <div key={title} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-4 h-4 text-success" />
-                  </div>
+                <li key={title} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
                   <div>
-                    <div className="font-medium">{title}</div>
-                    <div className="text-sm text-muted-foreground">{description}</div>
+                    <p className="text-sm font-medium text-foreground">{title}</p>
+                    <p className="text-sm text-muted-foreground">{description}</p>
                   </div>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
 
-            <Button asChild>
+            <Button asChild className="mt-8">
               <Link href="/docs">
-                Explore Documentation
-                <ArrowRight className="ml-2 w-4 h-4" />
+                Explore documentation
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-          </div>
+          </m.div>
 
-          <DeveloperCodePreview />
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function TestimonialsSection() {
-  const testimonials = [
-    {
-      quote:
-        "We replaced three months of in-house WebSocket work with Brenox in a weekend. Messaging, presence, and calls just worked.",
-      name: "Sarah Chen",
-      role: "CTO",
-      company: "RelayHQ",
-    },
-    {
-      quote:
-        "The React UI Kit got us to production fast, but the headless SDK let us customize the experience without fighting the platform.",
-      name: "Marcus Okonkwo",
-      role: "Lead Engineer",
-      company: "Shipwright",
-    },
-    {
-      quote:
-        "Pricing is straightforward, support is responsive, and our team finally ships chat features instead of maintaining infrastructure.",
-      name: "Elena Vasquez",
-      role: "Product Manager",
-      company: "Threadline",
-    },
-  ]
-
-  return (
-    <section id="testimonials" className="py-8 bg-surface scroll-mt-4">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Loved by builders shipping fast</h2>
-          <p className="text-muted-foreground text-lg">
-            Teams use Brenox to launch chat, calls, and presence without rebuilding realtime infrastructure from scratch.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {testimonials.map((testimonial) => (
-            <figure
-              key={testimonial.name}
-              className="flex flex-col rounded-xl border border-border bg-card p-6"
-            >
-              <blockquote className="flex-1 text-sm leading-relaxed text-muted-foreground">
-                &ldquo;{testimonial.quote}&rdquo;
-              </blockquote>
-              <figcaption className="mt-6 pt-6 border-t border-border">
-                <div className="font-semibold">{testimonial.name}</div>
-                <div className="text-sm text-muted-foreground">
-                  {testimonial.role}, {testimonial.company}
-                </div>
-              </figcaption>
-            </figure>
-          ))}
+          <m.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.55, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <DeveloperCodePreview />
+          </m.div>
         </div>
       </div>
     </section>
@@ -236,28 +177,37 @@ function TestimonialsSection() {
 
 function CTASection() {
   return (
-    <section className="py-8">
-      <div className="container mx-auto px-4">
-        <div className="relative rounded-2xl bg-gradient-to-br from-primary/20 via-background to-accent/20 border border-border p-12 text-center overflow-hidden">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-          <div className="relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to build something amazing?</h2>
-            <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-              Join teams building realtime experiences with Brenox. Plans start at $10/month.
+    <section className="pb-24 sm:pb-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <m.div
+          {...fadeUp}
+          className="relative overflow-hidden rounded-2xl border border-border bg-card px-6 py-14 text-center shadow-[var(--card-shadow)] sm:px-12"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06),transparent_65%)]"
+          />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent" />
+          <div className="relative">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Start building today
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-base text-muted-foreground">
+              Free Starter includes apps, messages, and video minutes. Upgrade when you grow.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="px-8">
-                <Link href="/#pricing">
-                  View Plans
-                  <ArrowRight className="ml-2 w-4 h-4" />
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button asChild size="lg" className="min-w-[160px]">
+                <Link href="/register">
+                  Create account
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="px-8">
-                <Link href="/register">Create an Account</Link>
+              <Button asChild variant="outline" size="lg" className="min-w-[160px]">
+                <Link href="/#pricing">Compare plans</Link>
               </Button>
             </div>
           </div>
-        </div>
+        </m.div>
       </div>
     </section>
   )
@@ -274,33 +224,36 @@ function Footer() {
       { name: "Documentation", href: "/docs" },
       { name: "TypeScript SDK", href: "/docs?sdk=typescript" },
       { name: "React SDK", href: "/docs?sdk=react" },
-      { name: "Get Started", href: "/register" },
+      { name: "Get started", href: "/register" },
     ],
     Account: [
       { name: "Sign in", href: "/login" },
       { name: "Register", href: "/register" },
-      { name: "Workspaces", href: "/workspaces" },
+      { name: "Billing", href: "/settings/billing" },
     ],
   }
 
   return (
-    <footer className="py-8 border-t border-border">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          <div className="col-span-2 md:col-span-1">
+    <footer className="border-t border-border py-14">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
+          <div className="col-span-2 md:col-span-2">
             <Logo size="sm" className="mb-4" />
-            <p className="text-sm text-muted-foreground">
-              Low-code chat infrastructure. SDKs and UI Kit for web, mobile, and desktop apps.
+            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+              Realtime chat infrastructure — SDKs and UI kit for web and beyond.
             </p>
           </div>
 
           {Object.entries(links).map(([category, items]) => (
             <div key={category}>
-              <h4 className="font-semibold mb-4">{category}</h4>
-              <ul className="space-y-2">
+              <h4 className="text-sm font-semibold">{category}</h4>
+              <ul className="mt-4 space-y-2.5">
                 {items.map((link) => (
                   <li key={link.name}>
-                    <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <Link
+                      href={link.href}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
                       {link.name}
                     </Link>
                   </li>
@@ -310,8 +263,11 @@ function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">2026 Brenox. All rights reserved.</p>
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-border pt-8 sm:flex-row sm:items-center">
+          <p className="text-sm text-muted-foreground">© 2026 Brenox</p>
+          <Link href="/docs" className="text-sm text-muted-foreground hover:text-foreground">
+            Documentation
+          </Link>
         </div>
       </div>
     </footer>

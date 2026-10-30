@@ -4,7 +4,6 @@ import { CodeSnippet } from "@/components/shared/code-snippet"
 
 const APP_TSX = `import { BrenoxProvider, ChatWindow } from '@brenox/react'
 
-// Full chat in your app with one component
 export function App() {
   return (
     <BrenoxProvider apiKey={process.env.BRENOX_API_KEY}>
@@ -20,7 +19,7 @@ export function DeveloperCodePreview() {
       title="App.tsx"
       language="tsx"
       showLineNumbers
-      className="shadow-2xl shadow-black/40"
+      className="overflow-hidden rounded-2xl border border-border shadow-[0_24px_80px_-24px_rgba(0,0,0,0.55)]"
     />
   )
 }
