@@ -13,14 +13,20 @@ export function StatCard({ label, value, hint, icon: Icon, className }: StatCard
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/30 hover:bg-surface-elevated",
+        "group relative overflow-hidden rounded-xl border border-border bg-card p-5 shadow-[var(--card-shadow)] transition-all",
+        "hover:border-foreground/15 hover:bg-surface-elevated",
         className
       )}
     >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
-          <p className="text-2xl font-semibold tabular-nums text-foreground">{value}</p>
+        <div className="min-w-0 space-y-1">
+          <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+            {label}
+          </p>
+          <p className="truncate text-2xl font-semibold tabular-nums tracking-tight text-foreground">
+            {value}
+          </p>
           {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
         </div>
         {Icon && (

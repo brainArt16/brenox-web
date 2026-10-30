@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Panel } from "@/components/shared/panel"
 import { updateAllowedOriginsRequest } from "@/lib/engine/apps"
 import type { App } from "@/lib/types"
 
@@ -53,25 +54,26 @@ export function AllowedOriginsEditor({ app, onSaved }: AllowedOriginsEditorProps
   }
 
   return (
-    <section className="rounded-xl border border-border bg-card p-6">
-      <div className="space-y-2">
-        <h2 className="font-semibold">Allowed browser origins</h2>
-        <p className="text-sm text-muted-foreground">
+    <Panel
+      title="Allowed browser origins"
+      description={
+        <>
           Add each HTTPS hostname where your frontend calls Brenox from the browser, for example{" "}
-          <code className="rounded bg-muted px-1 py-0.5">https://app.example.com</code>.
-          HTTP is allowed only for localhost/loopback development origins.{" "}
-          Server-side <code className="rounded bg-muted px-1 py-0.5">/v1</code> calls do not need this.{" "}
-          <Link href="/docs#browser-origins" className="font-medium text-primary hover:underline">
-            Documentation
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">https://app.example.com</code>.
+          HTTP is allowed only for localhost/loopback. Server-side{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">/v1</code> calls do not need this.{" "}
+          <Link href="/docs#browser-origins" className="font-medium text-foreground underline-offset-4 hover:underline">
+            Docs
           </Link>
-        </p>
-      </div>
-
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        </>
+      }
+    >
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           placeholder="https://app.example.com"
+          className="bg-surface"
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               event.preventDefault()
@@ -86,14 +88,16 @@ export function AllowedOriginsEditor({ app, onSaved }: AllowedOriginsEditorProps
 
       <ul className="mt-4 space-y-2">
         {origins.length === 0 ? (
-          <li className="text-sm text-muted-foreground">No origins configured yet.</li>
+          <li className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground">
+            No origins configured yet.
+          </li>
         ) : (
           origins.map((origin) => (
             <li
               key={origin}
-              className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2 text-sm"
+              className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface/40 px-3 py-2 text-sm"
             >
-              <span className="font-mono break-all">{origin}</span>
+              <span className="break-all font-mono text-xs sm:text-sm">{origin}</span>
               <Button type="button" variant="ghost" size="sm" onClick={() => removeOrigin(origin)}>
                 Remove
               </Button>
@@ -108,6 +112,6 @@ export function AllowedOriginsEditor({ app, onSaved }: AllowedOriginsEditorProps
       <Button className="mt-4" onClick={() => void save()} disabled={saving}>
         {saving ? "Saving…" : "Save origins"}
       </Button>
-    </section>
+    </Panel>
   )
 }
