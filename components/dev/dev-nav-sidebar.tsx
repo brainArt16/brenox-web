@@ -1,87 +1,103 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import {
-  ChevronDown,
+  Bell,
+  BookOpen,
+  Boxes,
+  CreditCard,
+  ExternalLink,
+  FlaskConical,
   Hash,
   Key,
   LayoutGrid,
   Lock,
+  LogOut,
   Plus,
-  BookOpen,
-  Boxes,
-  Bell,
   Settings,
+  Shield,
   Users,
   Webhook,
-  FlaskConical,
-  ExternalLink,
-  CreditCard,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import { getApps, getApp, getWorkspaces, getWorkspace, getChannels } from "@/lib/api"
-import { DOC_SECTIONS, getDocSectionsForSdk, DEFAULT_SDK_ID } from "@/lib/docs/content"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Logo } from "@/components/brand/logo"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
+import { getApps, getApp, getWorkspaces, getWorkspace, getChannels, getNotifications } from "@/lib/api"
+import { isPlatformAdmin } from "@/lib/engine/admin"
+import { getDocSectionsForSdk, DEFAULT_SDK_ID } from "@/lib/docs/content"
 import { useAuth } from "@/providers/auth-provider"
 import type { App, Channel, WorkspaceListItem } from "@/lib/types"
 
-function DocSubLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-2 py-1 pl-8 pr-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-    >
-      <span className="truncate">{children}</span>
-    </Link>
-  )
-}
-
-function NavLink({
+function NavItem({
   href,
   active,
   icon: Icon,
   children,
+  badge,
+  indented,
 }: {
   href: string
   active: boolean
   icon: React.ComponentType<{ className?: string }>
   children: React.ReactNode
+  badge?: number
+  indented?: boolean
 }) {
   return (
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors",
+        "group flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors",
+        indented && "pl-8",
         active
-          ? "bg-secondary text-foreground"
-          : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+          ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+          : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"
       )}
     >
-      <Icon className="w-4 h-4 flex-shrink-0" />
-      <span className="truncate flex-1">{children}</span>
+      <Icon className="h-4 w-4 shrink-0 opacity-80" />
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {badge !== undefined && badge > 0 && (
+        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
+          {badge > 9 ? "9+" : badge}
+        </span>
+      )}
     </Link>
+  )
+}
+
+function SectionLabel({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <div className="mb-1 mt-5 flex items-center gap-2 px-2.5 first:mt-0">
+      <span className="flex-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">
+        {children}
+      </span>
+      {action}
+    </div>
   )
 }
 
 export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
   const pathname = usePathname()
+  const router = useRouter()
   const searchParams = useSearchParams()
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+
   const [apps, setApps] = useState<App[]>([])
   const [app, setApp] = useState<App | null>(null)
   const [workspaces, setWorkspaces] = useState<WorkspaceListItem[]>([])
   const [workspace, setWorkspace] = useState<WorkspaceListItem | null>(null)
   const [channels, setChannels] = useState<Channel[]>([])
-  const [appsOpen, setAppsOpen] = useState(true)
-  const [channelsOpen, setChannelsOpen] = useState(true)
+  const [unread, setUnread] = useState(0)
 
   const appIdMatch = pathname.match(/^\/apps\/(\d+)/)
   const appId = appIdMatch ? Number(appIdMatch[1]) : null
@@ -91,11 +107,20 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
   const docsSdkId = searchParams.get("sdk") ?? DEFAULT_SDK_ID
   const docsVersion = searchParams.get("v")
 
+  const inApps = pathname.startsWith("/apps")
+  const inWorkspaces = pathname.startsWith("/workspaces")
+  const inDocs = pathname.startsWith("/docs")
+  const inSettings = pathname.startsWith("/settings")
+  const inNotifications = pathname.startsWith("/notifications")
+  const showAdmin = isPlatformAdmin(user?.platform_role)
+
   useEffect(() => {
-    if (pathname.startsWith("/apps")) {
-      void getApps().then(setApps)
-    }
+    void getNotifications().then((n) => setUnread(n.filter((x) => !x.read).length))
   }, [pathname])
+
+  useEffect(() => {
+    if (inApps) void getApps().then(setApps)
+  }, [inApps, pathname])
 
   useEffect(() => {
     if (appId) {
@@ -106,10 +131,8 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
   }, [appId])
 
   useEffect(() => {
-    if (pathname.startsWith("/workspaces")) {
-      void getWorkspaces().then(setWorkspaces)
-    }
-  }, [pathname])
+    if (inWorkspaces) void getWorkspaces().then(setWorkspaces)
+  }, [inWorkspaces, pathname])
 
   useEffect(() => {
     if (wsId) {
@@ -121,225 +144,274 @@ export function DevNavSidebar({ embedded = false }: { embedded?: boolean }) {
     }
   }, [wsId])
 
-  const headerTitle =
-    app?.name ??
-    workspace?.name ??
-    (pathname.startsWith("/settings") ? "Settings" : pathname.startsWith("/docs") ? "Documentation" : pathname.startsWith("/resources") ? "Resources" : pathname.startsWith("/notifications") ? "Notifications" : "Developer Console")
+  const displayName = user?.username?.trim() || user?.email?.split("@")[0] || "Developer"
+  const initials = displayName.slice(0, 2).toUpperCase()
 
   return (
     <aside
       className={cn(
-        "h-full flex flex-col bg-surface border-r border-border",
-        embedded ? "flex w-full" : "hidden md:flex w-60 h-screen"
+        "flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
+        embedded ? "w-full" : "hidden h-screen w-60 md:flex"
       )}
     >
-      <div className="h-14 px-4 flex items-center border-b border-border">
-        <span className="font-semibold truncate">{headerTitle}</span>
+      <div className="flex h-14 shrink-0 items-center gap-2 border-b border-sidebar-border px-4">
+        <Logo size="sm" href="/apps" priority />
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-2 py-3 flex flex-col">
-        {/* Apps section */}
-        {(pathname.startsWith("/apps")) && (
+      <div className="flex-1 overflow-y-auto px-2 py-3 scrollbar-thin">
+        <SectionLabel>Console</SectionLabel>
+        <div className="space-y-0.5">
+          <NavItem href="/apps" active={inApps} icon={LayoutGrid}>
+            Apps
+          </NavItem>
+          <NavItem href="/workspaces" active={inWorkspaces} icon={Boxes}>
+            Workspaces
+          </NavItem>
+          <NavItem href="/docs" active={inDocs} icon={BookOpen}>
+            Docs
+          </NavItem>
+          <NavItem
+            href="/notifications"
+            active={inNotifications}
+            icon={Bell}
+            badge={unread}
+          >
+            Notifications
+          </NavItem>
+          {showAdmin && (
+            <NavItem href="/admin" active={pathname.startsWith("/admin")} icon={Shield}>
+              Platform Admin
+            </NavItem>
+          )}
+        </div>
+
+        {inApps && (
           <>
-            <Collapsible open={appsOpen} onOpenChange={setAppsOpen}>
-              <div className="group flex items-center gap-1 px-2 py-1.5">
-                <CollapsibleTrigger className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground uppercase tracking-wide">
-                  <ChevronDown className={cn("w-3 h-3 transition-transform", !appsOpen && "-rotate-90")} />
-                  Apps
-                </CollapsibleTrigger>
+            <SectionLabel
+              action={
                 <Link
                   href="/apps/new"
-                  className="ml-auto p-1 hover:bg-secondary rounded-sm opacity-0 group-hover:opacity-100"
+                  className="rounded-sm p-1 text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
                   aria-label="New app"
                 >
-                  <Plus className="w-3 h-3" />
+                  <Plus className="h-3.5 w-3.5" />
                 </Link>
-              </div>
-              <CollapsibleContent>
-                <div className="space-y-0.5 mb-4">
-                  <NavLink href="/apps" active={pathname === "/apps"} icon={LayoutGrid}>
-                    All apps
-                  </NavLink>
-                  {apps.map((a) => (
-                    <NavLink
-                      key={a.id}
-                      href={`/apps/${a.id}`}
-                      active={appId === a.id && !pathname.includes("/keys") && !pathname.includes("/webhooks") && !pathname.includes("/sandbox") && !pathname.includes("/billing")}
-                      icon={LayoutGrid}
-                    >
-                      {a.name}
-                    </NavLink>
-                  ))}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
+              }
+            >
+              Your apps
+            </SectionLabel>
+            <div className="space-y-0.5">
+              <NavItem href="/apps" active={pathname === "/apps"} icon={LayoutGrid} indented>
+                All apps
+              </NavItem>
+              {apps.map((a) => (
+                <NavItem
+                  key={a.id}
+                  href={`/apps/${a.id}`}
+                  active={appId === a.id}
+                  icon={LayoutGrid}
+                  indented
+                >
+                  {a.name}
+                </NavItem>
+              ))}
+            </div>
 
             {appId && app && (
-              <div className="mb-4">
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  {app.name}
-                </div>
-                <div className="space-y-0.5">
-                  <NavLink href={`/apps/${appId}`} active={pathname === `/apps/${appId}`} icon={LayoutGrid}>
-                    Overview
-                  </NavLink>
-                  <NavLink href={`/apps/${appId}/keys`} active={pathname.endsWith("/keys")} icon={Key}>
-                    API Keys
-                  </NavLink>
-                  <NavLink href={`/apps/${appId}/webhooks`} active={pathname.endsWith("/webhooks")} icon={Webhook}>
-                    Webhooks
-                  </NavLink>
-                  <NavLink href={`/apps/${appId}/sandbox`} active={pathname.endsWith("/sandbox")} icon={FlaskConical}>
-                    Sandbox
-                  </NavLink>
-                  <NavLink href={`/apps/${appId}/billing`} active={pathname.endsWith("/billing")} icon={CreditCard}>
-                    Billing
-                  </NavLink>
-                  <NavLink href={`/workspaces/${app.workspace_id}`} active={false} icon={ExternalLink}>
-                    Open workspace
-                  </NavLink>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Workspaces section */}
-        {pathname.startsWith("/workspaces") && (
-          <>
-            {!wsId && (
-              <div className="space-y-0.5">
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Workspaces
-                </div>
-                {workspaces.map((ws) => (
-                  <NavLink
-                    key={ws.id}
-                    href={`/workspaces/${ws.id}`}
-                    active={wsId === ws.id || (pathname === "/workspaces" && false)}
-                    icon={Hash}
-                  >
-                    {ws.name}
-                  </NavLink>
-                ))}
-              </div>
-            )}
-
-            {wsId && workspace && (
               <>
-                <Collapsible open={channelsOpen} onOpenChange={setChannelsOpen}>
-                  <CollapsibleTrigger className="w-full flex items-center gap-1 px-2 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground uppercase tracking-wide">
-                    <ChevronDown className={cn("w-3 h-3 transition-transform", !channelsOpen && "-rotate-90")} />
-                    Channels
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="space-y-0.5">
-                      {channels.map((ch) => (
-                        <Link
-                          key={ch.ID}
-                          href={`/workspaces/${wsId}?channel=${ch.ID}`}
-                          className={cn(
-                            "flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors",
-                            activeChannelId === String(ch.ID) || (!activeChannelId && channels[0]?.ID === ch.ID)
-                              ? "bg-secondary text-foreground"
-                              : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
-                          )}
-                        >
-                          {ch.IsReadOnly ? (
-                            <Lock className="w-4 h-4 flex-shrink-0" />
-                          ) : (
-                            <Hash className="w-4 h-4 flex-shrink-0" />
-                          )}
-                          <span className="truncate">{ch.Name}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <div className="mt-4 space-y-0.5">
-                  <NavLink
-                    href={`/workspaces/${wsId}/settings/members`}
-                    active={pathname.includes("/settings/members")}
-                    icon={Users}
+                <SectionLabel>{app.name}</SectionLabel>
+                <div className="space-y-0.5">
+                  <NavItem
+                    href={`/apps/${appId}`}
+                    active={pathname === `/apps/${appId}`}
+                    icon={LayoutGrid}
                   >
-                    Members
-                  </NavLink>
+                    Overview
+                  </NavItem>
+                  <NavItem
+                    href={`/apps/${appId}/keys`}
+                    active={pathname.endsWith("/keys")}
+                    icon={Key}
+                  >
+                    API Keys
+                  </NavItem>
+                  <NavItem
+                    href={`/apps/${appId}/webhooks`}
+                    active={pathname.endsWith("/webhooks")}
+                    icon={Webhook}
+                  >
+                    Webhooks
+                  </NavItem>
+                  <NavItem
+                    href={`/apps/${appId}/sandbox`}
+                    active={pathname.endsWith("/sandbox")}
+                    icon={FlaskConical}
+                  >
+                    Sandbox
+                  </NavItem>
+                  <NavItem
+                    href={`/apps/${appId}/billing`}
+                    active={pathname.endsWith("/billing")}
+                    icon={CreditCard}
+                  >
+                    Billing
+                  </NavItem>
+                  <NavItem href={`/workspaces/${app.workspace_id}`} active={false} icon={ExternalLink}>
+                    Open workspace
+                  </NavItem>
                 </div>
               </>
             )}
           </>
         )}
 
-        {pathname.startsWith("/settings") && (
-          <div className="space-y-0.5">
-            <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Settings
+        {inWorkspaces && (
+          <>
+            {!wsId && (
+              <>
+                <SectionLabel>Workspaces</SectionLabel>
+                <div className="space-y-0.5">
+                  {workspaces.length === 0 ? (
+                    <p className="px-2.5 py-1.5 text-xs text-muted-foreground">No workspaces yet</p>
+                  ) : (
+                    workspaces.map((ws) => (
+                      <NavItem
+                        key={ws.id}
+                        href={`/workspaces/${ws.id}`}
+                        active={false}
+                        icon={Boxes}
+                        indented
+                      >
+                        {ws.name}
+                      </NavItem>
+                    ))
+                  )}
+                </div>
+              </>
+            )}
+
+            {wsId && workspace && (
+              <>
+                <SectionLabel>{workspace.name}</SectionLabel>
+                <div className="space-y-0.5">
+                  {channels.map((ch) => (
+                    <Link
+                      key={ch.ID}
+                      href={`/workspaces/${wsId}?channel=${ch.ID}`}
+                      className={cn(
+                        "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors",
+                        activeChannelId === String(ch.ID) ||
+                          (!activeChannelId && channels[0]?.ID === ch.ID)
+                          ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                          : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"
+                      )}
+                    >
+                      {ch.IsReadOnly ? (
+                        <Lock className="h-4 w-4 shrink-0 opacity-80" />
+                      ) : (
+                        <Hash className="h-4 w-4 shrink-0 opacity-80" />
+                      )}
+                      <span className="truncate">{ch.Name}</span>
+                    </Link>
+                  ))}
+                  <NavItem
+                    href={`/workspaces/${wsId}/settings/members`}
+                    active={pathname.includes("/settings/members")}
+                    icon={Users}
+                  >
+                    Members
+                  </NavItem>
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {inDocs && (
+          <>
+            <SectionLabel>Guides</SectionLabel>
+            <div className="space-y-0.5">
+              {getDocSectionsForSdk(docsSdkId).map((section) => {
+                const q = new URLSearchParams({ sdk: docsSdkId })
+                if (docsVersion) q.set("v", docsVersion)
+                return (
+                  <Link
+                    key={section.id}
+                    href={`/docs?${q.toString()}#${section.id}`}
+                    className="block truncate rounded-md px-2.5 py-1.5 pl-8 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+                  >
+                    {section.label}
+                  </Link>
+                )
+              })}
             </div>
-            <NavLink href="/settings/profile" active={pathname === "/settings/profile"} icon={Settings}>
-              Account
-            </NavLink>
-            <NavLink href="/notifications" active={pathname === "/notifications"} icon={Bell}>
-              Notifications
-            </NavLink>
-          </div>
+          </>
         )}
 
-        {pathname.startsWith("/notifications") && (
-          <div className="space-y-0.5">
-            <NavLink href="/notifications" active={pathname === "/notifications"} icon={Bell}>
-              All notifications
-            </NavLink>
-          </div>
+        {inSettings && (
+          <>
+            <SectionLabel>Settings</SectionLabel>
+            <div className="space-y-0.5">
+              <NavItem
+                href="/settings/profile"
+                active={pathname === "/settings/profile"}
+                icon={Settings}
+              >
+                Account
+              </NavItem>
+            </div>
+          </>
         )}
-
-        <div className="mt-auto space-y-0.5 pt-4">
-          <div className="px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Resources
-          </div>
-          <NavLink href="/docs" active={pathname.startsWith("/docs")} icon={BookOpen}>
-            Documentation
-          </NavLink>
-          <NavLink href="/resources" active={pathname.startsWith("/resources")} icon={Boxes}>
-            Resources
-          </NavLink>
-          {pathname.startsWith("/docs") &&
-            getDocSectionsForSdk(docsSdkId).map((section) => {
-              const q = new URLSearchParams({ sdk: docsSdkId })
-              if (docsVersion) q.set("v", docsVersion)
-              return (
-                <DocSubLink
-                  key={section.id}
-                  href={`/docs?${q.toString()}#${section.id}`}
-                >
-                  {section.label}
-                </DocSubLink>
-              )
-            })}
-        </div>
       </div>
 
-      <div className="p-2 border-t border-border bg-surface-elevated">
-        <Link
-          href="/settings/profile"
-          className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary/50 transition-colors"
-        >
-          <div className="relative">
-            <Avatar className="w-8 h-8">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                {user?.username?.slice(0, 2).toUpperCase() ?? "BX"}
-              </AvatarFallback>
-            </Avatar>
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-online border-2 border-surface-elevated rounded-full" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user?.username ?? "Developer"}</p>
-            <p className="text-xs text-muted-foreground truncate">Online</p>
-          </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-            <Settings className="w-4 h-4" />
-          </Button>
-        </Link>
+      <div className="shrink-0 border-t border-sidebar-border p-2">
+        <div className="flex items-center gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-sidebar-accent"
+              >
+                <Avatar className="h-7 w-7">
+                  <AvatarFallback className="bg-primary text-[10px] font-semibold text-primary-foreground">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium leading-tight">{displayName}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">{user?.email}</p>
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link href="/settings/profile">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/docs">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Documentation
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onSelect={(e) => {
+                  e.preventDefault()
+                  logout()
+                  router.replace("/login")
+                }}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ThemeToggle className="h-8 w-8 shrink-0" />
+        </div>
       </div>
     </aside>
   )
